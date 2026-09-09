@@ -1,0 +1,35 @@
+# ==============================================================================
+# Bangla Sketch - cPanel Apache / LiteSpeed .htaccess Configuration Example
+# ==============================================================================
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Force HTTPS
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Optional: Reverse proxy /api requests to local Express backend on port 5000
+  # Uncomment the lines below if hosting frontend and backend on the same domain:
+  # RewriteRule ^api/(.*)$ http://127.0.0.1:5000/api/$1 [P,L]
+  # ProxyPassReverse /api http://127.0.0.1:5000/api
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Caching for static assets (fonts, images, svg, icons)
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>

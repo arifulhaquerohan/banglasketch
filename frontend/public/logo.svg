@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Bangla Sketch – Interior Architecture, Dhaka">
+  <defs>
+    <!-- Rich deep emerald-obsidian badge background -->
+    <radialGradient id="badgeBg" cx="45%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#1B382B"/>
+      <stop offset="55%" stop-color="#0F241B"/>
+      <stop offset="100%" stop-color="#07130E"/>
+    </radialGradient>
+
+    <!-- Polished architectural gold gradients -->
+    <linearGradient id="goldPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDF3CD"/>
+      <stop offset="25%" stop-color="#E5C778"/>
+      <stop offset="60%" stop-color="#C5A059"/>
+      <stop offset="100%" stop-color="#936D28"/>
+    </linearGradient>
+
+    <linearGradient id="goldLight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8DC"/>
+      <stop offset="50%" stop-color="#E8CE8A"/>
+      <stop offset="100%" stop-color="#C5A059"/>
+    </linearGradient>
+
+    <linearGradient id="goldAccent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#936D28"/>
+      <stop offset="50%" stop-color="#D8B86E"/>
+      <stop offset="100%" stop-color="#FFF0BE"/>
+    </linearGradient>
+
+    <!-- Bangladesh heritage rising sun -->
+    <radialGradient id="sunGlow" cx="42%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#FF5E6D"/>
+      <stop offset="50%" stop-color="#E82438"/>
+      <stop offset="100%" stop-color="#B20F20"/>
+    </radialGradient>
+
+    <!-- Subtle drop shadow for architectural depth -->
+    <filter id="subtleShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Outer circular medallion with luxury double gold border -->
+  <circle cx="256" cy="256" r="246" fill="url(#badgeBg)"/>
+
+  <!-- Outer precision gold rim -->
+  <circle cx="256" cy="256" r="244" fill="none" stroke="url(#goldPrimary)" stroke-width="10"/>
+  <circle cx="256" cy="256" r="228" fill="none" stroke="#E5C778" stroke-width="1.75" opacity="0.6"/>
+  <circle cx="256" cy="256" r="218" fill="none" stroke="#C5A059" stroke-width="1.25" stroke-dasharray="3 7" opacity="0.45"/>
+
+  <!-- Compass / Star Accents at 4 cardinal points -->
+  <g fill="url(#goldLight)">
+    <polygon points="256,18 261,28 256,38 251,28"/>
+    <polygon points="256,474 261,484 256,494 251,484"/>
+    <polygon points="18,256 28,251 38,256 28,261"/>
+    <polygon points="474,256 484,251 494,256 484,261"/>
+  </g>
+
+  <!-- Architectural Content Group with subtle elevation shadow -->
+  <g filter="url(#subtleShadow)">
+    <!-- Heritage Rising Sun (positioned behind the archway, symbol of Bangladesh) -->
+    <circle cx="256" cy="225" r="46" fill="url(#sunGlow)"/>
+    <circle cx="256" cy="225" r="46" fill="none" stroke="#FFE3A0" stroke-width="2" opacity="0.65"/>
+
+    <!-- Architectural drafting guides (clean, high-legibility geometric lines) -->
+    <path d="M120 280 L256 142 L392 280" fill="none" stroke="#C5A059" stroke-width="2" opacity="0.35"/>
+    <line x1="140" y1="280" x2="140" y2="385" stroke="#C5A059" stroke-width="2" opacity="0.35"/>
+    <line x1="372" y1="280" x2="372" y2="385" stroke="#C5A059" stroke-width="2" opacity="0.35"/>
+
+    <!-- Primary Architectural Gable Roof (bold, crisp, unmistakable) -->
+    <!-- Outer roof bevel -->
+    <path d="M110 286 L256 138 L402 286" fill="none" stroke="url(#goldPrimary)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Inner bright roof highlight stroke for 3D metallic feel -->
+    <path d="M112 284 L256 140 L400 284" fill="none" stroke="#FFF8DC" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+
+    <!-- Left & Right Structural Columns / Walls -->
+    <line x1="142" y1="298" x2="142" y2="390" stroke="url(#goldLight)" stroke-width="16" stroke-linecap="round"/>
+    <line x1="370" y1="298" x2="370" y2="390" stroke="url(#goldLight)" stroke-width="16" stroke-linecap="round"/>
+
+    <!-- Fine column highlight lines -->
+    <line x1="142" y1="304" x2="142" y2="384" stroke="#FFF8DC" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+    <line x1="370" y1="304" x2="370" y2="384" stroke="#FFF8DC" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+
+    <!-- Interior Grand Archway (Welcoming Space & Interior Architecture) -->
+    <!-- Dark portal interior -->
+    <path d="M198 392 V310 A58 58 0 0 1 314 310 V392 Z" fill="#0A1812"/>
+    <!-- Gold portal arch frame -->
+    <path d="M198 392 V310 A58 58 0 0 1 314 310 V392" fill="none" stroke="url(#goldAccent)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Inner delicate arch drafting curve -->
+    <path d="M218 392 V318 A38 38 0 0 1 294 318 V392" fill="none" stroke="#FDF3CD" stroke-width="2" stroke-dasharray="4 5" opacity="0.75"/>
+
+    <!-- Studio Plinth / Base Foundation Beam -->
+    <line x1="96" y1="395" x2="416" y2="395" stroke="url(#goldPrimary)" stroke-width="14" stroke-linecap="round"/>
+    <line x1="102" y1="393" x2="410" y2="393" stroke="#FFF8DC" stroke-width="2" opacity="0.8"/>
+
+    <!-- Precision Drafting Compass Apex Star (representing "Sketch" / design excellence) -->
+    <g transform="translate(256, 102)">
+      <polygon points="0,-16 5,-4 16,0 5,4 0,16 -5,4 -16,0 -5,-4" fill="url(#goldLight)"/>
+      <circle cx="0" cy="0" r="3.5" fill="#0E2319"/>
+    </g>
+  </g>
+
+  <!-- Elegant Studio Monogram (BS - Bangla Sketch) subtly anchored in the foundation -->
+  <text x="256" y="446" text-anchor="middle" font-family="'Cinzel', 'Trajan Pro', Georgia, 'Times New Roman', serif" font-weight="700" font-size="30" letter-spacing="10" fill="url(#goldPrimary)">DHAKA</text>
+  <line x1="168" y1="456" x2="344" y2="456" stroke="#C5A059" stroke-width="1.2" opacity="0.5"/>
+</svg>

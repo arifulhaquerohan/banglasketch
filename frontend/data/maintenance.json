@@ -1,0 +1,15 @@
+{
+  "enabled": false,
+  "mode": "fullscreen",
+  "title": "Under Maintenance",
+  "titleBn": "আমাদের ওয়েবসাইট রক্ষণাবেক্ষণ চলছে",
+  "message": "We will be back shortly",
+  "messageBn": "উন্নত গ্রাহক অভিজ্ঞতার লক্ষ্যে আমাদের ওয়েবসাইটটিতে সিস্টেম আপগ্রেড চলছে। খুব শীঘ্রই আমরা পুনরায় সক্রিয় হবো।",
+  "estimatedEndTime": "",
+  "contactWhatsApp": "8801712458794",
+  "contactPhone": "+880 1712-458794",
+  "contactEmail": "contact@banglasketch.com",
+  "showContactButtons": true,
+  "allowDismiss": true,
+  "updatedAt": "2026-09-07T19:42:13.353Z"
+}

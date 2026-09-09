@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="Bangla Sketch – Interior Architecture, Dhaka">
+  <defs>
+    <!-- Rich deep emerald-obsidian badge background -->
+    <radialGradient id="badgeBgWm" cx="45%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#1B382B"/>
+      <stop offset="55%" stop-color="#0F241B"/>
+      <stop offset="100%" stop-color="#07130E"/>
+    </radialGradient>
+
+    <!-- Polished architectural gold gradients -->
+    <linearGradient id="goldPrimaryWm" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDF3CD"/>
+      <stop offset="25%" stop-color="#E5C778"/>
+      <stop offset="60%" stop-color="#C5A059"/>
+      <stop offset="100%" stop-color="#936D28"/>
+    </linearGradient>
+
+    <linearGradient id="goldLightWm" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8DC"/>
+      <stop offset="50%" stop-color="#E8CE8A"/>
+      <stop offset="100%" stop-color="#C5A059"/>
+    </linearGradient>
+
+    <linearGradient id="goldAccentWm" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#936D28"/>
+      <stop offset="50%" stop-color="#D8B86E"/>
+      <stop offset="100%" stop-color="#FFF0BE"/>
+    </linearGradient>
+
+    <!-- Bangladesh heritage rising sun -->
+    <radialGradient id="sunGlowWm" cx="42%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#FF5E6D"/>
+      <stop offset="50%" stop-color="#E82438"/>
+      <stop offset="100%" stop-color="#B20F20"/>
+    </radialGradient>
+
+    <filter id="shadowWm" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Left Emblem Mark (scaled down to fit 280x280 box, centered at 160, 160) -->
+  <g transform="translate(160, 160) scale(0.56) translate(-256, -256)">
+    <!-- Outer circular medallion -->
+    <circle cx="256" cy="256" r="246" fill="url(#badgeBgWm)"/>
+    <circle cx="256" cy="256" r="244" fill="none" stroke="url(#goldPrimaryWm)" stroke-width="10"/>
+    <circle cx="256" cy="256" r="228" fill="none" stroke="#E5C778" stroke-width="1.75" opacity="0.6"/>
+    <circle cx="256" cy="256" r="218" fill="none" stroke="#C5A059" stroke-width="1.25" stroke-dasharray="3 7" opacity="0.45"/>
+
+    <!-- Compass / Star Accents -->
+    <g fill="url(#goldLightWm)">
+      <polygon points="256,18 261,28 256,38 251,28"/>
+      <polygon points="256,474 261,484 256,494 251,484"/>
+      <polygon points="18,256 28,251 38,256 28,261"/>
+      <polygon points="474,256 484,251 494,256 484,261"/>
+    </g>
+
+    <g filter="url(#shadowWm)">
+      <!-- Rising Sun -->
+      <circle cx="256" cy="225" r="46" fill="url(#sunGlowWm)"/>
+      <circle cx="256" cy="225" r="46" fill="none" stroke="#FFE3A0" stroke-width="2" opacity="0.65"/>
+
+      <!-- Blueprint drafting guides -->
+      <path d="M120 280 L256 142 L392 280" fill="none" stroke="#C5A059" stroke-width="2" opacity="0.35"/>
+      <line x1="140" y1="280" x2="140" y2="385" stroke="#C5A059" stroke-width="2" opacity="0.35"/>
+      <line x1="372" y1="280" x2="372" y2="385" stroke="#C5A059" stroke-width="2" opacity="0.35"/>
+
+      <!-- Primary Gable Roof -->
+      <path d="M110 286 L256 138 L402 286" fill="none" stroke="url(#goldPrimaryWm)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M112 284 L256 140 L400 284" fill="none" stroke="#FFF8DC" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+
+      <!-- Structural Columns -->
+      <line x1="142" y1="298" x2="142" y2="390" stroke="url(#goldLightWm)" stroke-width="16" stroke-linecap="round"/>
+      <line x1="370" y1="298" x2="370" y2="390" stroke="url(#goldLightWm)" stroke-width="16" stroke-linecap="round"/>
+      <line x1="142" y1="304" x2="142" y2="384" stroke="#FFF8DC" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+      <line x1="370" y1="304" x2="370" y2="384" stroke="#FFF8DC" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+
+      <!-- Grand Archway -->
+      <path d="M198 392 V310 A58 58 0 0 1 314 310 V392 Z" fill="#0A1812"/>
+      <path d="M198 392 V310 A58 58 0 0 1 314 310 V392" fill="none" stroke="url(#goldAccentWm)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M218 392 V318 A38 38 0 0 1 294 318 V392" fill="none" stroke="#FDF3CD" stroke-width="2" stroke-dasharray="4 5" opacity="0.75"/>
+
+      <!-- Base Beam -->
+      <line x1="96" y1="395" x2="416" y2="395" stroke="url(#goldPrimaryWm)" stroke-width="14" stroke-linecap="round"/>
+      <line x1="102" y1="393" x2="410" y2="393" stroke="#FFF8DC" stroke-width="2" opacity="0.8"/>
+
+      <!-- Apex Star -->
+      <g transform="translate(256, 102)">
+        <polygon points="0,-16 5,-4 16,0 5,4 0,16 -5,4 -16,0 -5,-4" fill="url(#goldLightWm)"/>
+        <circle cx="0" cy="0" r="3.5" fill="#0E2319"/>
+      </g>
+    </g>
+    <text x="256" y="446" text-anchor="middle" font-family="'Cinzel', Georgia, serif" font-weight="700" font-size="30" letter-spacing="10" fill="url(#goldPrimaryWm)">DHAKA</text>
+  </g>
+
+  <!-- Right Typography Wordmark -->
+  <g transform="translate(350, 0)">
+    <!-- Primary English Brand Name -->
+    <text x="0" y="146" font-family="'Playfair Display', 'Cinzel', Georgia, 'Times New Roman', serif" font-weight="700" font-size="94" letter-spacing="3" fill="#242824">
+      Bangla <tspan fill="url(#goldPrimaryWm)">Sketch</tspan>
+    </text>
+
+    <!-- Precision Architectural Divider Line -->
+    <line x1="2" y1="182" x2="810" y2="182" stroke="url(#goldPrimaryWm)" stroke-width="2" opacity="0.85"/>
+    <circle cx="2" cy="182" r="3" fill="url(#goldPrimaryWm)"/>
+    <circle cx="810" cy="182" r="3" fill="url(#goldPrimaryWm)"/>
+
+    <!-- Subtitle: Bengali Brand Name + Architectural Specialty -->
+    <text x="4" y="240" font-family="'Noto Serif Bengali', 'Hind Siliguri', 'SolaimanLipi', sans-serif" font-size="38" font-weight="700" fill="#1B4D3E">
+      বাংলা স্কেচ
+    </text>
+
+    <text x="810" y="238" text-anchor="end" font-family="'Cinzel', 'Trajan Pro', Georgia, serif" font-weight="600" font-size="24" letter-spacing="7" fill="#8C6A2C">
+      INTERIOR ARCHITECTURE • DHAKA
+    </text>
+  </g>
+</svg>

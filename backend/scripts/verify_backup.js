@@ -1,0 +1,16 @@
+const fs = require('fs');
+const crypto = require('crypto');
+const { spawn } = require('child_process');
+const file = process.argv[2];
+const key = Buffer.from(process.env.BACKUP_ENCRYPTION_KEY || '', 'base64');
+if (!file || key.length !== 32) throw new Error('Usage: BACKUP_ENCRYPTION_KEY=... npm run verify-backup -- /path/file.dump.enc');
+const size = fs.statSync(file).size;
+if (size < 29) throw new Error('Backup is too small');
+const descriptor = fs.openSync(file, 'r');
+const iv = Buffer.alloc(12); const tag = Buffer.alloc(16);
+fs.readSync(descriptor, iv, 0, 12, 0); fs.readSync(descriptor, tag, 0, 16, size - 16); fs.closeSync(descriptor);
+const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv); decipher.setAuthTag(tag);
+const restore = spawn('pg_restore', ['--list'], { stdio: ['pipe','ignore','inherit'] });
+fs.createReadStream(file, { start: 12, end: size - 17 }).pipe(decipher).pipe(restore.stdin);
+restore.on('close', code => { if (code) process.exitCode = code; else console.log('Backup decrypted and pg_restore verified its archive structure.'); });
+decipher.on('error', error => { console.error('Backup authentication failed:', error.message); process.exitCode = 1; restore.kill(); });

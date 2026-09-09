@@ -1,0 +1,58 @@
+# ==============================================================================
+# Bangla Sketch Nginx Reverse Proxy Configuration
+# Place this in /etc/nginx/sites-available/banglasketch
+# Symlink: ln -s /etc/nginx/sites-available/banglasketch /etc/nginx/sites-enabled/
+# Test: nginx -t
+# Reload: systemctl reload nginx
+# SSL Setup: sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+# ==============================================================================
+
+# 1. OPTION A: Separate Subdomain for Backend API (Recommended)
+# -------------------------------------------------------------
+# Frontend: yourdomain.com (Port 3000)
+# Backend API: api.yourdomain.com (Port 5000)
+
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+
+    client_max_body_size 256k;
+
+    # Gzip Compression
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
+    gzip_min_length 256;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 60s;
+    }
+}
+
+server {
+    listen 80;
+    server_name api.yourdomain.com;
+
+    client_max_body_size 256k;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 60s;
+    }
+}

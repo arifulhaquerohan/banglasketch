@@ -1,0 +1,163 @@
+# ==============================================================================
+# Banglasketch (বাংলা স্কেচ) — Production .gitignore
+# Full-Stack Monorepo (Next.js 15 App Router + Node/Express + PostgreSQL)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. ENVIRONMENT VARIABLES & SECRETS (CRITICAL FOR SECURITY)
+# ------------------------------------------------------------------------------
+.env
+.env*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+*/.env
+*/.env*
+
+# Allow example/template files so team & CI can configure environments
+!.env.example
+!*/.env.example
+!.env.test.example
+!*/.env.test.example
+
+# SSL certificates, tokens, and private keys
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+*.pkcs12
+id_rsa
+id_rsa.pub
+*.keystore
+
+# ------------------------------------------------------------------------------
+# 2. DEPENDENCIES & PACKAGE MANAGERS
+# ------------------------------------------------------------------------------
+node_modules/
+*/node_modules/
+.pnp
+.pnp.js
+.pnpm-store/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Package manager logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ------------------------------------------------------------------------------
+# 3. NEXT.JS & FRONTEND BUILDS
+# ------------------------------------------------------------------------------
+.next/
+*/.next/
+out/
+*/out/
+build/
+*/build/
+dist/
+*/dist/
+
+# TypeScript build cache
+*.tsbuildinfo
+*/tsconfig.tsbuildinfo
+next-env.d.ts.bak
+
+# ------------------------------------------------------------------------------
+# 4. BACKEND & USER UPLOADS
+# ------------------------------------------------------------------------------
+uploads/
+*/uploads/
+storage/
+*/storage/
+media/
+*/media/
+temp/
+*/temp/
+tmp/
+*/tmp/
+*.tmp
+*.tmp.*
+
+# ------------------------------------------------------------------------------
+# 5. DATABASE DUMPS & LOCAL SQLITE/PG CACHES
+# ------------------------------------------------------------------------------
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.dump.enc
+backend/backups/
+*.sql.gz
+*.sql.tar
+# Note: Seed scripts under scripts/*.sql are explicitly kept tracked
+
+# ------------------------------------------------------------------------------
+# 6. LOGS & DIAGNOSTICS
+# ------------------------------------------------------------------------------
+logs/
+*.log
+*.log.*
+.backend-*.txt
+.lint-*.txt
+
+# ------------------------------------------------------------------------------
+# 7. TESTING & CODE COVERAGE
+# ------------------------------------------------------------------------------
+coverage/
+*/coverage/
+.nyc_output/
+.playwright/
+test-results/
+
+# ------------------------------------------------------------------------------
+# 8. OPERATING SYSTEM ARTIFACTS
+# ------------------------------------------------------------------------------
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+
+# ------------------------------------------------------------------------------
+# 9. IDE & CODE EDITORS
+# ------------------------------------------------------------------------------
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# VS Code (preserve team workspace configurations if added)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ------------------------------------------------------------------------------
+# 10. AI / LOCAL ASSISTANT ARTIFACTS
+# ------------------------------------------------------------------------------
+.claude/
+.claude-omniroute/
