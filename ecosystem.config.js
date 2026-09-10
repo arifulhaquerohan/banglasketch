@@ -1,22 +1,25 @@
 // PM2 Process Manager Configuration for Bangla Sketch Production Deployment
+// Backend: Django REST Framework with Gunicorn on port 5000
+// Frontend: Next.js Production Server on port 3000
 // Usage:
-//   pm2 start ecosystem.config.js
-//   pm2 save
-//   pm2 startup
+//   npx pm2 start ecosystem.config.js
+//   npx pm2 save
+//   npx pm2 startup
 
 module.exports = {
   apps: [
     {
       name: "banglasketch-backend",
-      cwd: "./backend",
-      script: "server.js",
-      instances: Number(process.env.BACKEND_INSTANCES || 1),
-      exec_mode: "cluster",
+      cwd: "./django_backend",
+      script: "./.venv/bin/gunicorn",
+      args: "banglasketch_api.wsgi:application --bind 127.0.0.1:5000 --workers 2",
+      interpreter: "none",
+      instances: 1,
       autorestart: true,
       watch: false,
       max_memory_restart: "500M",
       env: {
-        NODE_ENV: "production",
+        DJANGO_SETTINGS_MODULE: "banglasketch_api.settings",
         PORT: 5000,
       },
     },

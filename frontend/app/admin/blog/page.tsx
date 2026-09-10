@@ -11,7 +11,11 @@ function postStatus(post: BlogPost) {
   return "Published";
 }
 
-const STATUS_COLORS: Record<string, string> = { Published: "bg-green-500/20 text-green-400 border-green-500/30", Draft: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", Scheduled: "bg-blue-500/20 text-blue-400 border-blue-500/30" };
+const STATUS_COLORS: Record<string, string> = {
+  Published: "bg-emerald-50 text-emerald-800 border-emerald-200",
+  Draft: "bg-amber-50 text-amber-800 border-amber-200",
+  Scheduled: "bg-[#EDF1EA] text-[#586348] border-[#D5DEC4]",
+};
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -25,71 +29,130 @@ export default function BlogPage() {
   const filtered = useMemo(() => posts.filter((post) => { const matchesSearch = post.title.toLowerCase().includes(search.toLowerCase()); const matchesStatus = status === "all" || postStatus(post).toLowerCase() === status; return matchesSearch && matchesStatus; }), [posts, search, status]);
   const remove = async (post: BlogPost) => { if (!window.confirm(`Delete “${post.title}”?`)) return; const result = await adminFetch(`blog/${post.id}`, { method: "DELETE" }); if (result.success) setPosts((current) => current.filter((item) => String(item.id) !== String(post.id))); else setError(result.error || "Unable to delete post."); };
 
-  return <div className="space-y-6"><div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"><div><h1 className="text-2xl font-extrabold text-white">Blog Posts</h1><p className="text-gray-400 text-sm">Write and manage content published to your journal.</p></div><Link href="/admin/blog/new" className="btn btn-primary flex items-center gap-2 text-sm px-5 py-2.5"><FiPlus size={16}/> Write Post</Link></div><div className="flex flex-wrap gap-3"><div className="relative flex-1 min-w-[200px]"><FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16}/><input placeholder="Search posts..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-[#0a2540] border border-[#c5a059]/20 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-[#c5a059] focus:outline-none"/></div><select value={status} onChange={(e) => setStatus(e.target.value)} className="bg-[#0a2540] border border-[#c5a059]/20 rounded-xl px-4 py-2.5 text-sm text-white focus:border-[#c5a059] focus:outline-none"><option value="all">All Status</option><option value="published">Published</option><option value="draft">Draft</option><option value="scheduled">Scheduled</option></select><button onClick={load} className="btn btn-secondary flex items-center gap-2 text-sm" disabled={loading}><FiRefreshCw className={loading ? "animate-spin" : ""}/>Refresh</button></div>{error && <p role="alert" className="rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-300">{error}</p>}      <div className="bg-[#0a2540] border border-[#c5a059]/20 rounded-2xl overflow-hidden shadow-xl">
-        <div className="overflow-x-auto -webkit-overflow-scrolling-touch">
-          <table className="w-full min-w-[640px]">
+  return (
+    <div className="space-y-6 max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-3xl font-bold text-[#242824] tracking-tight">Blog Journal</h1>
+          <p className="text-[#5A625A] text-sm mt-1">Write, schedule, and curate architectural essays and design insights.</p>
+        </div>
+        <Link
+          href="/admin/blog/new"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#586348] hover:bg-[#444D37] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto"
+        >
+          <FiPlus size={15} /> Write Post
+        </Link>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-[220px]">
+          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[#737D73]" size={16} />
+          <input
+            placeholder="Search articles by title or keyword..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl pl-11 pr-4 py-3 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-xs"
+          />
+        </div>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl px-4 py-3 text-xs text-[#242824] font-medium focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-xs"
+        >
+          <option value="all">All Status</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+          <option value="scheduled">Scheduled</option>
+        </select>
+        <button
+          onClick={load}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FCFAF7] border border-[#DED5C7] hover:border-[#586348] text-xs font-semibold text-[#242824] transition-colors shadow-xs disabled:opacity-50"
+          disabled={loading}
+        >
+          <FiRefreshCw className={loading ? "animate-spin text-[#586348]" : "text-[#586348]"} size={14} /> Refresh
+        </button>
+      </div>
+
+      {error && (
+        <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-800">
+          {error}
+        </div>
+      )}
+
+      <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl overflow-hidden shadow-xs">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#c5a059]/20 bg-[#071d33]">
-                <th className="text-left text-xs font-semibold text-[#c5a059] uppercase tracking-wider px-6 py-4">Post</th>
-                <th className="text-left text-xs font-semibold text-[#c5a059] uppercase tracking-wider px-6 py-4">Category</th>
-                <th className="text-left text-xs font-semibold text-[#c5a059] uppercase tracking-wider px-6 py-4">Status</th>
-                <th className="text-left text-xs font-semibold text-[#c5a059] uppercase tracking-wider px-6 py-4">Views</th>
-                <th className="text-left text-xs font-semibold text-[#c5a059] uppercase tracking-wider px-6 py-4">Date</th>
-                <th className="text-right text-xs font-semibold text-[#c5a059] uppercase tracking-wider px-6 py-4">Actions</th>
+              <tr className="border-b border-[#DED5C7] bg-[#F5F2EB] text-left text-xs font-semibold text-[#586348] uppercase tracking-wider">
+                <th className="px-6 py-4">Post Title</th>
+                <th className="px-6 py-4">Category</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Views</th>
+                <th className="px-6 py-4">Date</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-[#DED5C7] bg-white">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="text-center text-gray-400 py-12">
-                    <div className="flex items-center justify-center gap-2">
-                      <FiRefreshCw className="animate-spin text-[#c5a059]" size={18} />
-                      <span>Loading posts…</span>
+                  <td colSpan={6} className="text-center text-[#737D73] py-12">
+                    <div className="flex items-center justify-center gap-2 text-xs">
+                      <FiRefreshCw className="animate-spin text-[#586348]" size={16} />
+                      <span>Loading journal articles…</span>
                     </div>
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center text-gray-400 py-12">No posts found</td>
+                  <td colSpan={6} className="text-center text-[#737D73] py-12">
+                    <div className="w-12 h-12 rounded-2xl bg-[#F5F2EB] border border-[#DED5C7] flex items-center justify-center mx-auto text-[#586348] mb-3">
+                      <FiFileText size={22} />
+                    </div>
+                    <p className="font-semibold text-[#242824]">No journal posts found</p>
+                    <p className="text-xs text-[#5A625A] mt-1">Try changing your search or filters.</p>
+                  </td>
                 </tr>
               ) : (
                 filtered.map((post) => {
                   const currentStatus = postStatus(post);
                   return (
-                    <tr key={post.id} className="border-b border-[#c5a059]/10 hover:bg-[#c5a059]/5 transition-colors">
+                    <tr key={post.id} className="hover:bg-[#F5F2EB]/50 transition-colors">
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] shrink-0 border border-[#c5a059]/20">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-[#EDF1EA] flex items-center justify-center text-[#586348] shrink-0 border border-[#D5DEC4]">
                             <FiFileText size={18} />
                           </div>
-                          <span className="font-semibold text-white max-w-xs truncate">{post.title}</span>
+                          <div className="min-w-0">
+                            <span className="font-semibold text-[#242824] block truncate max-w-sm">{post.title}</span>
+                            <span className="text-[11px] text-[#5A625A] font-mono block truncate max-w-xs">{post.slug}</span>
+                          </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-300">{post.category}</td>
+                      <td className="px-6 py-4 text-xs font-medium text-[#242824]">{post.category}</td>
                       <td className="px-6 py-4">
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${STATUS_COLORS[currentStatus]}`}>
+                        <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${STATUS_COLORS[currentStatus]}`}>
                           {currentStatus}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-300">{post.views_count?.toLocaleString() || "—"}</td>
-                      <td className="px-6 py-4 text-sm text-gray-400">
-                        {post.published_date ? new Date(post.published_date).toLocaleDateString() : "—"}
+                      <td className="px-6 py-4 text-xs text-[#737D73] tabular-nums">{post.views_count?.toLocaleString() || "0"}</td>
+                      <td className="px-6 py-4 text-xs text-[#737D73] tabular-nums">
+                        {post.published_date ? new Date(post.published_date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—"}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex items-center justify-end gap-1.5">
                           <Link
                             href={`/admin/blog/${post.id}`}
                             aria-label={`Edit ${post.title}`}
-                            className="p-2.5 rounded-xl hover:bg-[#c5a059]/10 text-gray-400 hover:text-[#c5a059] transition-colors"
+                            className="p-2 rounded-xl border border-[#DED5C7] bg-white text-[#586348] hover:bg-[#EDF1EA] transition-colors shadow-2xs"
                           >
-                            <FiEdit2 size={16} />
+                            <FiEdit2 size={14} />
                           </Link>
                           <button
                             onClick={() => remove(post)}
                             aria-label={`Delete ${post.title}`}
-                            className="p-2.5 rounded-xl hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors"
+                            className="p-2 rounded-xl border border-[#DED5C7] bg-white text-[#737D73] hover:text-red-700 hover:bg-red-50 hover:border-red-200 transition-colors shadow-2xs"
                           >
-                            <FiTrash2 size={16} />
+                            <FiTrash2 size={14} />
                           </button>
                         </div>
                       </td>
@@ -100,5 +163,7 @@ export default function BlogPage() {
             </tbody>
           </table>
         </div>
-      </div></div>;
+      </div>
+    </div>
+  );
 }

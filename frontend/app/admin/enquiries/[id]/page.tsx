@@ -137,7 +137,10 @@ export default function EnquiryDetailPage() {
     return (
       <div className="p-8 text-center text-red-600 bg-red-50 border border-red-200 rounded-2xl">
         <p>{error || "Client record not found"}</p>
-        <Link href="/admin/enquiries" className="mt-4 inline-block btn btn-secondary text-xs">
+        <Link
+          href="/admin/enquiries"
+          className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FCFAF7] border border-[#DED5C7] text-xs font-semibold text-[#242824] hover:border-[#586348] transition-colors"
+        >
           Return to Pipeline
         </Link>
       </div>

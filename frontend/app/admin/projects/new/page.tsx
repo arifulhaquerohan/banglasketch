@@ -56,73 +56,93 @@ export default function NewProjectPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 max-w-6xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <Link href="/admin/projects" className="text-sm text-gray-400 hover:text-[#c5a059] flex items-center gap-1 mb-2">
+          <Link
+            href="/admin/projects"
+            className="text-xs font-semibold text-[#5A625A] hover:text-[#586348] inline-flex items-center gap-1.5 mb-2 transition-colors"
+          >
             <FiArrowLeft size={14} /> Back to projects
           </Link>
-          <h1 className="text-2xl font-extrabold text-white">New Project</h1>
+          <h1 className="font-serif text-3xl font-bold text-[#242824] tracking-tight">New Project</h1>
+          <p className="text-sm text-[#5A625A] mt-0.5">Draft and publish a new architectural project to your portfolio.</p>
         </div>
         <button
           type="button"
           onClick={() => handleSubmit()}
           disabled={saving}
-          className="btn btn-primary flex items-center gap-2 text-sm px-5 py-2.5 disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#586348] hover:bg-[#444D37] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto disabled:opacity-50"
         >
-          <FiSave size={16} /> {saving ? "Saving..." : "Publish Project"}
+          <FiSave size={15} /> {saving ? "Publishing..." : "Publish Project"}
         </button>
       </div>
 
-      {error && <div role="alert" className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</div>}
+      {error && (
+        <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-800">
+          {error}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-[#0a2540] border border-[#c5a059]/20 rounded-2xl p-6 space-y-4">
+          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h2 className="font-serif text-lg font-bold text-[#242824]">Project Narrative</h2>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Project Title</label>
+              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+                Project Title
+              </label>
               <input
                 type="text"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="Modern Kitchen Renovation"
+                placeholder="e.g. Modern Minimalist Kitchen Renovation"
                 required
-                className="w-full bg-[#1a3a5c] border border-[#c5a059]/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-[#c5a059] focus:outline-none"
+                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">URL Slug</label>
+              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+                URL Slug
+              </label>
               <input
                 type="text"
                 value={form.slug}
                 onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })}
-                placeholder="modern-kitchen-renovation"
-                className="w-full bg-[#1a3a5c] border border-[#c5a059]/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-[#c5a059] focus:outline-none font-mono"
+                placeholder="modern-minimalist-kitchen"
+                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all font-mono shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Short Description</label>
+              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+                Short Description
+              </label>
               <textarea
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows={3}
-                placeholder="A brief summary of the project..."
-                className="w-full bg-[#1a3a5c] border border-[#c5a059]/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-[#c5a059] focus:outline-none resize-none"
+                placeholder="A brief overview of the space, layout, and client brief..."
+                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all resize-none shadow-2xs leading-relaxed"
               />
             </div>
             <RichTextEditor
               value={form.content}
               onChange={(content) => setForm({ ...form, content })}
-              label="Project Details"
-              placeholder="Describe the project, design choices, materials used..."
+              label="Detailed Project Story"
+              placeholder="Describe the architectural design choices, materials used, lighting, textures..."
             />
           </div>
 
-          <div className="bg-[#0a2540] border border-[#c5a059]/20 rounded-2xl p-6 space-y-4">
-            <h3 className="text-lg font-bold text-white">Gallery Images</h3>
-            <div className="grid grid-cols-3 gap-3">
+          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-[#242824]">Gallery Media</h3>
+            <p className="text-xs text-[#5A625A]">Additional perspectives, render angles, and layout sketches.</p>
+            <div className="grid grid-cols-3 gap-3 pt-1">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="aspect-square bg-[#1a3a5c]/30 border-2 border-dashed border-[#c5a059]/20 rounded-xl flex items-center justify-center text-gray-500 text-xs hover:border-[#c5a059]/50 cursor-pointer transition-colors">
-                  + Add Image
+                <div
+                  key={i}
+                  className="aspect-square bg-white border-2 border-dashed border-[#DED5C7] rounded-2xl flex items-center justify-center text-[#737D73] text-xs hover:border-[#586348] hover:bg-[#F5F2EB]/50 cursor-pointer transition-colors shadow-2xs"
+                >
+                  + Add Media
                 </div>
               ))}
             </div>
@@ -130,8 +150,8 @@ export default function NewProjectPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-[#0a2540] border border-[#c5a059]/20 rounded-2xl p-6 space-y-4">
-            <h3 className="text-lg font-bold text-white">Cover Image</h3>
+          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-[#242824]">Cover Showcase</h3>
             <CloudinaryUpload
               value={form.image}
               onChange={(image) => setForm({ ...form, image })}
@@ -140,14 +160,16 @@ export default function NewProjectPage() {
             />
           </div>
 
-          <div className="bg-[#0a2540] border border-[#c5a059]/20 rounded-2xl p-6 space-y-4">
-            <h3 className="text-lg font-bold text-white">Project Details</h3>
+          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-[#242824]">Project Metadata</h3>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
+              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+                Category
+              </label>
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full bg-[#1a3a5c] border border-[#c5a059]/20 rounded-xl px-4 py-2.5 text-sm text-white focus:border-[#c5a059] focus:outline-none"
+                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
               >
                 <option value="kitchen">Kitchen</option>
                 <option value="bedroom">Bedroom</option>
@@ -157,58 +179,66 @@ export default function NewProjectPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Location</label>
+              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+                Location
+              </label>
               <input
                 type="text"
                 value={form.location}
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
-                placeholder="Gulshan, Dhaka"
-                className="w-full bg-[#1a3a5c] border border-[#c5a059]/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-[#c5a059] focus:outline-none"
+                placeholder="e.g. Gulshan-2, Dhaka"
+                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Client</label>
+              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+                Client / Studio Partner
+              </label>
               <input
                 type="text"
                 value={form.client}
                 onChange={(e) => setForm({ ...form, client: e.target.value })}
-                placeholder="Client name"
-                className="w-full bg-[#1a3a5c] border border-[#c5a059]/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-[#c5a059] focus:outline-none"
+                placeholder="e.g. Private Residence"
+                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Year</label>
+              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+                Completion Year
+              </label>
               <input
                 type="number"
                 value={form.year}
                 onChange={(e) => setForm({ ...form, year: e.target.value })}
-                className="w-full bg-[#1a3a5c] border border-[#c5a059]/20 rounded-xl px-4 py-2.5 text-sm text-white focus:border-[#c5a059] focus:outline-none"
+                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
               />
             </div>
           </div>
 
-          <div className="bg-[#0a2540] border border-[#c5a059]/20 rounded-2xl p-6 space-y-4">
-            <h3 className="text-lg font-bold text-white">Publish</h3>
+          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-[#242824]">Visibility & Publication</h3>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
+              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+                Status
+              </label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full bg-[#1a3a5c] border border-[#c5a059]/20 rounded-xl px-4 py-2.5 text-sm text-white focus:border-[#c5a059] focus:outline-none"
+                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
                 <option value="archived">Archived</option>
               </select>
             </div>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex items-center gap-2.5 cursor-pointer pt-2">
               <input
                 type="checkbox"
                 checked={form.featured}
                 onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                className="w-4 h-4 accent-[#c5a059]"
+                className="w-4 h-4 accent-[#586348] rounded"
               />
-              <span className="text-sm text-gray-300">Mark as featured project</span>
+              <span className="text-xs font-medium text-[#242824]">Feature this project on homepage</span>
             </label>
           </div>
         </div>
