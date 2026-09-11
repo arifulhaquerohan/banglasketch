@@ -5,6 +5,7 @@ import {
   Noto_Serif_Bengali,
   Noto_Sans_Bengali,
 } from "next/font/google";
+import { ChatWidget } from "../components/ChatWidget";
 import { FloatingWhatsApp } from "../components/FloatingWhatsApp";
 import { Footer } from "../components/Footer";
 import { Navbar } from "../components/Navbar";
@@ -101,6 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MaintenancePopup />
           <main id="main-content" tabIndex={-1}>{children}</main>
           <Footer />
+          <ChatWidget />
           <FloatingWhatsApp />
           <MobileStickyBar />
           <SpaceCollectionDrawer />

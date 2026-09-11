@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
-import { FiClock, FiMail, FiPhone, FiTool, FiX } from "react-icons/fi";
+import { FiArrowUpRight, FiArrowRight, FiClock, FiMail, FiPhone, FiTool, FiX } from "react-icons/fi";
 import { DEFAULT_MAINTENANCE_CONFIG, MaintenanceConfig } from "../lib/maintenance.types";
 
 export function MaintenancePopup() {
@@ -18,10 +18,6 @@ export function MaintenancePopup() {
 
   useEffect(() => {
     setMounted(true);
-    // Check the server-verified httpOnly admin session. The browser never reads the credential.
-    fetch("/api/admin/session", { cache: "no-store", credentials: "same-origin" })
-      .then((res) => setIsAdmin(res.ok))
-      .catch(() => setIsAdmin(false));
 
     // Check if dismissed in this session
     const isDismissed = typeof window !== "undefined" ? sessionStorage.getItem("bs_maintenance_dismissed") === "true" : false;
@@ -33,6 +29,12 @@ export function MaintenancePopup() {
       .then((data) => {
         if (data.success && data.data) {
           setConfig(data.data);
+          // Only check admin session if maintenance mode is enabled and an admin cookie might exist
+          if (data.data.enabled && typeof document !== "undefined" && document.cookie.includes("bs_admin_session")) {
+            fetch("/api/admin/session", { cache: "no-store", credentials: "same-origin" })
+              .then((res) => setIsAdmin(res.ok))
+              .catch(() => setIsAdmin(false));
+          }
         }
       })
       .catch((err) => console.error("Error fetching maintenance status:", err));
@@ -46,20 +48,23 @@ export function MaintenancePopup() {
   };
 
   useEffect(() => {
-    const isDismissibleOverlay = config.enabled && !isAdmin && config.allowDismiss && config.mode !== "banner";
+    const isDismissibleOverlay = mounted && config.enabled && !isAdmin && config.mode !== "banner" && !(dismissed && config.allowDismiss && config.mode !== "fullscreen");
     if (!isDismissibleOverlay) return;
 
     const previousActiveElement = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const focusFirstControl = () => {
       const controls = modalRef.current?.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
       );
-      controls?.[0]?.focus();
+      if (controls?.length) controls[0].focus();
+      else modalRef.current?.focus();
     };
     const timeout = window.setTimeout(focusFirstControl, 0);
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === "Escape" && config.allowDismiss && config.mode !== "fullscreen") {
         event.preventDefault();
         handleDismiss();
         return;
@@ -87,9 +92,10 @@ export function MaintenancePopup() {
     return () => {
       window.clearTimeout(timeout);
       document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
       previousActiveElement?.focus();
     };
-  }, [config.enabled, config.mode, config.allowDismiss, isAdmin]);
+  }, [config.enabled, config.mode, config.allowDismiss, isAdmin, dismissed, mounted]);
 
   if (!mounted || !config.enabled) return null;
 
@@ -271,108 +277,101 @@ export function MaintenancePopup() {
     );
   }
 
-  // MODE 3: LUXURY MODAL POPUP (Default)
+  // The studio notice uses the same warm materials and quiet typography as the site.
   return (
     <div
-      ref={modalRef}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={titleId}
-      aria-describedby={descriptionId}
-      className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-fade-in"
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-emerald-darker/65 p-4 backdrop-blur-md sm:p-6"
     >
-      <div className="relative max-w-lg w-full bg-gradient-to-b from-[#0a2540] to-[#061a30] border-2 border-[#c5a059]/50 rounded-3xl p-6 sm:p-8 shadow-[0_20px_70px_rgba(0,0,0,0.8)] text-center space-y-6">
-
-        {/* Dismiss button if allowed */}
-        {config.allowDismiss && (
-          <button
-            onClick={handleDismiss}
-            className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center transition-colors border border-white/10"
-            aria-label="Close"
-          >
-            <FiX size={18} />
-          </button>
-        )}
-
-        {/* Ambient Top Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-[#c5a059]/20 rounded-full blur-2xl pointer-events-none" />
-
-        {/* Brand Logo & Maintenance Icon */}
-        <div className="relative inline-block mx-auto pt-2">
-          <div className="w-20 h-20 mx-auto rounded-full shadow-[0_0_25px_rgba(197,160,89,0.3)]">
-            <Image
-              src="/logo.svg"
-              alt="Bangla Sketch Logo"
-              width={80}
-              height={80}
-              className="w-full h-full"
-            />
-          </div>
-          <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#c5a059] text-[#0a2540] flex items-center justify-center shadow-lg border-2 border-[#0a2540]">
-            <FiTool size={14} />
-          </div>
-        </div>
-
-        {/* Title */}
-        <div className="space-y-1.5">
-          <span className="text-[11px] font-bold tracking-widest text-[#c5a059] uppercase block">
-            Notice / নোটিশ
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            {config.title}
-          </h2>
-          {config.titleBn && (
-            <p className="text-base sm:text-lg text-[#c5a059] font-serif font-medium">
-              {config.titleBn}
-            </p>
-          )}
-        </div>
-
-        {/* Message */}
-        <div className="bg-[#061a30]/80 rounded-2xl p-4 border border-[#c5a059]/20 text-gray-200 text-xs sm:text-sm leading-relaxed space-y-2">
-          <p>{config.message}</p>
-          {config.messageBn && (
-            <p className="text-gray-400 text-[11px] sm:text-xs pt-1 border-t border-[#c5a059]/10">
-              {config.messageBn}
-            </p>
-          )}
-
-          {config.estimatedEndTime && (
-            <div className="inline-flex items-center gap-1.5 text-[#c5a059] font-medium text-xs pt-2">
-              <FiClock size={13} /> {config.estimatedEndTime}
-            </div>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="space-y-3 pt-2">
-          {config.showContactButtons && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <a
-                href={`https://wa.me/${config.contactWhatsApp.replace(/[^0-9]/g, "")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-4 rounded-xl text-xs sm:text-sm transition-all shadow-lg hover:shadow-[#25D366]/20"
-              >
-                <FaWhatsapp size={16} /> WhatsApp Inquiry
-              </a>
-              <a
-                href={`tel:${config.contactPhone}`}
-                className="inline-flex items-center justify-center gap-2 bg-[#0a2540] hover:bg-[#153457] text-[#c5a059] border border-[#c5a059]/40 font-bold py-3 px-4 rounded-xl text-xs sm:text-sm transition-all"
-              >
-                <FiPhone size={15} /> Call Directly
-              </a>
-            </div>
-          )}
-
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+        tabIndex={-1}
+        className="relative my-auto max-h-[calc(100dvh-2rem)] w-full max-w-[520px] overflow-y-auto rounded-[28px] border border-[#e8e1d4]/70 bg-[#faf7f0] text-[#253b31] shadow-[0_32px_100px_-20px_rgba(0,0,0,0.55)] outline-none"
+      >
+        <div className="relative overflow-hidden bg-emerald px-7 pb-7 pt-8 sm:px-10 sm:pt-10">
+          <div aria-hidden="true" className="pointer-events-none absolute -bottom-28 -right-8 h-72 w-52 rounded-t-full border border-[#c3ae79]/20" />
+          <div aria-hidden="true" className="pointer-events-none absolute -bottom-28 -right-1 h-64 w-40 rounded-t-full border border-[#c3ae79]/20" />
+          <div aria-hidden="true" className="pointer-events-none absolute -bottom-28 right-6 h-56 w-28 rounded-t-full border border-[#c3ae79]/20" />
           {config.allowDismiss && (
             <button
               onClick={handleDismiss}
-              className="w-full text-xs text-gray-400 hover:text-white py-2 transition-colors"
+              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-[#eee9dc] transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d6bc81]"
+              aria-label="Close maintenance notice"
             >
-              Continue browsing website →
+              <FiX size={18} />
             </button>
           )}
+          <div className="relative flex items-center gap-3.5 pr-10">
+            <Image src="/logo.svg" alt="Bangla Sketch" width={56} height={56} className="h-14 w-14 shrink-0" />
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ivory-light">Bangla Sketch</p>
+              <p className="mt-1.5 text-xs text-gold">Thoughtful spaces. Beautiful living.</p>
+            </div>
+          </div>
+          <div className="relative mt-8 inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/5 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-gold">
+            <span className="h-1.5 w-1.5 rounded-full bg-gold" /> A little studio update
+          </div>
+        </div>
+
+        <div className="px-7 pb-6 pt-7 sm:px-10 sm:pb-7 sm:pt-8">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#82704a]">Website notice <span aria-hidden="true" className="mx-1">/</span> <span lang="bn">নোটিশ</span></p>
+          <h2 id={titleId} className="font-serif text-[34px] font-normal leading-[1.12] tracking-tight text-[#253b31] sm:text-[42px]">
+            {config.title}
+          </h2>
+          {config.titleBn && (
+            <p lang="bn" className="mt-3 font-serif text-base leading-relaxed text-[#62705c]">{config.titleBn}</p>
+          )}
+
+          <div id={descriptionId} className="mt-6 border-l-2 border-[#c3ad79] pl-4">
+            <p className="text-sm leading-7 text-[#4c584e]">{config.message}</p>
+            {config.messageBn && (
+              <p lang="bn" className="mt-2 text-[13px] leading-6 text-[#687164]">{config.messageBn}</p>
+            )}
+          </div>
+          {config.estimatedEndTime && (
+            <div className="mt-5 flex items-start gap-2 rounded-xl bg-[#eceee5] px-3.5 py-3 text-xs leading-5 text-[#47593f]">
+              <FiClock size={15} className="mt-0.5 shrink-0" />
+              <span>Expected back: {config.estimatedEndTime}</span>
+            </div>
+          )}
+
+          {config.showContactButtons && (
+            <div className="mt-7">
+              <p className="mb-3 text-xs text-[#677061]">Have a space in mind? Let’s talk.</p>
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-[1.2fr_1fr]">
+                <a
+                  href={`https://wa.me/${config.contactWhatsApp.replace(/[^0-9]/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl bg-[#2e4b39] px-4 py-3 text-sm font-semibold text-[#fffdf5] transition-colors hover:bg-[#20392b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2e4b39]"
+                >
+                  <FaWhatsapp size={19} /> WhatsApp us <FiArrowUpRight size={16} className="ml-auto opacity-70" />
+                </a>
+                <a
+                  href={`tel:${config.contactPhone}`}
+                  className="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl border border-[#d8d2c3] bg-[#fffdf8] px-4 py-3 text-sm font-semibold text-[#354a3b] transition-colors hover:bg-[#eeeadf] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2e4b39]"
+                >
+                  <FiPhone size={16} /> Call the studio
+                </a>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6 border-t border-[#e4ded1] pt-4 text-center">
+            {config.allowDismiss ? (
+              <button
+                onClick={handleDismiss}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 text-xs font-medium text-[#5a6655] transition-colors hover:text-[#253b31] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2e4b39]"
+              >
+                Continue exploring <FiArrowRight size={14} />
+              </button>
+            ) : (
+              <p className="py-2 text-xs text-[#737a6c]">Thank you for your patience.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

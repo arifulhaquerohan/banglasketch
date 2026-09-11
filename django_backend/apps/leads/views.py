@@ -1,38 +1,91 @@
+import time
+from django.db import transaction
+from django.conf import settings
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from banglasketch_api.pagination import EnvelopePagination
 from apps.authentication.auth import IsAdminUserAuthenticated, require_role
+from apps.core.services.rate_limit import PostgresRateLimiter
 from .models import ContactSubmission, NewsletterSubscriber, ContactEmailJob
 from .serializers import ContactSubmissionSerializer, NewsletterSubscriberSerializer
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        return x_forwarded_for.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR", "unknown")
+
 
 # Public Contact & Newsletter Views
 class PublicContactSubmitView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        name = request.data.get("name", "").strip()
-        email = request.data.get("email", "").strip()
-        phone = request.data.get("phone", "").strip()
-        service_type = request.data.get("service_type", "").strip()
-        message = request.data.get("message", "").strip()
+        ip = get_client_ip(request)
+
+        # Rate limiting: 10 inquiries per 15 minutes in production
+        if not settings.DEBUG:
+            limiter = PostgresRateLimiter("contact", 15 * 60 * 1000, 10)
+            allowed, hits, reset_at = limiter.check_and_increment(ip)
+            if not allowed:
+                return Response({
+                    "success": False,
+                    "error": "Too many contact submissions. Please wait a few minutes before trying again."
+                }, status=429)
+
+        # Honeypot spam check: 'website' field must be blank
+        website = request.data.get("website", "")
+        if website:
+            # Silently accept to avoid alerting bot
+            return Response({
+                "success": True,
+                "message": "Thank you for contacting us. We will get back to you shortly.",
+            }, status=201)
+
+        # Bot timing check (if client provided started_at timestamp)
+        started_at = request.data.get("started_at")
+        if isinstance(started_at, (int, float)):
+            now_ms = time.time() * 1000
+            if now_ms - started_at < 1000:
+                # Submitted in less than 1 second — bot behavior
+                return Response({
+                    "success": True,
+                    "message": "Thank you for contacting us. We will get back to you shortly.",
+                }, status=201)
+
+        name = (request.data.get("name") or "").strip()
+        email = (request.data.get("email") or "").strip().lower()
+        phone = (request.data.get("phone") or "").strip()
+        service_type = (request.data.get("service_type") or request.data.get("serviceType") or "").strip()
+        message = (request.data.get("message") or "").strip()
 
         if not name or not email or not message:
             return Response({"success": False, "error": "Name, email, and message are required"}, status=400)
 
-        submission = ContactSubmission.objects.create(
-            name=name,
-            email=email,
-            phone=phone,
-            service_type=service_type,
-            message=message,
-        )
+        if len(name) > 160 or len(email) > 160 or len(phone) > 160 or len(service_type) > 160:
+            return Response({"success": False, "error": "One or more fields exceed maximum allowed length"}, status=400)
 
-        ContactEmailJob.objects.create(submission=submission, kind="notification")
+        if len(message) > 5000:
+            return Response({"success": False, "error": "Message exceeds maximum allowed length"}, status=400)
+
+        # Atomic creation of submission and email jobs
+        with transaction.atomic():
+            submission = ContactSubmission.objects.create(
+                name=name,
+                email=email,
+                phone=phone,
+                service_type=service_type,
+                message=message,
+            )
+
+            ContactEmailJob.objects.create(submission=submission, kind="notification")
+            ContactEmailJob.objects.create(submission=submission, kind="confirmation")
 
         return Response({
             "success": True,
+            "id": submission.id,
             "message": "Thank you for contacting us. We will get back to you shortly.",
         }, status=201)
 

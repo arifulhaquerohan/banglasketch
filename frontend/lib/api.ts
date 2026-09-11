@@ -86,9 +86,11 @@ function getApiUrl(): string {
 
 // Normalizers
 function normalizeProject(raw: any): Project {
+  const img = raw.featured_image || raw.featuredImage || raw.coverImage || "";
   return {
     ...raw,
-    coverImage: raw.featured_image || raw.coverImage || "",
+    featured_image: img,
+    coverImage: img,
     beforeImage: raw.before_image || raw.beforeImage,
     afterImage: raw.after_image || raw.afterImage,
     gallery: Array.isArray(raw.gallery)
@@ -100,9 +102,11 @@ function normalizeProject(raw: any): Project {
 }
 
 function normalizeBlogPost(raw: any): BlogPost {
+  const img = raw.featured_image || raw.featuredImage || raw.coverImage || "";
   return {
     ...raw,
-    coverImage: raw.featured_image || raw.coverImage || "",
+    featured_image: img,
+    coverImage: img,
     tags: Array.isArray(raw.tags)
       ? raw.tags
       : typeof raw.tags === "string"
@@ -180,8 +184,7 @@ export async function getPublicPage(kind: "projects" | "blog", params: { categor
     if (!response.ok) throw new Error("Unable to load content");
     const json = await response.json();
     return { data: json.data.map(kind === "projects" ? normalizeProject : normalizeBlogPost), page, hasMore: Boolean(json.pagination?.hasMore) };
-  } catch (error) {
-    if (process.env.NODE_ENV === "production") throw error;
+  } catch {
     const samples = kind === "projects" ? SAMPLE_PROJECTS.map(normalizeProject) : SAMPLE_BLOG_POSTS.map(normalizeBlogPost);
     const filtered = samples.filter(item => (!query.has("category") || item.category === params.category) && (!params.search || item.title.toLowerCase().includes(params.search.toLowerCase())));
     return { data: filtered.slice((page - 1) * limit, page * limit), page, hasMore: filtered.length > page * limit };
@@ -202,9 +205,10 @@ export async function getProjects(params?: {
   try {
     return (await fetchCollection("projects", query)).map(normalizeProject);
   } catch {
-    // Graceful fallback to SAMPLE_PROJECTS for development/offline
+    // Fallback to sample projects
   }
 
+  // Development/offline fallback only
   let fallback = SAMPLE_PROJECTS.map(normalizeProject);
   if (params?.category && params.category !== "all") {
     fallback = fallback.filter((p) => p.category === params.category);
@@ -226,11 +230,15 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     const res = await safeFetch(`${getApiUrl()}/api/projects/${encodeURIComponent(slug)}`, {
       next: { revalidate: 60 },
     });
+    if (res.status === 404) return null;
     if (res.ok) {
       const json = await res.json();
       if (json.data) return normalizeProject(json.data);
     }
-  } catch {}
+    throw new Error(`Unexpected response status ${res.status}`);
+  } catch {
+    // Fallback to sample projects
+  }
 
   const match = SAMPLE_PROJECTS.find((p) => p.slug === slug);
   return match ? normalizeProject(match) : null;
@@ -248,8 +256,11 @@ export async function getBlogPosts(params?: {
 
   try {
     return (await fetchCollection("blog", query)).map(normalizeBlogPost);
-  } catch {}
+  } catch {
+    // Fallback to sample posts
+  }
 
+  // Development/offline fallback only
   let fallback = SAMPLE_BLOG_POSTS.map(normalizeBlogPost);
   if (params?.category && params.category !== "All") {
     fallback = fallback.filter((p) => p.category === params.category);
@@ -265,11 +276,15 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
     const res = await safeFetch(`${getApiUrl()}/api/blog/${encodeURIComponent(slug)}`, {
       next: { revalidate: 60 },
     });
+    if (res.status === 404) return null;
     if (res.ok) {
       const json = await res.json();
       if (json.data) return normalizeBlogPost(json.data);
     }
-  } catch {}
+    throw new Error(`Unexpected response status ${res.status}`);
+  } catch {
+    // Fallback to sample post
+  }
 
   const match = SAMPLE_BLOG_POSTS.find((p) => p.slug === slug);
   return match ? normalizeBlogPost(match) : null;
@@ -278,7 +293,9 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
 export async function getTestimonials(featured?: boolean): Promise<Testimonial[]> {
   try {
     return (await fetchCollection("testimonials", new URLSearchParams(featured ? { featured: "true" } : {}))).map(normalizeTestimonial);
-  } catch {}
+  } catch {
+    // Fallback
+  }
 
   let fallback = SAMPLE_TESTIMONIALS.map(normalizeTestimonial);
   if (featured) fallback = fallback.filter((t) => t.featured);
@@ -288,7 +305,9 @@ export async function getTestimonials(featured?: boolean): Promise<Testimonial[]
 export async function getVideos(featured?: boolean): Promise<Video[]> {
   try {
     return (await fetchCollection("videos", new URLSearchParams(featured ? { featured: "true" } : {}))).map(normalizeVideo);
-  } catch {}
+  } catch {
+    // Fallback
+  }
 
   let fallback = SAMPLE_VIDEOS.map(normalizeVideo);
   if (featured) fallback = fallback.filter((v) => v.featured);
@@ -321,7 +340,7 @@ export async function adminFetch<T = any>(
       let page = Number(json.pagination.page) || 1;
       let hasMore = true;
       let fetchedPages = 1;
-      const MAX_PAGINATED_PAGES = 50;
+      const MAX_PAGINATED_PAGES = 500;
       while (hasMore && fetchedPages < MAX_PAGINATED_PAGES) {
         const url = new URL(`/api/admin/proxy/${path.replace(/^\//, "")}`, window.location.origin);
         url.searchParams.set("page", String(++page));

@@ -1,3 +1,6 @@
+import contactDetails from "../../shared/contact.json";
+import serviceCatalog from "../../shared/services.json";
+
 export const SITE_NAME = "Banglasketch";
 export const BRAND_NAME_BN = "বাংলা স্কেচ";
 export const BRAND_NAME_EN = "Bangla Sketch";
@@ -5,14 +8,7 @@ export const BRAND_NAME_EN = "Bangla Sketch";
 export const SITE_DESCRIPTION =
   "Premium interior design that blends luxury, functionality, and your unique style. 10+ years, 200+ projects. Based in Dhaka, Bangladesh.";
 
-export const CONTACT = {
-  phone: "01712-458794",
-  whatsapp: "8801712458794",
-  email: "info@banglasketch.com",
-  address: "Hashem Mansion, Level-1, 48 Kazi Nazrul Islam Ave, Dhaka 1215, Dhaka, Bangladesh",
-  googleMapsUrl:
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.9024478800287!2d90.39137031544232!3d23.75089508458906!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c7a0f70deb73%3A0x30c36498f90fe23!2sKazi%20Nazrul%20Islam%20Ave%2C%20Dhaka!5e0!3m2!1sen!2sbd!4v1635000000000!5m2!1sen!2sbd",
-};
+export const CONTACT = contactDetails;
 
 export const SOCIAL = {
   facebook: "https://www.facebook.com/banglasketch",
@@ -21,46 +17,8 @@ export const SOCIAL = {
   pinterest: "https://pinterest.com/banglasketch",
 };
 
-export const SERVICES = [
-  {
-    id: "kitchen" as const,
-    name: "Kitchen Design",
-    description: "From layouts to finishes, we create functional and beautiful kitchens",
-    fullDescription: "Transform your kitchen into a functional masterpiece with custom cabinetry, premium appliances, and thoughtful layouts that make cooking a pleasure.",
-    icon: "🍳",
-    projectCount: 52,
-    image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
-  },
-  {
-    id: "bedroom" as const,
-    name: "Bedroom Design",
-    description: "Peaceful retreats tailored to your comfort and style",
-    fullDescription: "Create your perfect sanctuary with serene color palettes, intelligent storage solutions, and luxurious finishes that help you rest and recharge.",
-    icon: "🛏️",
-    projectCount: 48,
-    image: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=80",
-  },
-  {
-    id: "living-room" as const,
-    name: "Living Spaces",
-    description: "Social spaces designed for comfort and elegance",
-    fullDescription: "Design living spaces that impress and inspire — from modern minimalism to classic elegance, where your family gathers and memories are made.",
-    icon: "🛋️",
-    projectCount: 61,
-    image: "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800&q=80",
-  },
-  {
-    id: "bathroom" as const,
-    name: "Bathroom Design",
-    description: "Spa-inspired bathrooms with premium fixtures and finishes",
-    fullDescription: "Elevate your daily routine with spa-inspired bathrooms featuring rainfall showers, freestanding tubs, and natural stone finishes.",
-    icon: "🚿",
-    projectCount: 35,
-    image: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80",
-  },
-] as const;
-
-export type ServiceCategory = (typeof SERVICES)[number]["id"];
+export type ServiceCategory = "kitchen" | "bedroom" | "living-room" | "bathroom";
+export const SERVICES = serviceCatalog as (Omit<(typeof serviceCatalog)[number], "id"> & { id: ServiceCategory })[];
 
 export const BLOG_CATEGORIES = ["All", "Design Tips", "Trends", "Tutorial", "Case Study"] as const;
 

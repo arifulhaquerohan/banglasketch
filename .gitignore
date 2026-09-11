@@ -95,7 +95,9 @@ tmp/
 *.db
 *.dump
 *.dump.enc
+*.enc
 backend/backups/
+django_backend/backups/
 *.sql.gz
 *.sql.tar
 # Note: Seed scripts under scripts/*.sql are explicitly kept tracked

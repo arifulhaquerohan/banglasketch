@@ -1,0 +1,38 @@
+[
+  {
+    "id": "kitchen",
+    "name": "Kitchen Design",
+    "description": "From layouts to finishes, we create functional and beautiful kitchens",
+    "fullDescription": "Transform your kitchen into a functional masterpiece with custom cabinetry, premium appliances, and thoughtful layouts that make cooking a pleasure.",
+    "icon": "🍳",
+    "projectCount": 52,
+    "image": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80"
+  },
+  {
+    "id": "bedroom",
+    "name": "Bedroom Design",
+    "description": "Peaceful retreats tailored to your comfort and style",
+    "fullDescription": "Create your perfect sanctuary with serene color palettes, intelligent storage solutions, and luxurious finishes that help you rest and recharge.",
+    "icon": "🛏️",
+    "projectCount": 48,
+    "image": "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=80"
+  },
+  {
+    "id": "living-room",
+    "name": "Living Spaces",
+    "description": "Social spaces designed for comfort and elegance",
+    "fullDescription": "Design living spaces that impress and inspire — from modern minimalism to classic elegance, where your family gathers and memories are made.",
+    "icon": "🛋️",
+    "projectCount": 61,
+    "image": "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800&q=80"
+  },
+  {
+    "id": "bathroom",
+    "name": "Bathroom Design",
+    "description": "Spa-inspired bathrooms with premium fixtures and finishes",
+    "fullDescription": "Elevate your daily routine with spa-inspired bathrooms featuring rainfall showers, freestanding tubs, and natural stone finishes.",
+    "icon": "🚿",
+    "projectCount": 35,
+    "image": "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80"
+  }
+]

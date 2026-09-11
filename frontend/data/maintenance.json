@@ -1,6 +1,6 @@
 {
   "enabled": false,
-  "mode": "fullscreen",
+  "mode": "popup",
   "title": "Under Maintenance",
   "titleBn": "আমাদের ওয়েবসাইট রক্ষণাবেক্ষণ চলছে",
   "message": "We will be back shortly",
@@ -11,5 +11,5 @@
   "contactEmail": "contact@banglasketch.com",
   "showContactButtons": true,
   "allowDismiss": true,
-  "updatedAt": "2026-09-07T19:42:13.353Z"
+  "updatedAt": "2026-09-10T19:57:17.737Z"
 }

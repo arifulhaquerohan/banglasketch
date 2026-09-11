@@ -16,11 +16,14 @@ export function CloudinaryUpload({ value, onChange, folder = "general", label = 
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [storageInfo, setStorageInfo] = useState<{ folder: string; bytes?: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const uploadInProgress = useRef(false);
 
   const handleUpload = async (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      setError("Please select a valid image file.");
+    if (uploadInProgress.current) return;
+    if (!["image/jpeg", "image/png", "image/webp", "image/avif"].includes(file.type)) {
+      setError("Select a JPG, PNG, WebP or AVIF image.");
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
@@ -28,41 +31,29 @@ export function CloudinaryUpload({ value, onChange, folder = "general", label = 
       return;
     }
 
+    uploadInProgress.current = true;
     setUploading(true);
     setError(null);
+    setStorageInfo(null);
 
     try {
-      // 1. First attempt a secure, signed upload via the admin proxy if available
-      let signData: { signature?: string; timestamp?: number; apiKey?: string; cloudName?: string; folder?: string; allowedFormats?: string[]; maxBytes?: number; transformation?: string } = {};
-      try {
-        const signRes = await fetch(`/api/admin/proxy/cloudinary-sign?folder=${encodeURIComponent(folder)}`, { credentials: "same-origin" });
-        if (signRes.ok) {
-          signData = await signRes.json();
-        }
-      } catch {
-        // The backend signature is mandatory for administrator uploads.
-      }
-
-      if (!signData.signature || !signData.apiKey || !signData.timestamp || !signData.cloudName || !signData.folder) throw new Error("Secure upload is unavailable");
-
-      const cloudName = signData.cloudName || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "sm0xomj7";
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("folder", signData.folder);
-      formData.append("allowed_formats", (signData.allowedFormats || []).join(","));
-      formData.append("max_bytes", String(signData.maxBytes));
-      formData.append("transformation", String(signData.transformation));
-      formData.append("signature", signData.signature);
-      formData.append("timestamp", String(signData.timestamp));
-      formData.append("api_key", signData.apiKey);
-
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      formData.append("folder", folder);
+      const res = await fetch("/api/admin/upload", {
         method: "POST",
         body: formData,
+        credentials: "same-origin",
+        signal: AbortSignal.timeout(65_000),
       });
-      if (!res.ok) throw new Error("Upload failed");
-      const data = await res.json();
+      const result = await res.json();
+      if (!res.ok || !result.success) throw new Error(result.error || "Upload failed");
+      const data = { secure_url: result.data?.url };
       if (typeof data.secure_url !== "string") throw new Error("Upload did not return an image URL");
+      setStorageInfo({
+        folder: typeof result.data?.folder === "string" ? result.data.folder : "banglasketch/media",
+        bytes: typeof result.data?.bytes === "number" ? result.data.bytes : undefined,
+      });
 
       // Automatically optimize URL with f_auto, q_auto:good, and max width 1920
       const optimizedUrl = getOptimizedCloudinaryUrl(data.secure_url, {
@@ -71,9 +62,10 @@ export function CloudinaryUpload({ value, onChange, folder = "general", label = 
         crop: "limit",
       });
       onChange(optimizedUrl);
-    } catch {
-      setError("Upload failed. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed. Please try again.");
     } finally {
+      uploadInProgress.current = false;
       setUploading(false);
     }
   };
@@ -95,6 +87,7 @@ export function CloudinaryUpload({ value, onChange, folder = "general", label = 
           <div className="absolute inset-0 bg-[#242824]/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
             <button
               type="button"
+              disabled={uploading}
               onClick={() => inputRef.current?.click()}
               className="px-4 py-2 bg-[#586348] text-white rounded-xl font-semibold text-xs hover:bg-[#444D37] transition-colors shadow-xs"
             >
@@ -102,7 +95,8 @@ export function CloudinaryUpload({ value, onChange, folder = "general", label = 
             </button>
             <button
               type="button"
-              onClick={() => onChange("")}
+              disabled={uploading}
+              onClick={() => { onChange(""); setStorageInfo(null); }}
               className="px-4 py-2 bg-red-600 text-white rounded-xl font-semibold text-xs hover:bg-red-700 transition-colors shadow-xs"
             >
               <FiX size={16} />
@@ -138,11 +132,26 @@ export function CloudinaryUpload({ value, onChange, folder = "general", label = 
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp,image/avif"
+        disabled={uploading}
         className="hidden"
-        onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          e.target.value = "";
+          if (file) handleUpload(file);
+        }}
       />
       {error && <p className="text-xs text-red-600 mt-2 font-medium">{error}</p>}
+      {storageInfo && !error && (
+        <div role="status" className="mt-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px] leading-relaxed text-emerald-800">
+          <span className="font-semibold">Saved securely.</span>{" "}
+          Hidden photo metadata was removed and the upload was recorded in the admin audit log.
+          <span className="mt-0.5 block text-emerald-700/80">
+            Storage: {storageInfo.folder}
+            {storageInfo.bytes ? ` · ${(storageInfo.bytes / 1024 / 1024).toFixed(2)} MB` : ""}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

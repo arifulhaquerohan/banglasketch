@@ -174,6 +174,7 @@ export default function AdminLoginPage() {
                 height={112}
                 className="w-full h-full"
                 priority
+                unoptimized
               />
             </div>
             <p className="text-[11px] tracking-[0.25em] text-[#586348] uppercase font-semibold mt-3">

@@ -13,18 +13,18 @@ function inlineMarkdown(text: string) {
       return <em key={index}>{part.slice(1, -1)}</em>;
     }
     if (/^`[^`]+`$/.test(part)) {
-      return <code key={index} className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-sm text-[#e8dcc5]">{part.slice(1, -1)}</code>;
+      return <code key={index} className="rounded bg-emerald-light/20 px-1.5 py-0.5 font-mono text-sm text-gold-light">{part.slice(1, -1)}</code>;
     }
 
     const image = part.match(/^!\[([^\]]*)\]\(([^\s)]+)\)$/);
     if (image) {
       // eslint-disable-next-line @next/next/no-img-element
-      return <img key={index} src={image[2]} alt={image[1]} className="my-6 rounded-2xl border border-[#c5a059]/20" />;
+      return <img key={index} src={image[2]} alt={image[1]} className="my-6 rounded-2xl border border-gold/20" />;
     }
 
     const link = part.match(/^\[([^\]]+)\]\(([^\s)]+)\)$/);
     if (link) {
-      return <a key={index} href={link[2]} target="_blank" rel="noopener noreferrer" className="text-[#c5a059] underline underline-offset-4 hover:text-[#e07b2a]">{link[1]}</a>;
+      return <a key={index} href={link[2]} target="_blank" rel="noopener noreferrer" className="text-gold underline underline-offset-4 hover:text-clay-light">{link[1]}</a>;
     }
     return part;
   });
@@ -46,9 +46,9 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
     if (heading) {
       const headingLevel = heading[1].length;
       const text = inlineMarkdown(heading[2]);
-      if (headingLevel === 1) blocks.push(<h2 key={index} className="mt-10 text-3xl font-extrabold text-white">{text}</h2>);
-      if (headingLevel === 2) blocks.push(<h3 key={index} className="mt-9 text-2xl font-bold text-white">{text}</h3>);
-      if (headingLevel === 3) blocks.push(<h4 key={index} className="mt-7 text-xl font-bold text-[#e8dcc5]">{text}</h4>);
+      if (headingLevel === 1) blocks.push(<h2 key={index} className="mt-10 text-3xl font-extrabold text-ivory-light">{text}</h2>);
+      if (headingLevel === 2) blocks.push(<h3 key={index} className="mt-9 text-2xl font-bold text-ivory-light">{text}</h3>);
+      if (headingLevel === 3) blocks.push(<h4 key={index} className="mt-7 text-xl font-bold text-gold-light">{text}</h4>);
       index += 1;
       continue;
     }
@@ -62,7 +62,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
       blocks.push(
         <ul key={index} className="my-5 space-y-3 pl-1">
           {items.map((item, itemIndex) => (
-            <li key={itemIndex} className="flex gap-3"><span className="text-[#c5a059]">✦</span><span>{inlineMarkdown(item)}</span></li>
+            <li key={itemIndex} className="flex gap-3"><span className="text-gold">✦</span><span>{inlineMarkdown(item)}</span></li>
           ))}
         </ul>
       );
@@ -76,7 +76,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
         index += 1;
       }
       blocks.push(
-        <ol key={index} className="my-5 list-decimal space-y-3 pl-6 marker:text-[#c5a059]">
+        <ol key={index} className="my-5 list-decimal space-y-3 pl-6 marker:text-gold">
           {items.map((item, itemIndex) => <li key={itemIndex}>{inlineMarkdown(item)}</li>)}
         </ol>
       );
@@ -88,7 +88,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
       paragraph.push(lines[index].trim());
       index += 1;
     }
-    blocks.push(<p key={index} className="text-lg leading-relaxed text-gray-300">{inlineMarkdown(paragraph.join(" "))}</p>);
+    blocks.push(<p key={index} className="text-lg leading-relaxed text-limestone-light">{inlineMarkdown(paragraph.join(" "))}</p>);
   }
 
   return <div className="space-y-6">{blocks}</div>;

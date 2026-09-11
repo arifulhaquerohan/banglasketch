@@ -39,19 +39,19 @@ The ZIP includes your active `backend/.env`. Verify or update the following valu
 PORT=5000
 NODE_ENV=production
 FRONTEND_URL=https://yourdomain.com
-DATABASE_URL=postgresql://postgres.kbboeqltxhlqjwnhlxbn:PZ5ponseSEN4c77u@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
-CLOUDINARY_CLOUD_NAME=sm0xomj7
-CLOUDINARY_API_KEY=725716647278416
-CLOUDINARY_API_SECRET=UykVCqG_rPbXet2t-phzvooRK1w
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=arifulhaquerohan@gmail.com
-SMTP_PASS=mfecvjjfaipwsdga
+SMTP_USER=your_smtp_username
+SMTP_PASS=your_smtp_app_password
 CONTACT_EMAIL=info@banglasketch.com
-ADMIN_JWT_SECRET=5b1541ce0db15ed6260bb64b04e44c7ffc5cb315dff9b94b0343b52ab23a1492247cd1cb96df406cd0f04d638ea14f9d2f71f062057429c2ef2986ebbe6784fd
-ADMIN_PASSWORD_HASH=$2a$12$aozSRAx..8cj.sLUNqHekOZOxxJO8CzpbeyKoB2XIQLaDeOY/3CjS
-ADMIN_RECOVERY_EMAIL=arifulhaquerohan@gmail.com
-ADMIN_NOTIFICATION_EMAIL=arifulhaquerohan@gmail.com
+ADMIN_JWT_SECRET=replace_with_a_long_random_secret
+ADMIN_PASSWORD_HASH=replace_with_a_bcrypt_password_hash
+ADMIN_RECOVERY_EMAIL=admin@example.com
+ADMIN_NOTIFICATION_EMAIL=admin@example.com
 ```
 
 ### B. Frontend Environment (`frontend/.env.local` or `frontend/.env.production`)
@@ -60,7 +60,7 @@ Create or edit `frontend/.env.local`:
 ```env
 API_URL=https://api.yourdomain.com
 NEXT_PUBLIC_API_URL=https://api.yourdomain.com
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=sm0xomj7
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
 ```
 *(Replace `yourdomain.com` with your actual live domain).*
 

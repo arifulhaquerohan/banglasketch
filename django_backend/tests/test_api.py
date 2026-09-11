@@ -262,9 +262,51 @@ class BanglasketchAPITestCase(TestCase):
         self.assertEqual(settings_res.status_code, 200)
         self.assertEqual(settings_res.data["data"]["studio_phone"], "+8801700000000")
 
-        # Admin Cloudinary Signature
+        # All image uploads now go through server-side validation.
         sign_res = self.client.get("/api/admin/cloudinary-sign?folder=projects")
-        self.assertEqual(sign_res.status_code, 200)
-        self.assertTrue(sign_res.data.get("success"))
-        self.assertIn("signature", sign_res.data)
-        self.assertEqual(sign_res.data["folder"], "banglasketch/projects")
+        self.assertEqual(sign_res.status_code, 410)
+        self.assertNotIn("signature", sign_res.data)
+
+    # 8. Password Reset Flow (OTP request and verification)
+    def test_admin_password_reset_flow(self):
+        import hashlib
+        from apps.authentication.models import AdminPasswordReset
+
+        # Request OTP
+        req_res = self.client.post("/api/admin/request-reset-otp", {
+            "email": "admin@banglasketch.com",
+        }, format="json")
+        self.assertEqual(req_res.status_code, 200)
+        self.assertTrue(req_res.data.get("success"))
+        self.assertIn("maskedEmail", req_res.data)
+
+        # Create known reset OTP in test database
+        test_otp = "837417"
+        otp_hash = hashlib.sha256(test_otp.encode("utf-8")).hexdigest()
+        AdminPasswordReset.objects.create(
+            email="admin@banglasketch.com",
+            otp_hash=otp_hash,
+            expires_at=timezone.now() + timezone.timedelta(minutes=15),
+            ip_address="127.0.0.1",
+        )
+
+        # Test verification with email
+        verify_res = self.client.post("/api/admin/verify-reset-otp", {
+            "email": "admin@banglasketch.com",
+            "otp": test_otp,
+            "newPassword": "ResetMasterPassword2026!",
+        }, format="json")
+        self.assertEqual(verify_res.status_code, 200)
+        self.assertTrue(verify_res.data.get("success"))
+
+        # Verify password changed
+        self.admin.refresh_from_db()
+        self.assertTrue(self.admin.check_password("ResetMasterPassword2026!"))
+
+        # Login with new password
+        login_res = self.client.post("/api/admin/login", {
+            "email": "admin@banglasketch.com",
+            "password": "ResetMasterPassword2026!",
+        }, format="json")
+        self.assertEqual(login_res.status_code, 200)
+        self.assertTrue(login_res.data.get("success"))

@@ -41,16 +41,18 @@ pip install -r requirements.txt
 ```
 
 ### 2. Environment Variables
-Copy `.env.example` to `.env` (or let it auto-read from `../backend/.env`):
+Copy `.env.example` to `.env` and set the production values before deployment:
 ```bash
 cp .env.example .env
 ```
 
 ### 3. Database Migrations
-To apply initial migrations without conflicting with existing PostgreSQL tables:
+For a new local database:
 ```bash
-python manage.py migrate --fake-initial
+python manage.py migrate
 ```
+
+For an existing PostgreSQL database, first restore a copy and verify the schema. Use `--fake-initial` only after that verification confirms Django's initial tables already match the existing tables.
 
 ### 4. Create or Setup Django Admin Superuser
 ```bash
@@ -68,21 +70,50 @@ Runs at `http://127.0.0.1:5000/`.
 
 ## Running Automated Tests
 
-Run the full integration test suite:
+Run the complete test suite against PostgreSQL:
 ```bash
-python manage.py test tests.test_api --keepdb -v2
+python manage.py test tests --keepdb -v2
 ```
 
-Tests cover:
-- Public portfolio projects (list, pagination envelope, category filter, search, detail)
-- Public blog articles (list, detail view count increment)
-- Public media assets (videos, testimonials)
-- Lead capture (contact inquiries, newsletter subscriptions)
-- Client portal access & proposal decision approvals
-- Admin JWT authentication, profile, password reset, 2FA
-- Admin CRUD (projects, blog, videos, testimonials, settings)
-- Soft delete, trash listing, restore, and permanent deletion
-- Cloudinary upload signing
+Test suites include:
+- `tests/test_api.py`: Public endpoints (projects, blog, videos, testimonials, contact, newsletter, portal) and admin CRUD, soft-deletes, restore, settings, Cloudinary upload signatures.
+- `tests/test_auth_security.py`: AES-256-GCM TOTP secret encryption/decryption, 2FA workflow, login rate limiting, owner role invariants, and login audit trail logging.
+- `tests/test_email_jobs.py`: Lead submission atomicity, anti-spam honeypot and timing checks, background email job processor with exponential backoff, and scheduled blog publishing.
+- `tests/test_client_handling.py`: Client enquiries, intake follow-ups, proposal lifecycle, and client portal access tokens.
+
+---
+
+## Background Services & Management Commands
+
+### 1. Reliable Email Worker
+Processes queued contact notifications and confirmation emails with atomic `SKIP LOCKED` concurrency and exponential backoff retries:
+```bash
+python manage.py run_email_worker
+```
+For a single one-off batch (e.g. cron job):
+```bash
+python manage.py run_email_worker --once
+```
+
+### 2. Scheduled Jobs & Data Purging
+Publishes scheduled blog posts and purges expired rate limits and stale operational records:
+```bash
+python manage.py run_jobs
+```
+One-off mode:
+```bash
+python manage.py run_jobs --once
+```
+
+### 3. Encrypted Database Backup & Verification
+Creates an AES-256-GCM encrypted database dump using `pg_dump`:
+```bash
+python scripts/backup.py
+```
+Decrypts and validates the integrity of a backup archive:
+```bash
+python scripts/verify_backup.py
+```
 
 ---
 
@@ -95,7 +126,9 @@ gunicorn banglasketch_api.wsgi:application --bind 127.0.0.1:5000 --workers 3
 ```
 
 ### PM2 Integration
-Add or run with PM2:
+Run backend API and workers via PM2:
 ```bash
-pm2 start "django_backend/.venv/bin/gunicorn banglasketch_api.wsgi:application --bind 127.0.0.1:5000 --workers 3" --name banglasketch-backend
+pm2 start "django_backend/.venv/bin/gunicorn banglasketch_api.wsgi:application --bind 127.0.0.1:5000 --workers 3" --name banglasketch-api
+pm2 start "django_backend/.venv/bin/python manage.py run_email_worker" --name banglasketch-email-worker
+pm2 start "django_backend/.venv/bin/python manage.py run_jobs" --name banglasketch-scheduler
 ```

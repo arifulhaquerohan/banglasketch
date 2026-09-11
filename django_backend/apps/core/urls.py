@@ -9,6 +9,7 @@ from .views import (
     AdminUploadView,
     AdminCloudinarySignView,
     AdminRestoreView,
+    AdminVersionHistoryView,
     AdminPermanentDeleteView,
 )
 
@@ -25,6 +26,7 @@ core_admin_urlpatterns = [
     re_path(r"^upload/?$", AdminUploadView.as_view(), name="admin_upload"),
     re_path(r"^cloudinary-sign/?$", AdminCloudinarySignView.as_view(), name="admin_cloudinary_sign"),
     re_path(r"^restore/(?P<entity>[\w-]+)/(?P<id>\d+)/?$", AdminRestoreView.as_view(), name="admin_restore"),
+    re_path(r"^versions/(?P<entity>[\w-]+)/(?P<id>\d+)/?$", AdminVersionHistoryView.as_view(), name="admin_version_history"),
     re_path(r"^trash/(?P<entity>[\w-]+)/(?P<id>\d+)/?$", AdminPermanentDeleteView.as_view(), name="admin_permanent_delete"),
 ]
 

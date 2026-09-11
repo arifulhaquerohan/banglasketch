@@ -11,8 +11,10 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
     const { currentPassword, newPassword } = body;
+    const current_password = currentPassword;
+    const new_password = newPassword;
 
-    if (!currentPassword || !newPassword) {
+    if (!current_password || !new_password) {
       return NextResponse.json(
         { success: false, error: "Current password and new password are required" },
         { status: 400 }
@@ -26,7 +28,7 @@ export async function POST(req: NextRequest) {
         ...proxyHeaders(req),
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ currentPassword, newPassword }),
+      body: JSON.stringify({ current_password, new_password }),
       signal: AbortSignal.timeout(10000),
     });
 

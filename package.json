@@ -4,7 +4,7 @@
   "private": true,
   "description": "Bangla Sketch - Luxury Interior Design Studio Web Platform & CMS",
   "scripts": {
-    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "install:all": "python3 -m venv django_backend/.venv && django_backend/.venv/bin/python -m pip install -r django_backend/requirements.txt && npm install --prefix frontend",
     "build": "npm run build --prefix frontend",
     "start": "pm2 start ecosystem.config.js",
     "stop": "pm2 stop ecosystem.config.js",

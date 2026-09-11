@@ -292,29 +292,55 @@ class PublicPortalView(APIView):
 class PublicPortalProposalDecisionView(APIView):
     permission_classes = [AllowAny]
 
+    @transaction.atomic
     def post(self, request, token, proposal_id):
         client = Client.objects.filter(portal_token=token, deleted_at__isnull=True).first()
         if not client:
             return Response({"success": False, "error": "Unauthorized or invalid portal token"}, status=401)
 
-        proposal = Proposal.objects.filter(pk=proposal_id, project__client=client).first()
+        proposal = Proposal.objects.select_for_update().filter(
+            pk=proposal_id, project__client=client, project__deleted_at__isnull=True,
+        ).first()
         if not proposal:
             return Response({"success": False, "error": "Proposal not found"}, status=404)
 
         decision = request.data.get("decision")
         notes = request.data.get("notes", "")
-        version = request.data.get("version")
+        requested_version = request.data.get("version")
+        if decision not in ["approved", "rejected"] or not isinstance(notes, str):
+            return Response({"success": False, "error": "A valid decision and text notes are required"}, status=400)
+        if proposal.status != "sent":
+            return Response({"success": False, "error": "Only sent proposals can receive a decision"}, status=409)
 
-        if decision not in ["approved", "rejected"]:
-            return Response({"success": False, "error": "Decision must be 'approved' or 'rejected'"}, status=400)
+        version = None
+        if decision == "approved":
+            versions = ProposalVersion.objects.filter(proposal=proposal)
+            if requested_version is not None:
+                # Reject booleans, fractional numbers and malformed IDs before ORM coercion.
+                if not isinstance(requested_version, (str, int)) or isinstance(requested_version, bool):
+                    return Response({"success": False, "error": "Invalid proposal version"}, status=400)
+                try:
+                    version_number = int(requested_version)
+                except (ValueError, TypeError):
+                    return Response({"success": False, "error": "Invalid proposal version"}, status=400)
+                if not 1 <= version_number <= 2147483647:
+                    return Response({"success": False, "error": "Invalid proposal version"}, status=400)
+                versions = versions.filter(version=version_number)
+            version = versions.order_by("-version").first()
+            if version is None:
+                return Response({"success": False, "error": "Proposal version not found"}, status=404)
 
         proposal.status = decision
         proposal.approval_notes = notes
-        if decision == "approved":
+        if version is not None:
             proposal.approved_at = timezone.now()
-            if version:
-                proposal.approved_version = int(version)
-
+            proposal.approved_version = version.version
+            Proposal.objects.filter(project=proposal.project, status="approved").exclude(pk=proposal.pk).update(
+                status="superseded", updated_at=timezone.now(),
+            )
+            ClientProject.objects.filter(pk=proposal.project_id).update(
+                agreed_budget=version.proposed_cost, stage="approved", updated_at=timezone.now(),
+            )
         proposal.save()
         return Response({"success": True, "message": f"Proposal marked as {decision}"})
 
@@ -322,26 +348,29 @@ class PublicPortalProposalDecisionView(APIView):
 class PublicPortalChangeOrderDecisionView(APIView):
     permission_classes = [AllowAny]
 
+    @transaction.atomic
     def post(self, request, token, change_order_id):
         client = Client.objects.filter(portal_token=token, deleted_at__isnull=True).first()
         if not client:
             return Response({"success": False, "error": "Unauthorized or invalid portal token"}, status=401)
 
-        change_order = ChangeOrder.objects.filter(pk=change_order_id, project__client=client).first()
+        change_order = ChangeOrder.objects.select_for_update().filter(
+            pk=change_order_id, project__client=client, project__deleted_at__isnull=True,
+        ).first()
         if not change_order:
             return Response({"success": False, "error": "Change order not found"}, status=404)
 
         decision = request.data.get("decision")
         notes = request.data.get("notes", "")
-
-        if decision not in ["approved", "rejected"]:
-            return Response({"success": False, "error": "Decision must be 'approved' or 'rejected'"}, status=400)
+        if decision not in ["approved", "rejected"] or not isinstance(notes, str):
+            return Response({"success": False, "error": "A valid decision and text notes are required"}, status=400)
+        if change_order.status != "pending_approval":
+            return Response({"success": False, "error": "This change order already has a decision"}, status=409)
 
         change_order.status = decision
         change_order.client_notes = notes
         change_order.decided_at = timezone.now()
         change_order.save()
-
         return Response({"success": True, "message": f"Change order marked as {decision}"})
 
 
@@ -1179,24 +1208,39 @@ class AdminProposalApproveView(APIView):
     permission_classes = [IsAdminUserAuthenticated, require_role("editor")]
 
     def post(self, request, id):
-        proposal = Proposal.objects.filter(pk=id).first()
+        proposal = Proposal.objects.filter(pk=id, project__deleted_at__isnull=True).first()
         if not proposal:
             return Response({"success": False, "error": "Proposal not found"}, status=404)
+
+        if proposal.status not in ("draft", "sent"):
+            return Response({"success": False, "error": "Only draft or sent proposals can be approved"}, status=409)
 
         req_version = request.data.get("version")
         approval_notes = request.data.get("approval_notes", "Client signed off on scope & cost")
 
         with transaction.atomic():
-            if req_version:
-                version = ProposalVersion.objects.filter(proposal=proposal, version=int(req_version)).first()
+            if req_version is not None:
+                # Validate version input — reject booleans, fractional numbers, and out-of-range values.
+                if not isinstance(req_version, (str, int)) or isinstance(req_version, bool):
+                    return Response({"success": False, "error": "Invalid proposal version"}, status=400)
+                try:
+                    version_number = int(req_version)
+                except (ValueError, TypeError):
+                    return Response({"success": False, "error": "Invalid proposal version"}, status=400)
+                if not 1 <= version_number <= 2147483647:
+                    return Response({"success": False, "error": "Invalid proposal version"}, status=400)
+                version = ProposalVersion.objects.select_for_update().filter(proposal=proposal, version=version_number).first()
             else:
-                version = ProposalVersion.objects.filter(proposal=proposal).order_by("-version").first()
+                version = ProposalVersion.objects.select_for_update().filter(proposal=proposal).order_by("-version").first()
 
             if not version:
                 return Response({"success": False, "error": "Specified proposal version not found"}, status=404)
 
-            # Mark earlier proposals for this project as superseded
-            Proposal.objects.filter(
+            # Lock and re-fetch the proposal to prevent race conditions
+            proposal = Proposal.objects.select_for_update().get(pk=proposal.pk)
+
+            # Mark earlier proposals for this project as superseded (only if they are currently approved)
+            Proposal.objects.select_for_update().filter(
                 project_id=proposal.project_id,
                 status="approved",
             ).exclude(pk=proposal.id).update(status="superseded", updated_at=timezone.now())

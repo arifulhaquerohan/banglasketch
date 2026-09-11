@@ -168,7 +168,7 @@ export default function ClientPortalPage({
     );
   }
 
-  const { client, projects, enquiries } = data;
+  const { client, projects } = data;
 
   return (
     <div className="min-h-screen bg-[#F7F4EE] text-[#242824] py-10 px-4 sm:px-6 lg:px-8">
@@ -235,7 +235,6 @@ export default function ClientPortalPage({
         ) : (
           <div className="space-y-8">
             {projects.map((proj) => {
-              const hasApprovedProposal = proj.proposals?.some((p) => p.status === "approved");
               const approvedChangesTotal = proj.changeOrders
                 ?.filter((co) => co.status === "approved")
                 .reduce((acc, co) => acc + Number(co.proposed_cost || 0), 0) || 0;

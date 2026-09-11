@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from banglasketch_api.pagination import EnvelopePagination
+from banglasketch_api.pagination import EnvelopePagination, decode_cursor
 from apps.authentication.auth import IsAdminUserAuthenticated, require_role
 from .models import BlogPost
 from .serializers import BlogPostSerializer
@@ -37,8 +37,10 @@ class PublicBlogPostListView(APIView):
             )
 
         cursor = request.query_params.get("cursor")
-        if cursor and cursor.isdigit():
-            qs = qs.filter(id__lt=int(cursor))
+        if cursor:
+            decoded_id = decode_cursor(cursor)
+            if decoded_id:
+                qs = qs.filter(id__lt=decoded_id)
 
         qs = qs.order_by("-published_date", "-id")
 

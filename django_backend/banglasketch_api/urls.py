@@ -52,6 +52,7 @@ def get_public_api_urlpatterns():
         re_path(r"^testimonials(?:/|$)", include(testimonial_public_urlpatterns)),
         re_path(r"^contact(?:/|$)", include(contact_public_urlpatterns)),
         re_path(r"^newsletter(?:/|$)", include(newsletter_public_urlpatterns)),
+        re_path(r"^chat(?:/|$)", include("apps.chatbot.urls")),
         re_path(r"^enquiries(?:/|$)", include(enquiries_public_urlpatterns)),
         re_path(r"^portal(?:/|$)", include(portal_public_urlpatterns)),
     ]

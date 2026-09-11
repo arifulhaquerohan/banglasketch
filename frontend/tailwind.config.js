@@ -36,32 +36,16 @@ module.exports = {
           dark: "#893E28",
           tint: "#F8ECE9",
         },
-        sand: {
-          DEFAULT: "#DDD5C8",
-          light: "#EAE3D7",
-          dark: "#C6BCAD",
-          muted: "#B8AC9B",
-        },
-        terracotta: {
-          DEFAULT: "#A45138",
-          light: "#B8654D",
-          dark: "#893E28",
-        },
-        // Legacy aliases mapped smoothly
-        navy: {
-          DEFAULT: "#242622",
-          light: "#363A34",
-          dark: "#171815",
-        },
         gold: {
-          DEFAULT: "#727A61",
-          light: "#8C9678",
-          dark: "#575E4A",
+          DEFAULT: "#C5A059",
+          darker: "#936D28",
+          light: "#E8CE8A",
         },
-        orange: {
-          DEFAULT: "#A45138",
+        emerald: {
+          DEFAULT: "#0F241B",
+          darker: "#07130E",
+          light: "#1B382B",
         },
-        coral: "#A45138",
       },
       fontFamily: {
         serif: ["var(--font-instrument)", "var(--font-serif-bn)", "Playfair Display", "Georgia", "serif"],

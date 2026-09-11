@@ -84,7 +84,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
         <div className="text-center mb-8">
           <div className="relative inline-block mb-4">
             <div className="relative w-28 h-28 mx-auto rounded-full shadow-md bg-[#EDE7DE] p-2 border border-[#DED5C7]">
-              <Image src="/logo.svg" alt="Bangla Sketch" width={112} height={112} className="w-full h-full" priority />
+              <Image src="/logo.svg" alt="Bangla Sketch" width={112} height={112} className="w-full h-full" priority unoptimized />
             </div>
             <p className="text-[11px] tracking-[0.25em] text-[#586348] uppercase font-semibold mt-3">
               Architectural Studio
@@ -256,7 +256,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#242824] border-b border-[#383E38] px-4 py-3 flex items-center justify-between shadow-md pt-[max(0.75rem,env(safe-area-inset-top))]">
         <Link href="/admin" className="flex items-center gap-2.5">
           <div className="relative w-8 h-8 rounded-full bg-[#383E38] p-1">
-            <Image src="/logo.svg" alt="Logo" width={32} height={32} className="w-full h-full" />
+            <Image src="/logo.svg" alt="Logo" width={32} height={32} className="w-full h-full" unoptimized />
           </div>
           <div>
             <div className="text-sm font-semibold text-[#FCFAF7] tracking-wide">Bangla Sketch</div>
@@ -281,7 +281,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-5 border-b border-[#383E38] flex items-center justify-between">
           <Link href="/admin" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3">
             <div className="relative w-10 h-10 rounded-full bg-[#383E38] p-1.5 shadow-sm border border-white/10">
-              <Image src="/logo.svg" alt="Banglasketch" width={40} height={40} className="w-full h-full" />
+              <Image src="/logo.svg" alt="Banglasketch" width={40} height={40} className="w-full h-full" unoptimized />
             </div>
             <div>
               <div className="font-serif font-bold text-[#FCFAF7] text-base leading-tight">Bangla Sketch</div>

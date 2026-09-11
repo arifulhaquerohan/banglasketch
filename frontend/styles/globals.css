@@ -23,6 +23,14 @@
   --color-clay-dark: #893E28;
   --color-clay-tint: #F8ECE9;
 
+  /* Architectural Gold & Emerald */
+  --color-gold: #C5A059;
+  --color-gold-darker: #936D28;
+  --color-gold-light: #E8CE8A;
+  --color-emerald: #0F241B;
+  --color-emerald-darker: #07130E;
+  --color-emerald-light: #1B382B;
+
   /* Architectural sand & legacy aliases */
   --color-sand: #DDD5C8;
   --color-sand-light: #FAF7F2;

@@ -7,6 +7,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,8 +22,13 @@ for env_path in [
         load_dotenv(env_path)
         break
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-banglasketch-production-key-seed-98213974")
 DEBUG = os.getenv("NODE_ENV", "development") != "production"
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set in production environment")
+    SECRET_KEY = "django-insecure-banglasketch-production-key-seed-98213974"
 
 allowed_hosts_str = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0,testserver")
 ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_str.split(",") if h.strip()]
@@ -49,6 +56,7 @@ INSTALLED_APPS = [
     "apps.media_assets.apps.MediaAssetsConfig",
     "apps.leads.apps.LeadsConfig",
     "apps.clients.apps.ClientsConfig",
+    "apps.chatbot.apps.ChatbotConfig",
 ]
 
 MIDDLEWARE = [
@@ -85,6 +93,25 @@ WSGI_APPLICATION = "banglasketch_api.wsgi.application"
 DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL and (DATABASE_URL.startswith("postgres://") or DATABASE_URL.startswith("postgresql://")):
     parsed = urlparse(DATABASE_URL)
+    # Handle Supabase/PostgreSQL SSL options from environment
+    ssl_mode = os.getenv("DB_SSL_MODE", "require")
+    ssl_ca_file = os.getenv("DB_SSL_CA_FILE")
+
+    # Map common SSL modes to psycopg options
+    # 'require' = sslmode='require' (default)
+    # 'verify-ca' = sslmode='verify-ca'
+    # 'verify-full' = sslmode='verify-full'
+    ssl_options = {}
+    if ssl_mode == "verify-ca" or ssl_mode == "verify-full":
+        if ssl_ca_file:
+            ssl_options["sslrootcert"] = ssl_ca_file
+        else:
+            # Log warning or raise error if verification is requested but CA file is missing
+            pass
+
+    is_pooler = "pooler.supabase.com" in (parsed.hostname or "") or parsed.port == 6543
+    default_conn_max_age = 0 if is_pooler else 60
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -93,7 +120,12 @@ if DATABASE_URL and (DATABASE_URL.startswith("postgres://") or DATABASE_URL.star
             "PASSWORD": parsed.password or "",
             "HOST": parsed.hostname or "localhost",
             "PORT": parsed.port or 5432,
-            "CONN_MAX_AGE": int(os.getenv("CONN_MAX_AGE", 0)),
+            "CONN_MAX_AGE": int(os.getenv("CONN_MAX_AGE", default_conn_max_age)),
+            "DISABLE_SERVER_SIDE_CURSORS": is_pooler,
+            "OPTIONS": {
+                "sslmode": ssl_mode,
+                **ssl_options,
+            },
         }
     }
 else:
@@ -134,9 +166,20 @@ CORS_ALLOWED_ORIGINS = [u.strip() for u in frontend_url_str.split(",") if u.stri
 CORS_ALLOW_CREDENTIALS = True
 
 # JWT Secrets & Config
-ADMIN_JWT_SECRET = os.getenv("ADMIN_JWT_SECRET", "super-secret-jwt-key-banglasketch-32bytes")
+ADMIN_JWT_SECRET = os.getenv("ADMIN_JWT_SECRET")
+if not ADMIN_JWT_SECRET:
+    if not DEBUG:
+        raise ImproperlyConfigured("ADMIN_JWT_SECRET must be set in production environment")
+    ADMIN_JWT_SECRET = "super-secret-jwt-key-banglasketch-32bytes"
 ADMIN_TOKEN_TTL_HOURS = 8
 ADMIN_RECOVERY_EMAIL = os.getenv("ADMIN_RECOVERY_EMAIL", "arifulhaquerohan@gmail.com")
+
+# TOTP 2FA Encryption Key (AES-256-GCM 32-bytes base64 encoded)
+TOTP_ENCRYPTION_KEY = os.getenv("TOTP_ENCRYPTION_KEY")
+if not TOTP_ENCRYPTION_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured("TOTP_ENCRYPTION_KEY must be set in production environment")
+    TOTP_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI="
 
 # Cloudinary Configuration
 CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME", "")
@@ -166,6 +209,23 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Dhaka"
 USE_I18N = True
 USE_TZ = True
+
+# Security Headers & Cookies
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
+else:
+    SECURE_PROXY_SSL_HEADER = None
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 
 # Static & Media
 STATIC_URL = "static/"

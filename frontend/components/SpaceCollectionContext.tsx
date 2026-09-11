@@ -40,7 +40,18 @@ export function SpaceCollectionProvider({ children }: { children: React.ReactNod
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setItems(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          const valid = parsed.filter(
+            (item: unknown): item is SavedSpaceItem =>
+              typeof item === "object" &&
+              item !== null &&
+              typeof (item as SavedSpaceItem).id === "string" &&
+              typeof (item as SavedSpaceItem).type === "string" &&
+              typeof (item as SavedSpaceItem).title === "string"
+          );
+          setItems(valid);
+        }
       }
     } catch {
       // localStorage may fail in private mode or SSR

@@ -12,7 +12,7 @@ from apps.blog.models import BlogPost
 from apps.media_assets.models import Video, Testimonial
 from apps.leads.models import ContactSubmission, NewsletterSubscriber
 from apps.clients.models import Enquiry, ClientProject
-from .models import SiteSetting, AuditLog
+from .models import SiteSetting, AuditLog, ContentVersion
 
 class HealthCheckView(APIView):
     permission_classes = [AllowAny]
@@ -208,73 +208,78 @@ class AdminUploadView(APIView):
     permission_classes = [IsAdminUserAuthenticated, require_role("editor")]
 
     def post(self, request):
-        # Cloudinary direct upload or sign request
+        from .services.media_upload import upload_image
+        from rest_framework.exceptions import ValidationError
         file_obj = request.FILES.get("file")
         if not file_obj:
             return Response({"success": False, "error": "No file uploaded"}, status=400)
 
         import cloudinary.uploader
         try:
-            upload_result = cloudinary.uploader.upload(
-                file_obj,
-                folder="banglasketch",
-                resource_type="auto",
-            )
+            upload_result = upload_image(file_obj, request.data.get("folder", "general"))
+            public_id = upload_result.get("public_id")
+            storage_folder = public_id.rsplit("/", 1)[0] if public_id and "/" in public_id else "banglasketch/general"
+            try:
+                AuditLog.objects.create(
+                    actor=request.user if hasattr(request.user, "id") else None,
+                    action="media_upload",
+                    entity_type="cloudinary_asset",
+                    entity_id=public_id,
+                    after_data={
+                        "folder": storage_folder,
+                        "format": upload_result.get("format"),
+                        "bytes": upload_result.get("bytes"),
+                        "metadata_removed": True,
+                        "visibility": "public_website_asset",
+                    },
+                )
+            except Exception:
+                # A provider upload must not be reported as failed just because
+                # audit persistence is temporarily unavailable.
+                pass
             return Response({
                 "success": True,
                 "data": {
                     "url": upload_result.get("secure_url"),
-                    "public_id": upload_result.get("public_id"),
+                    "public_id": public_id,
+                    "folder": storage_folder,
                     "format": upload_result.get("format"),
                     "bytes": upload_result.get("bytes"),
+                    "metadata_removed": True,
+                    "visibility": "public_website_asset",
                 }
             })
-        except Exception as e:
-            return Response({"success": False, "error": f"Upload failed: {str(e)}"}, status=500)
+        except ValidationError as exc:
+            return Response({"success": False, "error": str(exc.detail[0])}, status=400)
+        except Exception:
+            return Response({"success": False, "error": "Media storage is unavailable. Please retry."}, status=502)
 
 
 class AdminCloudinarySignView(APIView):
     permission_classes = [IsAdminUserAuthenticated, require_role("editor")]
 
     def get(self, request):
-        import time
-        import re
-        import cloudinary.utils
-        from django.conf import settings
-
-        if not getattr(settings, "CLOUDINARY_API_SECRET", None) or not getattr(settings, "CLOUDINARY_API_KEY", None) or not getattr(settings, "CLOUDINARY_CLOUD_NAME", None):
-            return Response({"success": False, "error": "Cloudinary is not configured on the backend"}, status=500)
-
-        timestamp = int(time.time())
-        requested = request.query_params.get("folder", "general")
-        requested = re.sub(r"^banglasketch/", "", requested)
-        if not re.match(r"^[a-zA-Z0-9_-]{1,40}$", requested):
-            return Response({"success": False, "error": "Invalid upload folder"}, status=400)
-
-        folder = f"banglasketch/{requested}"
-        params_to_sign = {
-            "timestamp": timestamp,
-            "folder": folder,
-            "allowed_formats": "jpg,jpeg,png,webp,avif",
-            "max_bytes": 10485760,
-            "transformation": "c_limit,w_4096,h_4096",
-        }
-        signature = cloudinary.utils.api_sign_request(params_to_sign, settings.CLOUDINARY_API_SECRET)
-
-        return Response({
-            "success": True,
-            "timestamp": timestamp,
-            "folder": folder,
-            "allowedFormats": ["jpg", "jpeg", "png", "webp", "avif"],
-            "maxBytes": 10485760,
-            "transformation": "c_limit,w_4096,h_4096",
-            "signature": signature,
-            "apiKey": settings.CLOUDINARY_API_KEY,
-            "cloudName": settings.CLOUDINARY_CLOUD_NAME,
-        })
+        # Retire reusable browser signatures; all bytes must pass image validation.
+        return Response({"success": False, "error": "Use the authenticated image upload endpoint"}, status=410)
 
 
-class AdminRestoreView(APIView):
+class AdminVersionHistoryView(APIView):
+    permission_classes = [IsAdminUserAuthenticated, require_role("editor")]
+
+    def get(self, request, entity, id):
+        versions = ContentVersion.objects.filter(entity_type=entity, entity_id=id).order_by("-version")
+        data = [
+            {
+                "id": v.id,
+                "version": v.version,
+                "snapshot": v.snapshot,
+                "actor_id": v.actor_id,
+                "created_at": v.created_at.isoformat(),
+            }
+            for v in versions
+        ]
+        return Response({"success": True, "data": data})
+
     permission_classes = [IsAdminUserAuthenticated, require_role("editor")]
 
     def post(self, request, entity, id):
@@ -282,6 +287,7 @@ class AdminRestoreView(APIView):
         from apps.blog.models import BlogPost
         from apps.media_assets.models import Video, Testimonial
         from apps.leads.models import ContactSubmission
+        from .models import ContentVersion
 
         entity_map = {
             "projects": Project,
@@ -297,6 +303,31 @@ class AdminRestoreView(APIView):
         if not model:
             return Response({"success": False, "error": "Invalid entity"}, status=400)
 
+        version = request.data.get("version")
+        if version:
+            # Restore to version
+            v_obj = ContentVersion.objects.filter(entity_type=entity, entity_id=id, version=version).first()
+            if not v_obj:
+                return Response({"success": False, "error": "Version not found"}, status=404)
+
+            item = model.objects.filter(pk=id).first()
+            if not item:
+                return Response({"success": False, "error": "Item not found"}, status=404)
+
+            for key, value in v_obj.snapshot.items():
+                setattr(item, key, value)
+            item.save()
+
+            AuditLog.objects.create(
+                actor=request.user if hasattr(request.user, "id") else None,
+                action="restore_version",
+                entity_type=entity,
+                entity_id=int(id),
+                after_data={"restored_version": int(version)},
+            )
+            return Response({"success": True, "message": f"Restored to version {version} successfully"})
+
+        # Undelete
         item = model.objects.filter(id=id).first()
         if not item:
             return Response({"success": False, "error": "Item not found"}, status=404)
@@ -313,6 +344,10 @@ class AdminRestoreView(APIView):
         )
 
         return Response({"success": True, "message": "Item restored successfully"})
+
+
+class AdminRestoreView(AdminVersionHistoryView):
+    pass
 
 
 class AdminPermanentDeleteView(APIView):
@@ -348,6 +383,12 @@ class AdminPermanentDeleteView(APIView):
             entity_type=entity,
             entity_id=int(id),
             before_data={"deleted": True},
+        )
+
+        from .models import BackgroundJob
+        BackgroundJob.objects.create(
+            kind="permanent_delete",
+            payload={"entity": entity, "id": id},
         )
 
         item.delete()

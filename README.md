@@ -5,7 +5,7 @@ Official production web application and Content Management System for **Bangla S
 ## Architecture
 
 - **Frontend:** Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Next/Image, Next/Link.
-- **Backend:** Node.js, Express 4, PostgreSQL (`pg`), Helmet, Express Rate Limit, JWT, Bcrypt.
+- **Backend:** Django REST Framework, PostgreSQL, JWT, Bcrypt.
 - **Media:** Cloudinary with automatic WebP/AVIF compression pipeline.
 - **Directory Structure:** See [STRUCTURE.md](docs/STRUCTURE.md) for full project layout and developer architecture guide.
 - **Security:**
@@ -27,20 +27,18 @@ Official production web application and Content Management System for **Bangla S
 ### 1. Backend Setup
 
 ```bash
-cd backend
+cd django_backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 cp .env.example .env
-npm install
-npm run dev
+# Configure the database and secrets in .env before continuing.
+python manage.py migrate
+python manage.py setup_admin
+python manage.py runserver 5000
 ```
 
-#### Seeding Database
-
-To initialize database tables with sample projects, blogs, videos, testimonials, and settings:
-
-```bash
-cd backend
-node scripts/seed.js
-```
+See [backend setup and operations](django_backend/README.md) for database compatibility and deployment details.
 
 ### 2. Frontend Setup
 
@@ -66,8 +64,8 @@ npm run start
 
 ### Run Backend in Production
 ```bash
-cd backend
-npm start
+cd django_backend
+DJANGO_SETTINGS_MODULE=config.settings.production .venv/bin/gunicorn config.wsgi:application --bind 127.0.0.1:5000 --workers 3
 ```
 
 ---

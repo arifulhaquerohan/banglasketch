@@ -31,7 +31,7 @@ export function FloatingWhatsApp() {
   };
 
   return (
-    <aside aria-label="WhatsApp quick chat" className="hidden md:block fixed bottom-6 right-6 z-40">
+    <aside aria-label="WhatsApp quick chat" className="hidden md:block fixed bottom-24 right-6 z-40">
       {/* Chat Popup Box */}
       {isOpen && (
         <div className="absolute bottom-16 right-0 w-[calc(100vw-2rem)] sm:w-80 max-w-[340px] bg-[#20251F] border-2 border-[#BEC6AD]/40 rounded-2xl shadow-xl overflow-hidden animate-scale-in">

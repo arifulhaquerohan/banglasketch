@@ -11,7 +11,10 @@ class PublicVideoListView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        qs = Video.objects.filter(published=True, deleted_at__isnull=True).order_by("display_order", "-id")
+        qs = Video.objects.filter(published=True, deleted_at__isnull=True)
+        if request.query_params.get("featured") == "true":
+            qs = qs.filter(featured=True)
+        qs = qs.order_by("display_order", "-id")
         serializer = VideoSerializer(qs, many=True)
         return Response({"success": True, "data": serializer.data})
 
