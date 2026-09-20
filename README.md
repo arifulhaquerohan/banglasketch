@@ -2,13 +2,23 @@
 
 Official production web application and Content Management System for **Bangla Sketch**, Dhaka's premier luxury interior design studio.
 
-## Website Screenshots
+## Feature Screenshots
 
-Desktop and mobile previews captured from the local production build.
+The gallery below documents the responsive public website and the CMS admin panel included in this project. These previews were captured from the local production build.
+
+### Public website
 
 ![Bangla Sketch desktop homepage](docs/previews/website-desktop.png)
 
 <img src="docs/previews/website-mobile.png" alt="Bangla Sketch mobile homepage" width="390" />
+
+### Admin panel
+
+![Bangla Sketch admin dashboard on desktop](docs/previews/admin-desktop.png)
+
+<img src="docs/previews/admin-mobile.png" alt="Bangla Sketch admin dashboard on mobile" width="390" />
+
+The admin panel includes project, blog, video, testimonial, enquiry, contact, client-project, site-visit booking, settings, security, media upload, version history, and trash management screens.
 
 ## Architecture
 
