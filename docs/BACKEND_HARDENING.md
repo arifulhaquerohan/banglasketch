@@ -39,7 +39,7 @@ Account for **instances × pool maximum**, other services, and administrative he
 
 The included VPS configuration binds Node services to loopback and Nginx overwrites incoming `X-Real-IP` and `X-Forwarded-For`. PM2 enables `TRUST_INGRESS_IP=true` for the frontend. Next forwards only the overwritten `X-Real-IP`; Express trusts only configured proxy addresses. This gives separate contact/login counters to different visitors.
 
-Do not expose Next directly while `TRUST_INGRESS_IP=true`. For a CDN, containers, Vercel, Render, Railway, or another topology, configure the actual ingress's verified client IP behavior and trusted subnets first. Leave forwarding disabled until the ingress overwrites that header. Container services may require `HOST=0.0.0.0` with network access restricted to their ingress. The VPS proxy settings are not a universal cloud-hosting configuration.
+Do not expose Next directly while `TRUST_INGRESS_IP=true`. For a CDN, containers, or another topology, configure the actual ingress's verified client IP behavior and trusted subnets first. Leave forwarding disabled until the ingress overwrites that header. Container services may require `HOST=0.0.0.0` with network access restricted to their ingress. The VPS proxy settings are not a universal cloud-hosting configuration.
 
 Use HTTPS at Nginx. JSON/form bodies are capped at 256 KiB; media should upload directly to Cloudinary. Increase this limit deliberately if existing rich blog documents exceed it. Avoid adding broad trusted proxy ranges merely to make rate limits stop firing.
 

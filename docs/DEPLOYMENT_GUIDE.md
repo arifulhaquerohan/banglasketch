@@ -126,26 +126,7 @@ sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com -d api.yourdomain.c
 
 ---
 
-## Option 2: Cloud Hosting (Vercel + Render / Railway)
-
-### 1. Deploy Frontend to Vercel
-1. Upload the `frontend/` folder to GitHub or import via Vercel CLI.
-2. In Vercel Project Settings, set Root Directory to `frontend`.
-3. Add Environment Variables:
-   * `API_URL` = URL of your deployed backend (e.g. `https://banglasketch-api.onrender.com`)
-   * `NEXT_PUBLIC_API_URL` = URL of your deployed backend
-   * Configure trusted client IP forwarding for your hosting provider; see `BACKEND_HARDENING.md`.
-4. Click **Deploy**.
-
-### 2. Deploy Backend to Render / Railway
-1. Create a Web Service pointing to `backend/`.
-2. Build Command: `npm install`
-3. Start Command: `node server.js`
-4. Add Environment Variables matching `backend/.env.example`.
-
----
-
-## Option 3: cPanel (Shared Hosting with Node.js Selector)
+## Option 2: cPanel (Shared Hosting with Node.js Selector)
 
 1. Log into your cPanel and locate **Setup Node.js App**.
 2. **Create Backend App**:
