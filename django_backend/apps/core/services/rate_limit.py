@@ -4,7 +4,8 @@ from datetime import timedelta
 
 class PostgresRateLimiter:
     """
-    Atomic PostgreSQL rate limiter matching Express sharedRateLimit.
+    Atomic rate limiter supporting both PostgreSQL (via raw upsert)
+    and SQLite/fallback via Django ORM.
     Uses the 'rate_limit_counters' table to share limits across processes.
     """
     def __init__(self, prefix: str, window_ms: int, max_hits: int):
@@ -22,27 +23,47 @@ class PostgresRateLimiter:
         now = timezone.now()
         expiry = now + window_delta
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                INSERT INTO rate_limit_counters (key, hits, expires_at)
-                VALUES (%s, 1, %s)
-                ON CONFLICT (key) DO UPDATE SET
-                hits = CASE WHEN rate_limit_counters.expires_at <= %s THEN 1 ELSE rate_limit_counters.hits + 1 END,
-                expires_at = CASE WHEN rate_limit_counters.expires_at <= %s THEN EXCLUDED.expires_at ELSE rate_limit_counters.expires_at END
-                RETURNING hits, expires_at;
-                """,
-                [full_key, expiry, now, now],
-            )
-            row = cursor.fetchone()
-            if not row:
-                return False, 0, now
+        if connection.vendor == "postgresql":
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO rate_limit_counters (key, hits, expires_at)
+                    VALUES (%s, 1, %s)
+                    ON CONFLICT (key) DO UPDATE SET
+                    hits = CASE WHEN rate_limit_counters.expires_at <= %s THEN 1 ELSE rate_limit_counters.hits + 1 END,
+                    expires_at = CASE WHEN rate_limit_counters.expires_at <= %s THEN EXCLUDED.expires_at ELSE rate_limit_counters.expires_at END
+                    RETURNING hits, expires_at;
+                    """,
+                    [full_key, expiry, now, now],
+                )
+                row = cursor.fetchone()
+                if not row:
+                    return False, 0, now
 
-            hits, reset_time = row
-            return (hits <= self.max_hits), hits, reset_time
+                hits, reset_time = row
+                return (hits <= self.max_hits), hits, reset_time
+        else:
+            # Fallback for SQLite in local development & tests
+            from apps.core.models import RateLimitCounter
+            counter, created = RateLimitCounter.objects.get_or_create(
+                key=full_key,
+                defaults={"hits": 1, "expires_at": expiry},
+            )
+            if not created:
+                if counter.expires_at <= now:
+                    counter.hits = 1
+                    counter.expires_at = expiry
+                else:
+                    counter.hits += 1
+                counter.save(update_fields=["hits", "expires_at"])
+            return (counter.hits <= self.max_hits), counter.hits, counter.expires_at
 
     def reset(self, key: str):
         """Manually resets the counter for a key."""
         full_key = f"{self.prefix}:{key}"
-        with connection.cursor() as cursor:
-            cursor.execute("DELETE FROM rate_limit_counters WHERE key = %s", [full_key])
+        if connection.vendor == "postgresql":
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM rate_limit_counters WHERE key = %s", [full_key])
+        else:
+            from apps.core.models import RateLimitCounter
+            RateLimitCounter.objects.filter(key=full_key).delete()

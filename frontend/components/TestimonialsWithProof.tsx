@@ -78,15 +78,15 @@ export function TestimonialsWithProof() {
         <div className="max-w-3xl mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF7F2] border border-[#DDD5C8] text-[11px] font-semibold tracking-widest uppercase text-[#727A61] mb-3">
             <span className="w-2 h-2 rounded-full bg-[#A45138]" />
-            <span>Proof Through Lived Experience</span>
+            <span>Client Stories</span>
           </div>
 
           <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#242622] tracking-tight leading-[1.15]">
-            Sanctuaries Lived & Loved
+            What Our Clients Say
           </h2>
 
           <p className="text-base sm:text-lg text-[#5A6057] mt-3 leading-relaxed">
-            A home is not just an aesthetic concept—it is a lived experience. See the real Dhaka residences completed by our studio, paired with verified scopes and client testimonials.
+            Real experiences from homeowners across Dhaka — paired with the projects we designed and delivered for them.
           </p>
         </div>
 

@@ -54,18 +54,18 @@ export default function NewBlogPage() {
         <div>
           <Link
             href="/admin/blog"
-            className="text-xs font-semibold text-[#5A625A] hover:text-[#586348] inline-flex items-center gap-1.5 mb-2 transition-colors"
+            className="text-xs font-semibold text-admin-muted hover:text-admin-primary inline-flex items-center gap-1.5 mb-2 transition-colors"
           >
             <FiArrowLeft size={14} /> Back to blog
           </Link>
-          <h1 className="font-serif text-3xl font-bold text-[#242824] tracking-tight">Write New Post</h1>
-          <p className="text-sm text-[#5A625A] mt-0.5">Author an architectural essay, insight piece, or project case study.</p>
+          <h1 className="font-serif text-3xl font-bold text-admin-ink tracking-tight">Write New Post</h1>
+          <p className="text-sm text-admin-muted mt-0.5">Author an architectural essay, insight piece, or project case study.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           <button
             type="button"
             onClick={() => setForm({ ...form, status: "draft" })}
-            className="px-4 py-2.5 text-xs font-semibold rounded-xl border border-[#DED5C7] bg-[#FCFAF7] text-[#242824] hover:bg-[#EDE7DE] transition-colors shadow-xs"
+            className="px-4 py-2.5 text-xs font-semibold rounded-xl border border-admin-border bg-admin-surface text-admin-ink hover:bg-admin-tint transition-colors shadow-xs"
           >
             Save Draft
           </button>
@@ -73,7 +73,7 @@ export default function NewBlogPage() {
             type="button"
             onClick={() => handleSubmit()}
             disabled={saving}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#586348] hover:bg-[#444D37] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-admin-primary hover:bg-admin-hover text-white rounded-xl text-xs font-semibold shadow-xs transition-colors disabled:opacity-50"
           >
             <FiSave size={15} /> {saving ? "Publishing..." : "Publish Post"}
           </button>
@@ -88,10 +88,10 @@ export default function NewBlogPage() {
 
       <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <h2 className="font-serif text-lg font-bold text-[#242824]">Article Content</h2>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h2 className="font-serif text-lg font-bold text-admin-ink">Article Content</h2>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Post Title
               </label>
               <input
@@ -100,11 +100,11 @@ export default function NewBlogPage() {
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="e.g. Modern Minimalist Interiors in Urban Dhaka"
                 required
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 URL Slug
               </label>
               <input
@@ -112,11 +112,11 @@ export default function NewBlogPage() {
                 value={form.slug}
                 onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })}
                 placeholder="modern-minimalist-interiors"
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all font-mono shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all font-mono shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Excerpt / Summary
               </label>
               <textarea
@@ -124,7 +124,7 @@ export default function NewBlogPage() {
                 onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
                 rows={2}
                 placeholder="Brief teaser shown in article cards and social previews..."
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all resize-none shadow-2xs leading-relaxed"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all resize-none shadow-2xs leading-relaxed"
               />
             </div>
             <RichTextEditor
@@ -135,10 +135,10 @@ export default function NewBlogPage() {
             />
           </div>
 
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-bold text-[#242824]">Search Engine Optimization (SEO)</h3>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-admin-ink">Search Engine Optimization (SEO)</h3>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Meta Title
               </label>
               <input
@@ -146,11 +146,11 @@ export default function NewBlogPage() {
                 value={form.seoTitle}
                 onChange={(e) => setForm({ ...form, seoTitle: e.target.value })}
                 placeholder="Optimized headline for search engines"
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Meta Description
               </label>
               <textarea
@@ -158,15 +158,15 @@ export default function NewBlogPage() {
                 onChange={(e) => setForm({ ...form, seoDescription: e.target.value })}
                 rows={2}
                 placeholder="Concise description shown in Google search result cards..."
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all resize-none shadow-2xs leading-relaxed"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all resize-none shadow-2xs leading-relaxed"
               />
             </div>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-bold text-[#242824]">Cover Showcase</h3>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-admin-ink">Cover Showcase</h3>
             <CloudinaryUpload
               value={form.coverImage}
               onChange={(coverImage) => setForm({ ...form, coverImage })}
@@ -175,16 +175,16 @@ export default function NewBlogPage() {
             />
           </div>
 
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-bold text-[#242824]">Topic & Classification</h3>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-admin-ink">Topic & Classification</h3>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Category
               </label>
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 shadow-2xs"
               >
                 <option>Design Tips</option>
                 <option>Color Theory</option>
@@ -196,7 +196,7 @@ export default function NewBlogPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Tags
               </label>
               <input
@@ -204,22 +204,22 @@ export default function NewBlogPage() {
                 value={form.tags}
                 onChange={(e) => setForm({ ...form, tags: e.target.value })}
                 placeholder="e.g. minimalist, interior, oak"
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 shadow-2xs"
               />
-              <p className="text-[11px] text-[#737D73] mt-1">Separate keywords with commas</p>
+              <p className="text-[11px] text-admin-subtle mt-1">Separate keywords with commas</p>
             </div>
           </div>
 
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-bold text-[#242824]">Publishing Status</h3>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-admin-ink">Publishing Status</h3>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Status
               </label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 shadow-2xs"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -229,14 +229,14 @@ export default function NewBlogPage() {
             </div>
             {form.status === "scheduled" && (
               <div>
-                <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                   <FiCalendar size={13} /> Scheduled Date & Time
                 </label>
                 <input
                   type="datetime-local"
                   value={form.scheduledAt}
                   onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
+                  className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 shadow-2xs"
                 />
               </div>
             )}
@@ -245,9 +245,9 @@ export default function NewBlogPage() {
                 type="checkbox"
                 checked={form.featured}
                 onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                className="w-4 h-4 accent-[#586348] rounded"
+                className="w-4 h-4 accent-admin-primary rounded"
               />
-              <span className="text-xs font-medium text-[#242824]">Featured in journal highlights</span>
+              <span className="text-xs font-medium text-admin-ink">Featured in journal highlights</span>
             </label>
           </div>
         </div>

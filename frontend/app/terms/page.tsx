@@ -3,10 +3,11 @@ import Link from "next/link";
 import { FiArrowUpRight, FiBriefcase, FiChevronRight, FiMail, FiPhone } from "react-icons/fi";
 import { AnimateOnScroll } from "../../components/AnimateOnScroll";
 import { BRAND_NAME_BN, CONTACT, SITE_NAME } from "../../lib/constants";
+import { ArchitecturalDivider } from "../../components/ServiceIcons";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Banglasketch",
-  description: "Read the terms that govern your use of the Banglasketch website and our interior design consultation services.",
+  title: "Terms of Service | Bangla Sketch",
+  description: "Read the terms that govern your use of the Bangla Sketch website and our interior design consultation services.",
 };
 
 const SECTIONS = [
@@ -26,9 +27,9 @@ const SECTIONS = [
 function TermsNavigation({ mobile = false }: { mobile?: boolean }) {
   return (
     <nav aria-label="Terms of Service sections" className={mobile ? "lg:hidden" : "hidden lg:block sticky top-28"}>
-      <div className={mobile ? "flex gap-2 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-none" : "bg-[#0a2540] border border-[#c5a059]/20 rounded-2xl p-4"}>
+      <div className={mobile ? "flex gap-2 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-none" : "bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-5 shadow-xs"}>
         {!mobile && (
-          <p className="px-3 pb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#c5a059] border-b border-[#c5a059]/15">
+          <p className="px-3 pb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#586348] border-b border-[#DED5C7]">
             On this page
           </p>
         )}
@@ -38,10 +39,10 @@ function TermsNavigation({ mobile = false }: { mobile?: boolean }) {
               key={section.id}
               href={`#${section.id}`}
               className={mobile
-                ? "shrink-0 rounded-full border border-[#c5a059]/25 bg-[#0a2540] px-3 py-1.5 text-xs text-gray-300 transition-colors hover:border-[#c5a059] hover:text-[#c5a059] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c5a059]"
-                : "group flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-gray-400 transition-colors hover:bg-[#c5a059]/10 hover:text-[#c5a059] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c5a059]"}
+                ? "shrink-0 rounded-full border border-[#DED5C7] bg-[#FCFAF7] px-3.5 py-1.5 text-xs text-[#5A625A] transition-colors hover:border-[#586348] hover:text-[#242824] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#586348]"
+                : "group flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-[#5A625A] transition-colors hover:bg-[#EDF1EA] hover:text-[#242824] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#586348]"}
             >
-              {!mobile && <span className="text-[#c5a059]/50 group-hover:text-[#c5a059]">{String(index + 1).padStart(2, "0")}</span>}
+              {!mobile && <span className="text-[#8C9678] font-mono text-[11px] group-hover:text-[#586348]">{String(index + 1).padStart(2, "0")}</span>}
               {section.label}
             </a>
           ))}
@@ -63,53 +64,55 @@ function TermsSection({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-32 space-y-3 border-b border-[#c5a059]/15 pb-8 last:border-0 last:pb-0">
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#c5a059]/40 bg-[#c5a059]/10 text-xs font-bold text-[#c5a059]">
+    <section id={id} className="scroll-mt-32 space-y-3 border-b border-[#DED5C7] pb-8 last:border-0 last:pb-0">
+      <div className="flex items-start gap-3.5">
+        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#D5DEC4] bg-[#EDF1EA] text-xs font-bold text-[#586348] shadow-2xs">
           {number}
         </span>
-        <h2 className="pt-0.5 text-xl font-bold text-white md:text-2xl">{title}</h2>
+        <h2 className="pt-0.5 text-xl font-serif font-semibold text-[#242824] md:text-2xl">{title}</h2>
       </div>
-      <div className="pl-0 md:pl-10 text-sm leading-relaxed text-gray-300 md:text-base">{children}</div>
+      <div className="pl-0 md:pl-10 text-sm leading-relaxed text-[#5A625A] md:text-base">{children}</div>
     </section>
   );
 }
 
 export default function TermsPage() {
   return (
-    <div id="top" className="pt-28 pb-20">
-      <div className="container max-w-6xl">
-        <AnimateOnScroll>
-          <nav aria-label="Breadcrumb" className="mb-7 flex items-center gap-1.5 text-xs text-gray-400">
-            <Link href="/" className="transition-colors hover:text-[#c5a059]">Home</Link>
-            <FiChevronRight aria-hidden="true" size={13} />
-            <span>Legal</span>
-            <FiChevronRight aria-hidden="true" size={13} />
-            <span className="text-gray-200">Terms of Service</span>
-          </nav>
-        </AnimateOnScroll>
+    <div id="top" className="pt-24 pb-20 bg-[#F5F2EB]">
+      {/* Header Banner */}
+      <section className="py-14 md:py-20 bg-[#EDE7DE] border-b border-[#DED5C7]">
+        <div className="container max-w-4xl text-center">
+          <AnimateOnScroll>
+            <nav aria-label="Breadcrumb" className="mb-4 flex items-center justify-center gap-1.5 text-xs text-[#737D73]">
+              <Link href="/" className="transition-colors hover:text-[#586348]">Home</Link>
+              <FiChevronRight aria-hidden="true" size={13} />
+              <span>Legal</span>
+              <FiChevronRight aria-hidden="true" size={13} />
+              <span className="text-[#242824] font-medium">Terms of Service</span>
+            </nav>
+            <span className="text-xs font-bold uppercase tracking-widest text-[#586348] inline-flex items-center gap-1.5 mb-2">
+              <FiBriefcase aria-hidden="true" size={13} /> Clear Expectations
+            </span>
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#242824] mt-1 mb-4">
+              Terms of Service
+            </h1>
+            <ArchitecturalDivider />
+            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-[#5A625A] md:text-base mt-4">
+              These terms explain how you may use our website and how design consultations move toward a formal project agreement.
+            </p>
+            <p className="text-xs text-[#737D73] mt-2 font-medium">Last updated: September 6, 2026</p>
+          </AnimateOnScroll>
+        </div>
+      </section>
 
-        <AnimateOnScroll delay={60}>
-          <header className="relative overflow-hidden rounded-3xl border border-[#c5a059]/25 bg-gradient-to-br from-[#0a2540] via-[#0a2540] to-[#061a30] px-6 py-10 text-center shadow-2xl md:px-10 md:py-14">
-            <div className="pointer-events-none absolute -left-20 -top-24 h-64 w-64 rounded-full bg-[#e07b2a]/10 blur-3xl" />
-            <div className="relative mx-auto max-w-3xl space-y-4">
-              <span className="badge badge-gold inline-flex items-center gap-2"><FiBriefcase aria-hidden="true" size={13} /> Clear expectations</span>
-              <h1 className="text-3xl font-extrabold text-white md:text-5xl">Terms of Service</h1>
-              <p className="mx-auto max-w-2xl text-sm leading-relaxed text-gray-300 md:text-base">
-                These terms explain how you may use our website and how design consultations move toward a formal project agreement.
-              </p>
-              <p className="text-xs text-gray-400">Last updated: September 6, 2026</p>
-            </div>
-          </header>
-        </AnimateOnScroll>
+      <div className="container max-w-6xl mt-10">
+        <div className="lg:hidden mb-6"><TermsNavigation mobile /></div>
 
-        <div className="mt-7"><TermsNavigation mobile /></div>
-
-        <div className="mt-6 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
+        <div className="grid gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start">
           <TermsNavigation />
           <AnimateOnScroll delay={100}>
-            <article className="rounded-3xl border border-[#c5a059]/20 bg-[#0a2540] p-6 shadow-xl md:p-10">
-              <div className="mb-8 rounded-2xl border border-[#c5a059]/15 bg-[#061a30] p-5 text-sm leading-relaxed text-gray-300">
+            <article className="rounded-3xl border border-[#DED5C7] bg-[#FCFAF7] p-6 shadow-xs md:p-10">
+              <div className="mb-8 rounded-2xl border border-[#D5DEC4] bg-[#EDF1EA] p-5 text-sm leading-relaxed text-[#383E38] font-medium">
                 These Terms of Service apply to your use of the {SITE_NAME} ({BRAND_NAME_BN}) website and any initial communication with us. Specific design, construction, and procurement work is governed by the written agreement prepared for your project.
               </div>
 
@@ -155,25 +158,25 @@ export default function TermsPage() {
                 </TermsSection>
 
                 <TermsSection id="contact" number={11} title="Contact us">
-                  <p>For questions about these terms or an upcoming design consultation, contact our team:</p>
-                  <div className="mt-4 grid gap-3 rounded-2xl border border-[#c5a059]/15 bg-[#061a30] p-4 text-sm sm:grid-cols-2">
-                    <a href={`mailto:${CONTACT.email}`} className="group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-[#c5a059]/10">
-                      <FiMail aria-hidden="true" className="shrink-0 text-[#c5a059]" size={17} />
-                      <span><span className="block text-xs text-gray-400">Email</span><span className="text-gray-100 group-hover:text-[#c5a059]">{CONTACT.email}</span></span>
+                  <p>For questions about these terms or an upcoming design consultation, contact our studio team:</p>
+                  <div className="mt-4 grid gap-3 rounded-2xl border border-[#DED5C7] bg-[#EDE7DE] p-4 text-sm sm:grid-cols-2">
+                    <a href={`mailto:${CONTACT.email}`} className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors bg-[#FCFAF7] border border-[#DED5C7] hover:border-[#586348]">
+                      <FiMail aria-hidden="true" className="shrink-0 text-[#586348]" size={17} />
+                      <span><span className="block text-xs text-[#737D73]">Email</span><span className="text-[#242824] font-medium group-hover:text-[#586348]">{CONTACT.email}</span></span>
                     </a>
-                    <a href={`tel:${CONTACT.phone}`} className="group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-[#c5a059]/10">
-                      <FiPhone aria-hidden="true" className="shrink-0 text-[#c5a059]" size={17} />
-                      <span><span className="block text-xs text-gray-400">Phone</span><span className="text-gray-100 group-hover:text-[#c5a059]">{CONTACT.phone}</span></span>
+                    <a href={`tel:${CONTACT.phone}`} className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors bg-[#FCFAF7] border border-[#DED5C7] hover:border-[#586348]">
+                      <FiPhone aria-hidden="true" className="shrink-0 text-[#586348]" size={17} />
+                      <span><span className="block text-xs text-[#737D73]">Phone</span><span className="text-[#242824] font-medium group-hover:text-[#586348]">{CONTACT.phone}</span></span>
                     </a>
                   </div>
                 </TermsSection>
               </div>
 
-              <div className="mt-10 flex flex-col gap-4 border-t border-[#c5a059]/15 pt-6 text-sm sm:flex-row sm:items-center sm:justify-between">
-                <Link href="/privacy" className="inline-flex items-center gap-1.5 font-medium text-[#c5a059] transition-colors hover:text-[#e07b2a]">
+              <div className="mt-10 flex flex-col gap-4 border-t border-[#DED5C7] pt-6 text-sm sm:flex-row sm:items-center sm:justify-between">
+                <Link href="/privacy" className="inline-flex items-center gap-1.5 font-semibold text-[#586348] transition-colors hover:text-[#242824]">
                   Read our Privacy Policy <FiArrowUpRight aria-hidden="true" size={15} />
                 </Link>
-                <a href="#top" className="inline-flex items-center gap-1.5 text-gray-400 transition-colors hover:text-[#c5a059]">
+                <a href="#top" className="inline-flex items-center gap-1.5 text-[#737D73] transition-colors hover:text-[#242824] font-medium">
                   Back to top <FiArrowUpRight aria-hidden="true" size={15} className="-rotate-45" />
                 </a>
               </div>

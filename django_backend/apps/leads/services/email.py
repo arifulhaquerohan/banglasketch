@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.utils import timezone
 from django.utils.html import escape
-from apps.leads.models import ContactEmailJob, ContactSubmission
+from apps.leads.models import ContactEmailJob, ContactSubmission, SiteVisitBooking, SiteVisitTimeSlot
 
 logger = logging.getLogger(__name__)
 
@@ -131,6 +131,78 @@ def build_confirmation_email(submission: ContactSubmission) -> tuple[str, str, s
     return subject, text_content, html_content
 
 
+def get_booking_time_label(booking: SiteVisitBooking) -> str:
+    slot = SiteVisitTimeSlot.objects.filter(value=booking.time_slot).first()
+    return slot.label if slot else booking.time_slot
+
+
+def build_site_visit_notification_email(booking: SiteVisitBooking) -> tuple[str, str, str]:
+    time_label = get_booking_time_label(booking)
+    subject = f"[Banglasketch Site Visit] {booking.name} - {booking.visit_date} {time_label}"
+    text_content = (
+        "New Site Visit Booking\n"
+        "======================\n"
+        f"Name: {booking.name}\n"
+        f"Phone: {booking.phone}\n"
+        f"Email: {booking.email or 'Not provided'}\n"
+        f"Date: {booking.visit_date}\n"
+        f"Time: {time_label}\n"
+        f"Location: {booking.location}\n"
+        f"Size: {booking.space_size or 'Not provided'}\n\n"
+        f"Project Note:\n{booking.project_note or 'Not provided'}\n"
+    )
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: Arial, sans-serif; background:#f7f6f2; padding:24px; color:#242824;">
+      <div style="max-width:620px;margin:auto;background:#fff;border:1px solid #e2ded7;border-radius:12px;padding:28px;">
+        <h1 style="margin:0 0 16px;font-size:22px;">New Site Visit Booking</h1>
+        <p><strong>Client:</strong> {escape(booking.name)}</p>
+        <p><strong>Phone:</strong> <a href="tel:{escape(booking.phone)}">{escape(booking.phone)}</a></p>
+        <p><strong>Email:</strong> {escape(booking.email or 'Not provided')}</p>
+        <p><strong>Visit:</strong> {escape(str(booking.visit_date))} at {escape(time_label)}</p>
+        <p><strong>Location:</strong> {escape(booking.location)}</p>
+        <p><strong>Size:</strong> {escape(booking.space_size or 'Not provided')}</p>
+        <div style="background:#fbf9f4;border-left:4px solid #586348;padding:14px;margin-top:16px;white-space:pre-wrap;">{escape(booking.project_note or 'No project note provided.')}</div>
+      </div>
+    </body>
+    </html>
+    """
+    return subject, text_content, html_content
+
+
+def build_site_visit_confirmation_email(booking: SiteVisitBooking) -> tuple[str, str, str]:
+    time_label = get_booking_time_label(booking)
+    subject = "Your Banglasketch site visit request is reserved"
+    text_content = (
+        f"Dear {booking.name},\n\n"
+        f"Your Banglasketch site visit request has been reserved for {booking.visit_date} at {time_label}.\n"
+        "Our admin team will call you to confirm the visit before it is final.\n\n"
+        f"Phone: {booking.phone}\n"
+        f"Location: {booking.location}\n\n"
+        "Banglasketch Studio\n"
+    )
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: Arial, sans-serif; background:#f7f6f2; padding:24px; color:#242824;">
+      <div style="max-width:620px;margin:auto;background:#fff;border:1px solid #e2ded7;border-radius:12px;padding:28px;">
+        <h1 style="margin:0 0 16px;font-size:22px;">Site Visit Request Reserved</h1>
+        <p>Dear {escape(booking.name)},</p>
+        <p>Your Banglasketch site visit request has been reserved.</p>
+        <div style="background:#fbf9f4;border:1px solid #ede8de;border-radius:8px;padding:16px;margin:20px 0;">
+          <strong>Date:</strong> {escape(str(booking.visit_date))}<br>
+          <strong>Time:</strong> {escape(time_label)}<br>
+          <strong>Location:</strong> {escape(booking.location)}
+        </div>
+        <p>Our admin team will call you to confirm before the visit is final.</p>
+      </div>
+    </body>
+    </html>
+    """
+    return subject, text_content, html_content
+
+
 def process_email_job(job: ContactEmailJob) -> bool:
     """
     Processes a single ContactEmailJob.
@@ -154,6 +226,25 @@ def process_email_job(job: ContactEmailJob) -> bool:
                 return True
             subject, text, html = build_confirmation_email(submission)
             msg = EmailMultiAlternatives(subject, text, from_email, [submission.email])
+            msg.attach_alternative(html, "text/html")
+            msg.send(fail_silently=False)
+        elif job.kind == "site_visit_notification":
+            booking = job.site_visit_booking
+            if not booking:
+                return False
+            admin_email = getattr(settings, "ADMIN_RECOVERY_EMAIL", "arifulhaquerohan@gmail.com")
+            subject, text, html = build_site_visit_notification_email(booking)
+            msg = EmailMultiAlternatives(subject, text, from_email, [admin_email])
+            msg.attach_alternative(html, "text/html")
+            msg.send(fail_silently=False)
+        elif job.kind == "site_visit_confirmation":
+            booking = job.site_visit_booking
+            if not booking or not booking.email or "@" not in booking.email:
+                job.delivered_at = timezone.now()
+                job.save(update_fields=["delivered_at"])
+                return True
+            subject, text, html = build_site_visit_confirmation_email(booking)
+            msg = EmailMultiAlternatives(subject, text, from_email, [booking.email])
             msg.attach_alternative(html, "text/html")
             msg.send(fail_silently=False)
         else:

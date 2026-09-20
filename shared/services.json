@@ -27,6 +27,15 @@
     "image": "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800&q=80"
   },
   {
+    "id": "commercial",
+    "name": "Commercial & Studio",
+    "description": "Turnkey commercial spaces, executive lounges & boutique offices",
+    "fullDescription": "Architectural design for commercial studios, flagship lounges, executive headquarters, and retail environments that inspire clients and teams.",
+    "icon": "🏢",
+    "projectCount": 28,
+    "image": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80"
+  },
+  {
     "id": "bathroom",
     "name": "Bathroom Design",
     "description": "Spa-inspired bathrooms with premium fixtures and finishes",

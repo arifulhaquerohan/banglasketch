@@ -93,10 +93,16 @@ export function InteractiveHotspotLayer({
                 </span>
               </button>
 
-              {/* Tooltip on Desktop / Inline Popover */}
+              {/* Tooltip on Mobile & Desktop / Inline Popover */}
               {isActive && (
                 <div
-                  className="absolute left-1/2 -translate-x-1/2 top-10 sm:top-11 w-64 sm:w-72 bg-[#FAF7F2] text-[#242622] rounded-xl p-4 shadow-2xl border border-[#DDD5C8] z-30 animate-scale-in text-left pointer-events-auto"
+                  className={`absolute top-10 sm:top-11 w-64 sm:w-72 max-w-[calc(100vw-2.5rem)] bg-[#FAF7F2] text-[#242622] rounded-xl p-4 shadow-2xl border border-[#DDD5C8] z-30 animate-scale-in text-left pointer-events-auto ${
+                    h.x > 65
+                      ? "right-0 translate-x-4 sm:translate-x-0"
+                      : h.x < 35
+                      ? "left-0 -translate-x-4 sm:translate-x-0"
+                      : "left-1/2 -translate-x-1/2"
+                  }`}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center justify-between gap-2 pb-2 border-b border-[#DDD5C8]/70">
@@ -118,7 +124,7 @@ export function InteractiveHotspotLayer({
                   </p>
 
                   {h.spec && (
-                    <div className="bg-[#EEF1EA] px-2.5 py-1.5 rounded text-[10px] font-mono text-[#575E4A] mb-3">
+                    <div className="bg-[#EEF1EA] px-2.5 py-1.5 rounded text-[10px] font-mono text-[#575E4A] mb-3 break-words">
                       SPEC: {h.spec}
                     </div>
                   )}

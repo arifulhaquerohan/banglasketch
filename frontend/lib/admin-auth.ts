@@ -4,7 +4,8 @@ import { NextRequest } from "next/server";
 const ADMIN_SESSION_COOKIE = "bs_admin_session";
 
 function getBackendUrl(): string {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const url = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  return url.replace(/\/+$/, "");
 }
 
 /**

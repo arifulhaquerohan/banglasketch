@@ -30,14 +30,14 @@ const ENTRY_POINTS: EntryPointOption[] = [
   {
     id: "entire-home",
     title: "An Entire Home",
-    subtitle: "Complete Interior Architecture",
-    tagline: "Turnkey spatial transformation from bare concrete to lived-in sanctuary.",
+    subtitle: "Complete Interior Design",
+    tagline: "Full design and build — from bare apartment to finished home.",
     image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80",
     typicalArea: "2,400 – 6,500 sq.ft",
     duration: "90 – 120 Days",
     recommendedBudget: "Tier 1 Bespoke Turnkey",
     description:
-      "A holistic architectural undertaking where every room, hallway, lighting circuit, and bespoke joinery unit is designed in cohesive harmony. Ideal for new apartments or villas.",
+      "A complete interior design project covering every room, hallway, and storage unit in your home. We handle the floor plan, 3D design, material selection, and construction supervision.",
     deliverables: [
       "Master layout plan & 3D virtual walkthroughs",
       "Full MEP, smart lighting & acoustic schedule",
@@ -64,14 +64,14 @@ const ENTRY_POINTS: EntryPointOption[] = [
   {
     id: "one-room",
     title: "One Room",
-    subtitle: "Targeted Room Sanctuary",
-    tagline: "Focused craftsmanship for your kitchen, master bedroom, or living pavilion.",
+    subtitle: "Single Room Design",
+    tagline: "Focused design for your kitchen, bedroom, or living room.",
     image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=80",
     typicalArea: "250 – 800 sq.ft",
     duration: "25 – 45 Days",
     recommendedBudget: "Targeted High-Impact",
     description:
-      "Transforming a single defining room without disrupting the rest of your home. We specialize in modular gourmet kitchens, serene master suites, and acoustic media lounges.",
+      "Transform one room without disrupting the rest of your home. We specialise in kitchens, master bedrooms, living rooms, and bathrooms — designed for how you actually use them.",
     deliverables: [
       "Precise spatial ergonomics & cabinetry blueprint",
       "Integrated appliance & architectural lighting plan",
@@ -98,14 +98,14 @@ const ENTRY_POINTS: EntryPointOption[] = [
   {
     id: "renovation",
     title: "A Renovation",
-    subtitle: "Structural & Aesthetic Remodeling",
-    tagline: "Reclaiming dated layouts into expansive, light-filled modern living.",
+    subtitle: "Renovation & Remodelling",
+    tagline: "Modernise an existing home — open up layouts, update finishes, fix what doesn’t work.",
     image: "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=1200&q=80",
     typicalArea: "1,500 – 4,000 sq.ft",
     duration: "60 – 90 Days",
     recommendedBudget: "Full Architectural Remodel",
     description:
-      "Modernizing an existing older apartment or building in Dhaka. We remove confining partition walls, replace obsolete plumbing and wiring, and install clean architectural finishes.",
+      "Renovate an older apartment or home in Dhaka. We remove partition walls, update plumbing and wiring, and install modern finishes — giving your space a fresh start.",
     deliverables: [
       "Structural feasibility & partition wall modifications",
       "Electrical & plumbing system modernization",
@@ -144,15 +144,15 @@ export function ChooseStartingPoint() {
         <div className="max-w-2xl mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF7F2] border border-[#DDD5C8] text-[11px] font-semibold tracking-widest uppercase text-[#727A61] mb-3">
             <span className="w-2 h-2 rounded-full bg-[#A45138]" />
-            <span>Tailored Entry Points</span>
+            <span>Our Services</span>
           </div>
 
           <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#242622] tracking-tight leading-[1.15]">
-            Choose Your Starting Point
+            What We Design
           </h2>
 
           <p className="text-base sm:text-lg text-[#5A6057] mt-3 leading-relaxed">
-            Whether you are taking handover of a brand-new apartment or reimagining a single cherished room, select your scope below to view our process and relevant case studies.
+            Whole-home interiors, individual rooms, or renovations of existing spaces. Select your scope to see our process and related work.
           </p>
         </div>
 

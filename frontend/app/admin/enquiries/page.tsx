@@ -23,7 +23,7 @@ const STAGES = [
   { id: "site_visit", label: "Site Visit", color: "bg-indigo-500/10 text-indigo-700 border-indigo-200" },
   { id: "proposal_sent", label: "Proposal Sent", color: "bg-amber-500/10 text-amber-700 border-amber-200" },
   { id: "approved", label: "Approved", color: "bg-emerald-500/10 text-emerald-700 border-emerald-200" },
-  { id: "active_project", label: "Active Project", color: "bg-[#586348]/15 text-[#586348] border-[#D5DEC4]" },
+  { id: "active_project", label: "Active Project", color: "bg-admin-primary/15 text-admin-primary border-[#D5DEC4]" },
   { id: "handover", label: "Handover", color: "bg-stone-500/15 text-stone-700 border-stone-300" },
 ];
 
@@ -148,10 +148,10 @@ export default function EnquiriesPipelinePage() {
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#242824]">
+          <h1 className="font-serif text-2xl md:text-3xl font-bold text-admin-ink">
             Client Pipeline & Enquiries
           </h1>
-          <p className="text-xs md:text-sm text-[#5A625A] mt-1">
+          <p className="text-xs md:text-sm text-admin-muted mt-1">
             Track client journeys from new consultation request to handover. Never let a lead go cold.
           </p>
         </div>
@@ -162,8 +162,8 @@ export default function EnquiriesPipelinePage() {
             onClick={() => setViewMode("kanban")}
             className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-all ${
               viewMode === "kanban"
-                ? "bg-[#586348] text-white border-[#586348]"
-                : "bg-white text-[#5A625A] border-[#DED5C7] hover:bg-[#F5F2EB]"
+                ? "bg-admin-primary text-white border-admin-primary"
+                : "bg-white text-admin-muted border-admin-border hover:bg-admin-canvas"
             }`}
           >
             <FiLayers size={14} /> Kanban Board
@@ -172,8 +172,8 @@ export default function EnquiriesPipelinePage() {
             onClick={() => setViewMode("list")}
             className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-all ${
               viewMode === "list"
-                ? "bg-[#586348] text-white border-[#586348]"
-                : "bg-white text-[#5A625A] border-[#DED5C7] hover:bg-[#F5F2EB]"
+                ? "bg-admin-primary text-white border-admin-primary"
+                : "bg-white text-admin-muted border-admin-border hover:bg-admin-canvas"
             }`}
           >
             <FiList size={14} /> Table View
@@ -188,10 +188,10 @@ export default function EnquiriesPipelinePage() {
             setNeedsAttentionOnly(false);
             setTabFilter("pipeline");
           }}
-          className="p-4 bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl text-left hover:border-[#586348] transition-all"
+          className="p-4 bg-admin-surface border border-admin-border rounded-2xl text-left hover:border-admin-primary transition-all"
         >
-          <span className="text-xs text-[#5A625A] font-semibold uppercase tracking-wider block">New Enquiries</span>
-          <span className="text-2xl font-bold text-[#242824] mt-1 block">{stats.newLeads}</span>
+          <span className="text-xs text-admin-muted font-semibold uppercase tracking-wider block">New Enquiries</span>
+          <span className="text-2xl font-bold text-admin-ink mt-1 block">{stats.newLeads}</span>
           <span className="text-[11px] text-[#788278]">Awaiting initial call</span>
         </button>
 
@@ -203,7 +203,7 @@ export default function EnquiriesPipelinePage() {
           className={`p-4 border rounded-2xl text-left transition-all ${
             stats.overdue > 0
               ? "bg-red-50/70 border-red-200 text-red-900"
-              : "bg-[#FCFAF7] border-[#DED5C7] text-[#242824]"
+              : "bg-admin-surface border-admin-border text-admin-ink"
           }`}
         >
           <div className="flex items-center justify-between">
@@ -222,7 +222,7 @@ export default function EnquiriesPipelinePage() {
           className={`p-4 border rounded-2xl text-left transition-all ${
             stats.noNextAction > 0
               ? "bg-amber-50/70 border-amber-200 text-amber-900"
-              : "bg-[#FCFAF7] border-[#DED5C7] text-[#242824]"
+              : "bg-admin-surface border-admin-border text-admin-ink"
           }`}
         >
           <span className="text-xs font-semibold uppercase tracking-wider block">Missing Next Step</span>
@@ -230,23 +230,23 @@ export default function EnquiriesPipelinePage() {
           <span className="text-[11px] opacity-80">Enquiries without next action</span>
         </button>
 
-        <div className="p-4 bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl">
-          <span className="text-xs text-[#5A625A] font-semibold uppercase tracking-wider block">Active Pipeline</span>
-          <span className="text-2xl font-bold text-[#586348] mt-1 block">{stats.total}</span>
+        <div className="p-4 bg-admin-surface border border-admin-border rounded-2xl">
+          <span className="text-xs text-admin-muted font-semibold uppercase tracking-wider block">Active Pipeline</span>
+          <span className="text-2xl font-bold text-admin-primary mt-1 block">{stats.total}</span>
           <span className="text-[11px] text-[#788278]">Total managed leads</span>
         </div>
       </div>
 
       {/* Filter and Tab bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-[#FCFAF7] p-3 rounded-2xl border border-[#DED5C7]">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-admin-surface p-3 rounded-2xl border border-admin-border">
         {/* Stage Tabs */}
-        <div className="flex items-center gap-2 border-b md:border-b-0 pb-2 md:pb-0 border-[#DED5C7]">
+        <div className="flex items-center gap-2 border-b md:border-b-0 pb-2 md:pb-0 border-admin-border">
           <button
             onClick={() => setTabFilter("pipeline")}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               tabFilter === "pipeline"
-                ? "bg-[#242824] text-white"
-                : "text-[#5A625A] hover:bg-[#F5F2EB]"
+                ? "bg-admin-ink text-white"
+                : "text-admin-muted hover:bg-admin-canvas"
             }`}
           >
             Active Pipeline
@@ -255,8 +255,8 @@ export default function EnquiriesPipelinePage() {
             onClick={() => setTabFilter("on_hold")}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               tabFilter === "on_hold"
-                ? "bg-[#242824] text-white"
-                : "text-[#5A625A] hover:bg-[#F5F2EB]"
+                ? "bg-admin-ink text-white"
+                : "text-admin-muted hover:bg-admin-canvas"
             }`}
           >
             On Hold
@@ -265,8 +265,8 @@ export default function EnquiriesPipelinePage() {
             onClick={() => setTabFilter("closed")}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               tabFilter === "closed"
-                ? "bg-[#242824] text-white"
-                : "text-[#5A625A] hover:bg-[#F5F2EB]"
+                ? "bg-admin-ink text-white"
+                : "text-admin-muted hover:bg-admin-canvas"
             }`}
           >
             Closed / Lost
@@ -282,16 +282,16 @@ export default function EnquiriesPipelinePage() {
               placeholder="Search name, phone, area..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-[#DED5C7] rounded-xl focus:outline-none focus:border-[#586348]"
+              className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-admin-border rounded-xl focus:outline-none focus:border-admin-primary"
             />
           </div>
 
-          <label className="flex items-center gap-2 text-xs text-[#242824] cursor-pointer shrink-0">
+          <label className="flex items-center gap-2 text-xs text-admin-ink cursor-pointer shrink-0">
             <input
               type="checkbox"
               checked={needsAttentionOnly}
               onChange={(e) => setNeedsAttentionOnly(e.target.checked)}
-              className="accent-[#586348] rounded"
+              className="accent-admin-primary rounded"
             />
             <span className="font-semibold text-red-600">Needs Attention Only</span>
           </label>
@@ -309,14 +309,14 @@ export default function EnquiriesPipelinePage() {
             return (
               <div
                 key={stage.id}
-                className="w-72 shrink-0 bg-[#F7F4EE] border border-[#DED5C7] rounded-2xl flex flex-col max-h-[78vh]"
+                className="w-72 shrink-0 bg-[#F7F4EE] border border-admin-border rounded-2xl flex flex-col max-h-[78vh]"
               >
                 {/* Column Header */}
-                <div className="p-3 border-b border-[#DED5C7] flex items-center justify-between bg-[#F2EDE4] rounded-t-2xl">
-                  <span className="font-semibold text-xs text-[#242824] uppercase tracking-wider">
+                <div className="p-3 border-b border-admin-border flex items-center justify-between bg-[#F2EDE4] rounded-t-2xl">
+                  <span className="font-semibold text-xs text-admin-ink uppercase tracking-wider">
                     {stage.label}
                   </span>
-                  <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-[#FCFAF7] border border-[#DED5C7] text-[#5A625A]">
+                  <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-admin-surface border border-admin-border text-admin-muted">
                     {stageLeads.length}
                   </span>
                 </div>
@@ -345,7 +345,7 @@ export default function EnquiriesPipelinePage() {
                               ? "border-red-400/80 ring-1 ring-red-400/30"
                               : hasNoNextAction
                               ? "border-amber-400/80"
-                              : "border-[#DED5C7]"
+                              : "border-admin-border"
                           }`}
                         >
                           {/* Alert badges */}
@@ -371,13 +371,13 @@ export default function EnquiriesPipelinePage() {
                           <div className="flex items-start justify-between gap-2">
                             <Link
                               href={`/admin/enquiries/${enquiry.id}`}
-                              className="font-bold text-sm text-[#242824] hover:text-[#586348] transition-colors line-clamp-1"
+                              className="font-bold text-sm text-admin-ink hover:text-admin-primary transition-colors line-clamp-1"
                             >
                               {enquiry.name}
                             </Link>
                           </div>
 
-                          <div className="space-y-1 mt-1.5 text-xs text-[#5A625A]">
+                          <div className="space-y-1 mt-1.5 text-xs text-admin-muted">
                             <div className="flex items-center gap-1.5">
                               <FiPhone size={12} className="text-[#788278]" />
                               <span>{enquiry.phone}</span>
@@ -390,7 +390,7 @@ export default function EnquiriesPipelinePage() {
 
                           {/* Next step info */}
                           <div className="mt-3 pt-2.5 border-t border-[#F0EBE1] text-[11px]">
-                            <div className="font-medium text-[#242824] flex items-center gap-1">
+                            <div className="font-medium text-admin-ink flex items-center gap-1">
                               <span className="text-[#788278]">Next:</span>
                               <span className="truncate">{enquiry.next_action || "Schedule action"}</span>
                             </div>
@@ -408,7 +408,7 @@ export default function EnquiriesPipelinePage() {
                             <select
                               value={enquiry.status}
                               onChange={(e) => handleStageChange(enquiry.id, e.target.value)}
-                              className="text-[11px] bg-[#F5F2EB] border border-[#DED5C7] rounded-lg px-1.5 py-1 text-[#242824] focus:outline-none"
+                              className="text-[11px] bg-admin-canvas border border-admin-border rounded-lg px-1.5 py-1 text-admin-ink focus:outline-none"
                             >
                               {STAGES.map((s) => (
                                 <option key={s.id} value={s.id}>
@@ -426,7 +426,7 @@ export default function EnquiriesPipelinePage() {
                                 setNextActionInput(enquiry.next_action || "");
                               }}
                               title="Log Call or Note"
-                              className="p-1.5 text-[#586348] hover:bg-[#F5F2EB] rounded-lg border border-[#D5DEC4]"
+                              className="p-1.5 text-admin-primary hover:bg-admin-canvas rounded-lg border border-[#D5DEC4]"
                             >
                               <FiMessageSquare size={13} />
                             </button>
@@ -434,7 +434,7 @@ export default function EnquiriesPipelinePage() {
                             {/* Link to Dossier */}
                             <Link
                               href={`/admin/enquiries/${enquiry.id}`}
-                              className="p-1.5 text-[#242824] hover:bg-[#F5F2EB] rounded-lg border border-[#DED5C7]"
+                              className="p-1.5 text-admin-ink hover:bg-admin-canvas rounded-lg border border-admin-border"
                               title="Full Client File"
                             >
                               <FiArrowRight size={13} />
@@ -451,9 +451,9 @@ export default function EnquiriesPipelinePage() {
         </div>
       ) : (
         /* TABLE LIST VIEW */
-        <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl overflow-hidden">
+        <div className="bg-admin-surface border border-admin-border rounded-2xl overflow-hidden">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#F2EDE4] border-b border-[#DED5C7] text-[#586348] uppercase tracking-wider font-semibold">
+            <thead className="bg-[#F2EDE4] border-b border-admin-border text-admin-primary uppercase tracking-wider font-semibold">
               <tr>
                 <th className="p-3.5">Client & Location</th>
                 <th className="p-3.5">Scope & Budget</th>
@@ -476,15 +476,15 @@ export default function EnquiriesPipelinePage() {
                     <td className="p-3.5">
                       <Link
                         href={`/admin/enquiries/${enquiry.id}`}
-                        className="font-bold text-sm text-[#242824] hover:text-[#586348] block"
+                        className="font-bold text-sm text-admin-ink hover:text-admin-primary block"
                       >
                         {enquiry.name}
                       </Link>
-                      <span className="text-[#5A625A] block">{enquiry.phone}</span>
+                      <span className="text-admin-muted block">{enquiry.phone}</span>
                       <span className="text-[11px] text-[#788278]">{enquiry.project_location}</span>
                     </td>
                     <td className="p-3.5">
-                      <span className="capitalize font-medium text-[#242824] block">
+                      <span className="capitalize font-medium text-admin-ink block">
                         {enquiry.property_type} ({enquiry.service_scope.replace(/_/g, " ")})
                       </span>
                       <span className="text-[#788278] block">{enquiry.approx_budget || "Not specified"}</span>
@@ -493,7 +493,7 @@ export default function EnquiriesPipelinePage() {
                       <select
                         value={enquiry.status}
                         onChange={(e) => handleStageChange(enquiry.id, e.target.value)}
-                        className="text-xs font-medium bg-white border border-[#DED5C7] rounded-lg px-2 py-1 focus:outline-none"
+                        className="text-xs font-medium bg-white border border-admin-border rounded-lg px-2 py-1 focus:outline-none"
                       >
                         {STAGES.map((s) => (
                           <option key={s.id} value={s.id}>
@@ -504,13 +504,13 @@ export default function EnquiriesPipelinePage() {
                         <option value="closed">Closed</option>
                       </select>
                     </td>
-                    <td className="p-3.5 text-[#5A625A]">
+                    <td className="p-3.5 text-admin-muted">
                       {enquiry.assigned_name || (
                         <span className="text-blue-600 font-semibold">Unassigned</span>
                       )}
                     </td>
                     <td className="p-3.5">
-                      <span className="font-medium text-[#242824] block line-clamp-1">
+                      <span className="font-medium text-admin-ink block line-clamp-1">
                         {enquiry.next_action || <span className="text-amber-600">None scheduled</span>}
                       </span>
                       {enquiry.next_follow_up_date && (
@@ -533,13 +533,13 @@ export default function EnquiriesPipelinePage() {
                             setActiveFollowUpEnquiry(enquiry);
                             setNextActionInput(enquiry.next_action || "");
                           }}
-                          className="px-2.5 py-1 bg-[#EDF1EA] text-[#586348] rounded-lg text-xs font-semibold hover:bg-[#586348] hover:text-white transition-all"
+                          className="px-2.5 py-1 bg-[#EDF1EA] text-admin-primary rounded-lg text-xs font-semibold hover:bg-admin-primary hover:text-white transition-all"
                         >
                           + Log Note
                         </button>
                         <Link
                           href={`/admin/enquiries/${enquiry.id}`}
-                          className="px-2.5 py-1 bg-white border border-[#DED5C7] text-[#242824] rounded-lg text-xs font-semibold hover:bg-[#F5F2EB]"
+                          className="px-2.5 py-1 bg-white border border-admin-border text-admin-ink rounded-lg text-xs font-semibold hover:bg-admin-canvas"
                         >
                           Dossier
                         </Link>
@@ -556,18 +556,18 @@ export default function EnquiriesPipelinePage() {
       {/* QUICK FOLLOW-UP MODAL */}
       {activeFollowUpEnquiry && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 w-full max-w-lg shadow-xl">
-            <h3 className="font-serif text-xl font-bold text-[#242824]">
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 w-full max-w-lg shadow-xl">
+            <h3 className="font-serif text-xl font-bold text-admin-ink">
               Log Communication with {activeFollowUpEnquiry.name}
             </h3>
-            <p className="text-xs text-[#5A625A] mt-1">
+            <p className="text-xs text-admin-muted mt-1">
               Record details from a call, site meeting, or note to keep project history traceable.
             </p>
 
             <form onSubmit={handleQuickFollowUpSubmit} className="space-y-4 mt-5">
               {/* Channel Selector */}
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-[#586348]">
+                <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-admin-primary">
                   Interaction Type
                 </label>
                 <div className="grid grid-cols-5 gap-2">
@@ -578,8 +578,8 @@ export default function EnquiriesPipelinePage() {
                       onClick={() => setFollowUpChannel(ch)}
                       className={`py-2 text-xs font-semibold rounded-xl border capitalize transition-all ${
                         followUpChannel === ch
-                          ? "bg-[#586348] text-white border-[#586348]"
-                          : "bg-white text-[#5A625A] border-[#DED5C7] hover:bg-[#F5F2EB]"
+                          ? "bg-admin-primary text-white border-admin-primary"
+                          : "bg-white text-admin-muted border-admin-border hover:bg-admin-canvas"
                       }`}
                     >
                       {ch.replace("_", " ")}
@@ -590,7 +590,7 @@ export default function EnquiriesPipelinePage() {
 
               {/* Summary Notes */}
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-[#586348]">
+                <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-admin-primary">
                   Discussion Summary / Findings *
                 </label>
                 <textarea
@@ -599,14 +599,14 @@ export default function EnquiriesPipelinePage() {
                   value={followUpSummary}
                   onChange={(e) => setFollowUpSummary(e.target.value)}
                   placeholder="e.g. Client requested revisions to kitchen island layout. Prefers dark walnut veneer finish..."
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl p-3 text-xs focus:outline-none focus:border-[#586348]"
+                  className="w-full bg-white border border-admin-border rounded-xl p-3 text-xs focus:outline-none focus:border-admin-primary"
                 />
               </div>
 
               {/* Next Action & Schedule */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-[#586348]">
+                  <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-admin-primary">
                     Next Action Step
                   </label>
                   <input
@@ -614,36 +614,36 @@ export default function EnquiriesPipelinePage() {
                     value={nextActionInput}
                     onChange={(e) => setNextActionInput(e.target.value)}
                     placeholder="e.g. Send revised 3D render"
-                    className="w-full bg-white border border-[#DED5C7] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#586348]"
+                    className="w-full bg-white border border-admin-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-admin-primary"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-[#586348]">
+                  <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-admin-primary">
                     Follow-up Due Date
                   </label>
                   <input
                     type="date"
                     value={scheduledAtInput}
                     onChange={(e) => setScheduledAtInput(e.target.value)}
-                    className="w-full bg-white border border-[#DED5C7] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#586348]"
+                    className="w-full bg-white border border-admin-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-admin-primary"
                   />
                 </div>
               </div>
 
               {/* Modal Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#DED5C7]">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-admin-border">
                 <button
                   type="button"
                   onClick={() => setActiveFollowUpEnquiry(null)}
-                  className="px-4 py-2 text-xs font-semibold text-[#5A625A] hover:bg-[#F5F2EB] rounded-xl border border-transparent"
+                  className="px-4 py-2 text-xs font-semibold text-admin-muted hover:bg-admin-canvas rounded-xl border border-transparent"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingFollowUp}
-                  className="px-5 py-2 text-xs font-semibold bg-[#586348] text-white rounded-xl hover:bg-[#444D37] transition-all"
+                  className="px-5 py-2 text-xs font-semibold bg-admin-primary text-white rounded-xl hover:bg-admin-hover transition-all"
                 >
                   {submittingFollowUp ? "Saving..." : "Save Follow-up Entry"}
                 </button>

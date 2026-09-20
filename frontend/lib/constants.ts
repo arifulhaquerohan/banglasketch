@@ -4,6 +4,8 @@ import serviceCatalog from "../../shared/services.json";
 export const SITE_NAME = "Banglasketch";
 export const BRAND_NAME_BN = "বাংলা স্কেচ";
 export const BRAND_NAME_EN = "Bangla Sketch";
+export const BRAND_TAGLINE_BN = "ইন্টেরিয়র ডিজাইন যার হাতেখড়ি";
+export const BRAND_TAGLINE_EN = "Where Interior Design Begins";
 
 export const SITE_DESCRIPTION =
   "Premium interior design that blends luxury, functionality, and your unique style. 10+ years, 200+ projects. Based in Dhaka, Bangladesh.";
@@ -17,7 +19,7 @@ export const SOCIAL = {
   pinterest: "https://pinterest.com/banglasketch",
 };
 
-export type ServiceCategory = "kitchen" | "bedroom" | "living-room" | "bathroom";
+export type ServiceCategory = "kitchen" | "bedroom" | "living-room" | "bathroom" | "commercial";
 export const SERVICES = serviceCatalog as (Omit<(typeof serviceCatalog)[number], "id"> & { id: ServiceCategory })[];
 
 export const BLOG_CATEGORIES = ["All", "Design Tips", "Trends", "Tutorial", "Case Study"] as const;
@@ -29,83 +31,169 @@ export const STATS = [
   { label: "Awards Won", value: "15" },
 ];
 
-export const SAMPLE_PROJECTS = [
+export interface SampleProjectItem {
+  id: string | number;
+  title: string;
+  slug: string;
+  category: ServiceCategory;
+  description: string;
+  location?: string;
+  area?: string;
+  style?: string;
+  year?: string;
+  featuredImage: string;
+  gallery?: string[];
+  dateCompleted: string;
+  featured: boolean;
+  clientName?: string;
+  clientTestimonial?: string;
+}
+
+export const SAMPLE_PROJECTS: SampleProjectItem[] = [
   {
     id: "1",
-    title: "Modern Kitchen Renovation",
-    slug: "modern-kitchen-renovation",
-    category: "kitchen" as ServiceCategory,
-    description: "Contemporary kitchen with smart storage and premium finishes",
-    featuredImage: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
+    title: "The Courtyard Pavilion & Living Lounge",
+    slug: "open-living-space",
+    category: "living-room",
+    description: "Expansive conversation pavilion framed in warm Roman travertine, tactile fluted teak, and natural daylight.",
+    location: "Gulshan II, Dhaka",
+    area: "4,400 sq.ft",
+    style: "Quiet Editorial Luxury",
+    year: "2026",
+    featuredImage: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
-      "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=80",
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1200&q=85",
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=85",
+      "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200&q=85",
     ],
     dateCompleted: "2026-08-15",
     featured: true,
-    clientName: "Rahman Family",
-    clientTestimonial: "Absolutely stunning work! The kitchen has become the heart of our home.",
+    clientName: "Khan Residence",
+    clientTestimonial: "Our living room is now the talk of the neighborhood! The tactile craftsmanship is second to none.",
   },
   {
     id: "2",
-    title: "Luxury Bedroom Sanctuary",
-    slug: "luxury-bedroom-sanctuary",
-    category: "bedroom" as ServiceCategory,
-    description: "Serene master bedroom with custom lighting and built-in wardrobes",
-    featuredImage: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=80",
-    gallery: [],
-    dateCompleted: "2026-07-20",
+    title: "Sculpted Culinary Studio & Quartzite Island",
+    slug: "modern-kitchen-renovation",
+    category: "kitchen",
+    description: "A dual-zone kitchen balancing Bengali culinary traditions with an open quartzite waterfall social centerpiece.",
+    location: "Banani, Dhaka",
+    area: "650 sq.ft",
+    style: "Warm Tactile Minimalist",
+    year: "2026",
+    featuredImage: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=85",
+    gallery: [
+      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=85",
+      "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=1200&q=85",
+    ],
+    dateCompleted: "2026-07-28",
     featured: true,
-    clientName: "Ahmed Family",
-    clientTestimonial: "We finally have the bedroom we dreamed of. Incredible attention to detail.",
+    clientName: "Rahman Family",
+    clientTestimonial: "Absolutely stunning work! The kitchen has become the true heart of our family life.",
   },
   {
     id: "3",
-    title: "Open Living Space",
-    slug: "open-living-space",
-    category: "living-room" as ServiceCategory,
-    description: "Spacious living area with minimalist design and warm ambiance",
-    featuredImage: "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800&q=80",
-    gallery: [],
-    dateCompleted: "2026-06-10",
+    title: "The Riverine Master Suite & Sanctuary",
+    slug: "luxury-bedroom-sanctuary",
+    category: "bedroom",
+    description: "Penthouse master suite with custom acoustic linen wall paneling, smoked oak pocket screens, and serene 2700K lighting.",
+    location: "Baridhara DOHS, Dhaka",
+    area: "3,200 sq.ft",
+    style: "Serene Contemporary",
+    year: "2026",
+    featuredImage: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=1200&q=85",
+    gallery: [
+      "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=1200&q=85",
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=1200&q=85",
+    ],
+    dateCompleted: "2026-07-10",
     featured: true,
-    clientName: "Khan Residence",
-    clientTestimonial: "Our living room is now the talk of the neighborhood!",
+    clientName: "Ahmed Family",
+    clientTestimonial: "We finally have the restful sanctuary we dreamed of. Incredible attention to detail.",
   },
   {
     id: "4",
-    title: "Boutique Bathroom Design",
-    slug: "boutique-bathroom-design",
-    category: "bathroom" as ServiceCategory,
-    description: "Spa-like bathroom with marble finishes and heated floors",
-    featuredImage: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80",
-    gallery: [],
-    dateCompleted: "2026-05-25",
+    title: "Tejgaon Creative Headquarters & Executive Suite",
+    slug: "tejgaon-creative-headquarters",
+    category: "commercial",
+    description: "Architectural workspace blending natural concrete, acoustic timber slats, curated art lighting, and executive breakout lounges.",
+    location: "Tejgaon Commercial District, Dhaka",
+    area: "5,800 sq.ft",
+    style: "Architectural Studio Modern",
+    year: "2026",
+    featuredImage: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=85",
+    gallery: [
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=85",
+      "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1200&q=85",
+    ],
+    dateCompleted: "2026-06-20",
     featured: true,
-    clientName: "Hossain Residence",
-    clientTestimonial: "It feels like a five-star hotel every morning!",
+    clientName: "Apex Design Partners",
+    clientTestimonial: "Our clients are mesmerized the moment they walk into our new headquarters.",
   },
   {
     id: "5",
-    title: "L-Shaped Modular Kitchen",
-    slug: "l-shaped-modular-kitchen",
-    category: "kitchen" as ServiceCategory,
-    description: "An efficient L-shaped kitchen maximizing corner space with smart storage.",
-    featuredImage: "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=80",
-    gallery: [],
-    dateCompleted: "2026-04-18",
-    featured: false,
+    title: "Boutique Stone Spa Bathroom Retreat",
+    slug: "boutique-bathroom-design",
+    category: "bathroom",
+    description: "Spa-like bathroom finished in honed Arabescato marble, concealed rain showers, and bespoke brushed brass fittings.",
+    location: "Dhanmondi, Dhaka",
+    area: "420 sq.ft",
+    style: "Italian Marble & Brass",
+    year: "2026",
+    featuredImage: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1200&q=85",
+    gallery: [
+      "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1200&q=85",
+    ],
+    dateCompleted: "2026-05-25",
+    featured: true,
+    clientName: "Hossain Residence",
+    clientTestimonial: "It feels like a five-star private resort every single morning.",
   },
   {
     id: "6",
-    title: "Kids Bedroom Paradise",
-    slug: "kids-bedroom-paradise",
-    category: "bedroom" as ServiceCategory,
-    description: "Playful yet practical children's bedroom with custom bunk beds and study area.",
-    featuredImage: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
+    title: "L-Shaped Modular Minimalist Kitchen",
+    slug: "l-shaped-modular-kitchen",
+    category: "kitchen",
+    description: "An efficient ergonomic L-shaped kitchen maximizing natural light and smart concealed pull-out storage.",
+    location: "Uttara Sector 4, Dhaka",
+    area: "480 sq.ft",
+    style: "Warm Scandinavian & Teak",
+    year: "2025",
+    featuredImage: "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=1200&q=85",
     gallery: [],
-    dateCompleted: "2026-03-12",
+    dateCompleted: "2025-11-18",
     featured: false,
+  },
+  {
+    id: "7",
+    title: "Children's Creative Studio Bedroom",
+    slug: "kids-bedroom-paradise",
+    category: "bedroom",
+    description: "Custom bunk joinery, integrated reading alcove, and non-toxic natural oak finishes for growing children.",
+    location: "Bashundhara R/A, Dhaka",
+    area: "750 sq.ft",
+    style: "Natural Oak & Pastel",
+    year: "2025",
+    featuredImage: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=85",
+    gallery: [],
+    dateCompleted: "2025-10-12",
+    featured: false,
+  },
+  {
+    id: "8",
+    title: "Banani Executive Flagship Lounge",
+    slug: "banani-executive-flagship-lounge",
+    category: "commercial",
+    description: "High-end private client lounge featuring bookmatched walnut paneling, acoustic felt ceilings, and custom hospitality bar.",
+    location: "Banani 11, Dhaka",
+    area: "2,600 sq.ft",
+    style: "Quiet Commercial Luxury",
+    year: "2026",
+    featuredImage: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1200&q=85",
+    gallery: [],
+    dateCompleted: "2026-04-14",
+    featured: true,
   },
 ];
 

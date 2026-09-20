@@ -10,12 +10,13 @@ from apps.authentication.auth import IsAdminUserAuthenticated, require_role
 from apps.projects.models import Project
 from apps.blog.models import BlogPost
 from apps.media_assets.models import Video, Testimonial
-from apps.leads.models import ContactSubmission, NewsletterSubscriber
+from apps.leads.models import ContactSubmission, NewsletterSubscriber, SiteVisitBooking, SiteVisitTimeSlot
 from apps.clients.models import Enquiry, ClientProject
 from .models import SiteSetting, AuditLog, ContentVersion
 
 class HealthCheckView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = []
 
     def get(self, request):
         db_status = "ok"
@@ -30,27 +31,30 @@ class HealthCheckView(APIView):
             "status": "ok" if db_status == "ok" else "degraded",
             "service": "Banglasketch API (Django)",
             "database": db_status,
+            "version": "1.0.0",
             "time": timezone.now().isoformat(),
         }, status=status_code)
 
 
 class HealthLiveView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = []
 
     def get(self, request):
-        return Response({"status": "ok"})
+        return Response({"status": "ok", "service": "Banglasketch API"})
 
 
 class HealthReadyView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = []
 
     def get(self, request):
         try:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
-            return Response({"status": "ready"})
+            return Response({"status": "ready", "database": "ok"})
         except Exception:
-            return Response({"status": "unavailable"}, status=503)
+            return Response({"status": "unavailable", "database": "error"}, status=503)
 
 
 class AdminDashboardStatsView(APIView):
@@ -80,6 +84,32 @@ class AdminDashboardStatsView(APIView):
         c_7d = ContactSubmission.objects.filter(deleted_at__isnull=True, submitted_at__gt=now - datetime.timedelta(days=7)).count()
 
         n_active = NewsletterSubscriber.objects.filter(active=True).count()
+        today = timezone.localdate()
+        site_visit_base = SiteVisitBooking.objects.filter(deleted_at__isnull=True)
+        pending_site_visits = site_visit_base.filter(status="pending").count()
+        today_site_visits_qs = site_visit_base.filter(
+            visit_date=today,
+        ).exclude(status="cancelled").order_by("time_slot", "submitted_at")
+        upcoming_site_visits_qs = site_visit_base.filter(
+            visit_date__gte=today,
+        ).exclude(status__in=["cancelled", "completed"]).order_by("visit_date", "time_slot", "submitted_at")
+        slot_labels = dict(SiteVisitTimeSlot.objects.values_list("value", "label"))
+
+        def serialize_site_visit(booking):
+            return {
+                "id": booking.id,
+                "name": booking.name,
+                "phone": booking.phone,
+                "location": booking.location,
+                "visit_date": booking.visit_date.isoformat(),
+                "time_slot": booking.time_slot,
+                "time_slot_label": slot_labels.get(booking.time_slot, booking.time_slot),
+                "status": booking.status,
+                "status_label": booking.get_status_display(),
+            }
+
+        today_site_visits = [serialize_site_visit(booking) for booking in today_site_visits_qs[:6]]
+        upcoming_site_visits = [serialize_site_visit(booking) for booking in upcoming_site_visits_qs[:6]]
 
         recent = ContactSubmission.objects.filter(deleted_at__isnull=True).order_by("-submitted_at")[:5]
         recent_contacts = [
@@ -111,8 +141,16 @@ class AdminDashboardStatsView(APIView):
                     "testimonials": {"total": t_total, "avg_rating": t_avg},
                     "contacts": {"total": c_total, "unread": c_unread, "unresponded": c_unresp, "last_7_days": c_7d},
                     "subscribers": n_active,
+                    "siteVisits": {
+                        "total": site_visit_base.count(),
+                        "pending": pending_site_visits,
+                        "today": today_site_visits_qs.count(),
+                        "upcoming": upcoming_site_visits_qs.count(),
+                    },
                 },
                 "recentContacts": recent_contacts,
+                "todaySiteVisits": today_site_visits,
+                "upcomingSiteVisits": upcoming_site_visits,
                 # Legacy Django fields
                 "projects_count": p_total,
                 "published_projects_count": p_pub,
@@ -314,8 +352,10 @@ class AdminVersionHistoryView(APIView):
             if not item:
                 return Response({"success": False, "error": "Item not found"}, status=404)
 
+            BLOCKED_RESTORE_FIELDS = {"id", "pk", "password_hash", "created_at", "deleted_at", "token_version", "totp_secret", "totp_enabled"}
             for key, value in v_obj.snapshot.items():
-                setattr(item, key, value)
+                if key not in BLOCKED_RESTORE_FIELDS:
+                    setattr(item, key, value)
             item.save()
 
             AuditLog.objects.create(

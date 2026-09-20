@@ -4,7 +4,7 @@ Django settings for banglasketch_api project.
 
 import os
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 from dotenv import load_dotenv
 
 from django.core.exceptions import ImproperlyConfigured
@@ -13,14 +13,15 @@ from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Load environment variables from django_backend/.env or backend/.env or root .env
-for env_path in [
-    BASE_DIR / ".env",
-    BASE_DIR.parent / "backend" / ".env",
-    BASE_DIR.parent / ".env",
-]:
-    if env_path.exists():
-        load_dotenv(env_path)
-        break
+if not os.getenv("PYTHON_DOTENV_DISABLED"):
+    for env_path in [
+        BASE_DIR / ".env",
+        BASE_DIR.parent / "backend" / ".env",
+        BASE_DIR.parent / ".env",
+    ]:
+        if env_path.exists():
+            load_dotenv(env_path)
+            break
 
 DEBUG = os.getenv("NODE_ENV", "development") != "production"
 
@@ -68,6 +69,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.core.middleware.SecurityHeadersMiddleware",
+    "apps.core.middleware.RequestIDMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -91,8 +94,12 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Database Configuration
 DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL and urlparse(DATABASE_URL).scheme not in ("postgres", "postgresql"):
+    raise ImproperlyConfigured("DATABASE_URL must use postgres:// or postgresql://")
 if DATABASE_URL and (DATABASE_URL.startswith("postgres://") or DATABASE_URL.startswith("postgresql://")):
     parsed = urlparse(DATABASE_URL)
+    if not parsed.hostname or not parsed.path.lstrip("/"):
+        raise ImproperlyConfigured("DATABASE_URL must include a host and database name")
     # Handle Supabase/PostgreSQL SSL options from environment
     ssl_mode = os.getenv("DB_SSL_MODE", "require")
     ssl_ca_file = os.getenv("DB_SSL_CA_FILE")
@@ -112,9 +119,9 @@ if DATABASE_URL and (DATABASE_URL.startswith("postgres://") or DATABASE_URL.star
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": parsed.path.lstrip("/"),
-            "USER": parsed.username or "",
-            "PASSWORD": parsed.password or "",
+            "NAME": unquote(parsed.path.lstrip("/")),
+            "USER": unquote(parsed.username or ""),
+            "PASSWORD": unquote(parsed.password or ""),
             "HOST": parsed.hostname or "localhost",
             "PORT": parsed.port or 5432,
             "CONN_MAX_AGE": int(os.getenv("CONN_MAX_AGE", 60)),
@@ -139,6 +146,14 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
 ]
 
+# Password Validation
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 10}},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
 # REST Framework Configuration
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "config.pagination.EnvelopePagination",
@@ -151,6 +166,14 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "300/minute",
+        "user": "1000/minute",
+    },
 }
 
 if DEBUG:
@@ -182,15 +205,6 @@ CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME", "")
 CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY", "")
 CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET", "")
 
-if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
-    import cloudinary
-    cloudinary.config(
-        cloud_name=CLOUDINARY_CLOUD_NAME,
-        api_key=CLOUDINARY_API_KEY,
-        api_secret=CLOUDINARY_API_SECRET,
-        secure=True,
-    )
-
 # Email / SMTP Configuration
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
@@ -214,3 +228,54 @@ MEDIA_URL = "uploads/"
 MEDIA_ROOT = BASE_DIR / "uploads"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Structured Logging Configuration
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "apps": {
+            "handlers": ["console"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+# Security Headers & Cookies
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
+else:
+    SECURE_PROXY_SSL_HEADER = None
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False

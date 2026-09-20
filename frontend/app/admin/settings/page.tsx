@@ -262,7 +262,7 @@ export default function SettingsPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-[#242824] tracking-tight flex flex-wrap items-center gap-2.5">
+          <h1 className="font-serif text-3xl font-bold text-admin-ink tracking-tight flex flex-wrap items-center gap-2.5">
             <span>Studio Settings</span>
             {maintenance.enabled && (
               <span className="text-xs px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1.5 font-semibold">
@@ -270,7 +270,7 @@ export default function SettingsPage() {
               </span>
             )}
           </h1>
-          <p className="text-[#5A625A] text-sm mt-1">
+          <p className="text-admin-muted text-sm mt-1">
             Persisted studio parameters for brand identity, contact channels, social profiles, and maintenance status.
           </p>
         </div>
@@ -281,7 +281,7 @@ export default function SettingsPage() {
             className={`inline-flex items-center justify-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-xl transition-all shadow-xs active:scale-98 ${
               saved
                 ? "bg-emerald-700 text-white"
-                : "bg-[#242824] hover:bg-[#383E38] text-[#FCFAF7]"
+                : "bg-admin-ink hover:bg-admin-elevated text-admin-surface"
             }`}
           >
             <FiSave size={15} /> {saving ? "Saving..." : saved ? "Saved Successfully!" : "Save Changes"}
@@ -292,7 +292,7 @@ export default function SettingsPage() {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Tabs */}
         <div className="lg:w-64 shrink-0">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-2.5 flex lg:flex-col gap-1.5 overflow-x-auto no-scrollbar scroll-smooth shadow-xs">
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-2.5 flex lg:flex-col gap-1.5 overflow-x-auto no-scrollbar scroll-smooth shadow-xs">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -302,8 +302,8 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center justify-between px-4 py-2.5 rounded-2xl text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
                     isActive
-                      ? "bg-[#586348] text-white shadow-xs"
-                      : "text-[#5A625A] hover:bg-[#F5F2EB] hover:text-[#242824]"
+                      ? "bg-admin-primary text-white shadow-xs"
+                      : "text-admin-muted hover:bg-admin-canvas hover:text-admin-ink"
                   }`}
                 >
                   <span className="flex items-center gap-2.5">
@@ -321,7 +321,7 @@ export default function SettingsPage() {
         {/* Content */}
         <div className="flex-1">
           {loading && (
-            <div className="mb-4 px-4 py-2.5 rounded-2xl bg-[#EDF1EA] border border-[#D5DEC4] text-xs text-[#586348] flex items-center gap-2">
+            <div className="mb-4 px-4 py-2.5 rounded-2xl bg-[#EDF1EA] border border-[#D5DEC4] text-xs text-admin-primary flex items-center gap-2">
               <FiRefreshCw className="animate-spin" size={14} />
               <span>Loading saved site configuration...</span>
             </div>
@@ -329,12 +329,12 @@ export default function SettingsPage() {
 
           {/* TAB: MAINTENANCE MODE */}
           {activeTab === "maintenance" && (
-            <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-8 shadow-xs">
+            <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-8 shadow-xs">
               <div>
-                <h2 className="font-serif text-xl font-bold text-[#242824] flex items-center gap-2">
-                  <FiTool className="text-[#586348]" /> Maintenance Mode & Visitor Controls
+                <h2 className="font-serif text-xl font-bold text-admin-ink flex items-center gap-2">
+                  <FiTool className="text-admin-primary" /> Maintenance Mode & Visitor Controls
                 </h2>
-                <p className="text-[#5A625A] text-xs mt-1">
+                <p className="text-admin-muted text-xs mt-1">
                   Control how visitors experience your website during upgrades, portfolio updates, or technical maintenance.
                 </p>
               </div>
@@ -356,10 +356,10 @@ export default function SettingsPage() {
                     {maintenance.enabled ? <FiAlertTriangle /> : <FiCheckCircle />}
                   </div>
                   <div>
-                    <h3 className="font-serif text-base font-bold text-[#242824]">
+                    <h3 className="font-serif text-base font-bold text-admin-ink">
                       {maintenance.enabled ? "Maintenance Mode is ACTIVE" : "Website is LIVE & Accessible"}
                     </h3>
-                    <p className="text-[#5A625A] text-xs mt-0.5">
+                    <p className="text-admin-muted text-xs mt-0.5">
                       {maintenance.enabled
                         ? `Visitors see the maintenance ${maintenance.mode}. You can still browse normally as admin.`
                         : "All visitors can freely browse the portfolio, architectural services, and submit inquiries."}
@@ -375,9 +375,9 @@ export default function SettingsPage() {
                       onChange={(e) => setMaintenance({ ...maintenance, enabled: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-14 h-8 bg-[#DED5C7] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#586348] shadow-inner"></div>
+                    <div className="w-14 h-8 bg-admin-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-admin-primary shadow-inner"></div>
                   </label>
-                  <span className="text-xs font-bold text-[#242824] min-w-[70px]">
+                  <span className="text-xs font-bold text-admin-ink min-w-[70px]">
                     {maintenance.enabled ? "Enabled" : "Disabled"}
                   </span>
                 </div>
@@ -385,7 +385,7 @@ export default function SettingsPage() {
 
               {/* Display Mode Selection */}
               <div className="space-y-3">
-                <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider">
                   Select Popup / Display Style
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -412,12 +412,12 @@ export default function SettingsPage() {
                       onClick={() => setMaintenance({ ...maintenance, mode: mode.id as any })}
                       className={`p-4 rounded-2xl border text-left transition-all ${
                         maintenance.mode === mode.id
-                          ? "border-[#586348] bg-[#EDF1EA] text-[#242824] shadow-xs"
-                          : "border-[#DED5C7] bg-white hover:border-[#8C948C] text-[#5A625A] hover:text-[#242824]"
+                          ? "border-admin-primary bg-[#EDF1EA] text-admin-ink shadow-xs"
+                          : "border-admin-border bg-white hover:border-admin-subtle text-admin-muted hover:text-admin-ink"
                       }`}
                     >
-                      <div className="font-semibold text-sm mb-1 text-[#242824]">{mode.title}</div>
-                      <div className="text-xs text-[#737D73] leading-relaxed">{mode.desc}</div>
+                      <div className="font-semibold text-sm mb-1 text-admin-ink">{mode.title}</div>
+                      <div className="text-xs text-admin-subtle leading-relaxed">{mode.desc}</div>
                     </button>
                   ))}
                 </div>
@@ -426,78 +426,78 @@ export default function SettingsPage() {
               {/* Bilingual Message Content */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-[#586348] border-b border-[#DED5C7] pb-2">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-admin-primary border-b border-admin-border pb-2">
                     English Content
                   </h4>
                   <div>
-                    <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Popup Title</label>
+                    <label className="block text-xs font-semibold text-admin-muted mb-1.5">Popup Title</label>
                     <input
                       type="text"
                       value={maintenance.title}
                       onChange={(e) => setMaintenance({ ...maintenance, title: e.target.value })}
-                      className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                      className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Message / Description</label>
+                    <label className="block text-xs font-semibold text-admin-muted mb-1.5">Message / Description</label>
                     <textarea
                       rows={3}
                       value={maintenance.message}
                       onChange={(e) => setMaintenance({ ...maintenance, message: e.target.value })}
-                      className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 resize-none"
+                      className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 resize-none"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-[#586348] border-b border-[#DED5C7] pb-2">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-admin-primary border-b border-admin-border pb-2">
                     Bengali Content (বাংলা)
                   </h4>
                   <div>
-                    <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Title in Bengali</label>
+                    <label className="block text-xs font-semibold text-admin-muted mb-1.5">Title in Bengali</label>
                     <input
                       type="text"
                       value={maintenance.titleBn}
                       onChange={(e) => setMaintenance({ ...maintenance, titleBn: e.target.value })}
-                      className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                      className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Message in Bengali</label>
+                    <label className="block text-xs font-semibold text-admin-muted mb-1.5">Message in Bengali</label>
                     <textarea
                       rows={3}
                       value={maintenance.messageBn}
                       onChange={(e) => setMaintenance({ ...maintenance, messageBn: e.target.value })}
-                      className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 resize-none"
+                      className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 resize-none"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Actions & Preview */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#DED5C7]">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-admin-border">
                 <button
                   type="button"
                   onClick={() => setShowLivePreview(!showLivePreview)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-[#DED5C7] text-xs font-semibold text-[#242824] hover:bg-[#F5F2EB] transition shadow-xs w-full sm:w-auto"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-admin-border text-xs font-semibold text-admin-ink hover:bg-admin-canvas transition shadow-xs w-full sm:w-auto"
                 >
-                  <FiEye size={15} className="text-[#586348]" /> {showLivePreview ? "Hide Preview" : "Preview Maintenance Popup"}
+                  <FiEye size={15} className="text-admin-primary" /> {showLivePreview ? "Hide Preview" : "Preview Maintenance Popup"}
                 </button>
               </div>
 
               {showLivePreview && (
-                <div className="mt-6 p-6 rounded-2xl bg-[#F5F2EB] border border-[#586348] space-y-4">
+                <div className="mt-6 p-6 rounded-2xl bg-admin-canvas border border-admin-primary space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#586348]">
+                    <span className="text-xs font-bold uppercase tracking-wider text-admin-primary">
                       Preview (Mode: {maintenance.mode.toUpperCase()})
                     </span>
-                    <button onClick={() => setShowLivePreview(false)} className="text-xs text-[#5A625A] hover:text-[#242824] font-medium">
+                    <button onClick={() => setShowLivePreview(false)} className="text-xs text-admin-muted hover:text-admin-ink font-medium">
                       Close Preview ✕
                     </button>
                   </div>
-                  <div className="max-w-md mx-auto bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-6 text-center shadow-lg space-y-3">
-                    <div className="font-serif text-lg font-bold text-[#242824]">{maintenance.title || "Site Under Maintenance"}</div>
-                    <div className="text-xs text-[#5A625A] leading-relaxed">{maintenance.message}</div>
+                  <div className="max-w-md mx-auto bg-admin-surface border border-admin-border rounded-2xl p-6 text-center shadow-lg space-y-3">
+                    <div className="font-serif text-lg font-bold text-admin-ink">{maintenance.title || "Site Under Maintenance"}</div>
+                    <div className="text-xs text-admin-muted leading-relaxed">{maintenance.message}</div>
                   </div>
                 </div>
               )}
@@ -506,56 +506,56 @@ export default function SettingsPage() {
 
           {/* TAB: GENERAL */}
           {activeTab === "general" && (
-            <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+            <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
               <div>
-                <h2 className="font-serif text-xl font-bold text-[#242824]">General Studio Parameters</h2>
-                <p className="text-xs text-[#5A625A] mt-1">SEO meta tags, studio naming, and primary language settings.</p>
+                <h2 className="font-serif text-xl font-bold text-admin-ink">General Studio Parameters</h2>
+                <p className="text-xs text-admin-muted mt-1">SEO meta tags, studio naming, and primary language settings.</p>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Site Name</label>
+                  <label className="block text-xs font-semibold text-admin-muted mb-1.5">Site Name</label>
                   <input
                     type="text"
                     value={general.siteName}
                     onChange={(e) => setGeneral({ ...general, siteName: e.target.value })}
-                    className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                    className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Site Title (SEO)</label>
+                  <label className="block text-xs font-semibold text-admin-muted mb-1.5">Site Title (SEO)</label>
                   <input
                     type="text"
                     value={general.siteTitle}
                     onChange={(e) => setGeneral({ ...general, siteTitle: e.target.value })}
-                    className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                    className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Site Description (SEO)</label>
+                <label className="block text-xs font-semibold text-admin-muted mb-1.5">Site Description (SEO)</label>
                 <textarea
                   rows={3}
                   value={general.siteDescription}
                   onChange={(e) => setGeneral({ ...general, siteDescription: e.target.value })}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 resize-none"
+                  className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 resize-none"
                 />
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Tagline</label>
+                  <label className="block text-xs font-semibold text-admin-muted mb-1.5">Tagline</label>
                   <input
                     type="text"
                     value={general.tagline}
                     onChange={(e) => setGeneral({ ...general, tagline: e.target.value })}
-                    className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                    className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Language</label>
+                  <label className="block text-xs font-semibold text-admin-muted mb-1.5">Language</label>
                   <select
                     value={general.language}
                     onChange={(e) => setGeneral({ ...general, language: e.target.value })}
-                    className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                    className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                   >
                     <option>English</option>
                     <option>Bengali (বাংলা)</option>
@@ -568,56 +568,56 @@ export default function SettingsPage() {
 
           {/* TAB: CONTACT */}
           {activeTab === "contact" && (
-            <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+            <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
               <div>
-                <h2 className="font-serif text-xl font-bold text-[#242824]">Contact Information</h2>
-                <p className="text-xs text-[#5A625A] mt-1">Official studio hotline, email, office address, and hours.</p>
+                <h2 className="font-serif text-xl font-bold text-admin-ink">Contact Information</h2>
+                <p className="text-xs text-admin-muted mt-1">Official studio hotline, email, office address, and hours.</p>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Phone Number</label>
+                  <label className="block text-xs font-semibold text-admin-muted mb-1.5">Phone Number</label>
                   <input
                     type="text"
                     value={contact.phone}
                     onChange={(e) => setContact({ ...contact, phone: e.target.value })}
-                    className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                    className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">WhatsApp Hotline</label>
+                  <label className="block text-xs font-semibold text-admin-muted mb-1.5">WhatsApp Hotline</label>
                   <input
                     type="text"
                     value={contact.whatsapp}
                     onChange={(e) => setContact({ ...contact, whatsapp: e.target.value })}
-                    className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                    className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Email</label>
+                <label className="block text-xs font-semibold text-admin-muted mb-1.5">Email</label>
                 <input
                   type="email"
                   value={contact.email}
                   onChange={(e) => setContact({ ...contact, email: e.target.value })}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                  className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Office Address</label>
+                <label className="block text-xs font-semibold text-admin-muted mb-1.5">Office Address</label>
                 <textarea
                   rows={2}
                   value={contact.address}
                   onChange={(e) => setContact({ ...contact, address: e.target.value })}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 resize-none"
+                  className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 resize-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Working Hours</label>
+                <label className="block text-xs font-semibold text-admin-muted mb-1.5">Working Hours</label>
                 <input
                   type="text"
                   value={contact.workingHours}
                   onChange={(e) => setContact({ ...contact, workingHours: e.target.value })}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                  className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                 />
               </div>
             </div>
@@ -625,46 +625,46 @@ export default function SettingsPage() {
 
           {/* TAB: SOCIAL */}
           {activeTab === "social" && (
-            <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+            <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
               <div>
-                <h2 className="font-serif text-xl font-bold text-[#242824]">Social Media Channels</h2>
-                <p className="text-xs text-[#5A625A] mt-1">Links displayed in public site footer and contact sections.</p>
+                <h2 className="font-serif text-xl font-bold text-admin-ink">Social Media Channels</h2>
+                <p className="text-xs text-admin-muted mt-1">Links displayed in public site footer and contact sections.</p>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Facebook Page</label>
+                <label className="block text-xs font-semibold text-admin-muted mb-1.5">Facebook Page</label>
                 <input
                   type="url"
                   value={social.facebook}
                   onChange={(e) => setSocial({ ...social, facebook: e.target.value })}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                  className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Instagram Profile</label>
+                <label className="block text-xs font-semibold text-admin-muted mb-1.5">Instagram Profile</label>
                 <input
                   type="url"
                   value={social.instagram}
                   onChange={(e) => setSocial({ ...social, instagram: e.target.value })}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                  className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">YouTube Channel</label>
+                <label className="block text-xs font-semibold text-admin-muted mb-1.5">YouTube Channel</label>
                 <input
                   type="url"
                   value={social.youtube}
                   onChange={(e) => setSocial({ ...social, youtube: e.target.value })}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                  className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">LinkedIn Profile</label>
+                <label className="block text-xs font-semibold text-admin-muted mb-1.5">LinkedIn Profile</label>
                 <input
                   type="url"
                   value={social.linkedin}
                   onChange={(e) => setSocial({ ...social, linkedin: e.target.value })}
                   placeholder="https://linkedin.com/company/banglasketch"
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                  className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                 />
               </div>
             </div>
@@ -674,14 +674,14 @@ export default function SettingsPage() {
           {activeTab === "security" && (
             <div className="space-y-6">
               {/* Change Password Card */}
-              <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
-                <div className="flex items-center gap-3.5 pb-4 border-b border-[#DED5C7]">
-                  <div className="w-12 h-12 rounded-2xl bg-[#EDF1EA] border border-[#D5DEC4] text-[#586348] flex items-center justify-center shadow-xs">
+              <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+                <div className="flex items-center gap-3.5 pb-4 border-b border-admin-border">
+                  <div className="w-12 h-12 rounded-2xl bg-[#EDF1EA] border border-[#D5DEC4] text-admin-primary flex items-center justify-center shadow-xs">
                     <FiLock size={20} />
                   </div>
                   <div>
-                    <h2 className="font-serif text-lg font-bold text-[#242824]">Change Master Password</h2>
-                    <p className="text-xs text-[#5A625A]">
+                    <h2 className="font-serif text-lg font-bold text-admin-ink">Change Master Password</h2>
+                    <p className="text-xs text-admin-muted">
                       Update your administrator credentials used to log in to this CMS.
                     </p>
                   </div>
@@ -704,7 +704,7 @@ export default function SettingsPage() {
                 <form onSubmit={handleChangePassword} className="space-y-4 max-w-xl">
                   {/* Current Password */}
                   <div>
-                    <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">
+                    <label className="block text-xs font-semibold text-admin-muted mb-1.5">
                       Current Password
                     </label>
                     <div className="relative">
@@ -717,12 +717,12 @@ export default function SettingsPage() {
                         }}
                         placeholder="Enter your existing password"
                         required
-                        className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 pr-11 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 placeholder:text-[#8C948C]"
+                        className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 pr-11 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 placeholder:text-admin-subtle"
                       />
                       <button
                         type="button"
                         onClick={() => setPwShowCurrent(!pwShowCurrent)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#737D73] hover:text-[#242824]"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-admin-subtle hover:text-admin-ink"
                       >
                         {pwShowCurrent ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                       </button>
@@ -731,7 +731,7 @@ export default function SettingsPage() {
 
                   {/* New Password */}
                   <div>
-                    <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">
+                    <label className="block text-xs font-semibold text-admin-muted mb-1.5">
                       New Password
                     </label>
                     <div className="relative">
@@ -745,12 +745,12 @@ export default function SettingsPage() {
                         placeholder="Must be at least 8 characters"
                         required
                         minLength={8}
-                        className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 pr-11 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 placeholder:text-[#8C948C]"
+                        className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 pr-11 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 placeholder:text-admin-subtle"
                       />
                       <button
                         type="button"
                         onClick={() => setPwShowNew(!pwShowNew)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#737D73] hover:text-[#242824]"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-admin-subtle hover:text-admin-ink"
                       >
                         {pwShowNew ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                       </button>
@@ -759,7 +759,7 @@ export default function SettingsPage() {
 
                   {/* Confirm New Password */}
                   <div>
-                    <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">
+                    <label className="block text-xs font-semibold text-admin-muted mb-1.5">
                       Confirm New Password
                     </label>
                     <input
@@ -771,7 +771,7 @@ export default function SettingsPage() {
                       }}
                       placeholder="Re-enter your new password"
                       required
-                      className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 placeholder:text-[#8C948C]"
+                      className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 placeholder:text-admin-subtle"
                     />
                   </div>
 
@@ -779,7 +779,7 @@ export default function SettingsPage() {
                     <button
                       type="submit"
                       disabled={pwLoading}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#242824] hover:bg-[#383E38] text-[#FCFAF7] rounded-xl text-xs font-semibold shadow-xs transition disabled:opacity-50"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-admin-ink hover:bg-admin-elevated text-admin-surface rounded-xl text-xs font-semibold shadow-xs transition disabled:opacity-50"
                     >
                       {pwLoading ? (
                         <>
@@ -798,29 +798,29 @@ export default function SettingsPage() {
               </div>
 
               {/* Emergency Recovery Card */}
-              <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-                <div className="flex items-center gap-3.5 pb-3 border-b border-[#DED5C7]">
-                  <div className="w-12 h-12 rounded-2xl bg-[#EDF1EA] border border-[#D5DEC4] text-[#586348] flex items-center justify-center shadow-xs">
+              <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+                <div className="flex items-center gap-3.5 pb-3 border-b border-admin-border">
+                  <div className="w-12 h-12 rounded-2xl bg-[#EDF1EA] border border-[#D5DEC4] text-admin-primary flex items-center justify-center shadow-xs">
                     <FiMail size={20} />
                   </div>
                   <div>
-                    <h3 className="font-serif text-base font-bold text-[#242824]">Emergency Password Recovery</h3>
-                    <p className="text-xs text-[#5A625A]">
+                    <h3 className="font-serif text-base font-bold text-admin-ink">Emergency Password Recovery</h3>
+                    <p className="text-xs text-admin-muted">
                       Recovery email is configured for emergency 6-digit OTP verification.
                     </p>
                   </div>
                 </div>
 
-                <p className="text-xs text-[#5A625A] leading-relaxed max-w-2xl">
+                <p className="text-xs text-admin-muted leading-relaxed max-w-2xl">
                   In the event you are locked out or forget your password, the login screen provides an emergency OTP reset option. Codes will be dispatched securely to{" "}
-                  <strong className="text-[#242824]">arifulhaquerohan@gmail.com</strong>.
+                  <strong className="text-admin-ink">arifulhaquerohan@gmail.com</strong>.
                 </p>
 
                 <div className="pt-2">
                   <button
                     type="button"
                     onClick={() => setPwResetModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-[#DED5C7] text-xs font-semibold text-[#586348] hover:bg-[#EDF1EA] transition shadow-xs"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-admin-border text-xs font-semibold text-admin-primary hover:bg-[#EDF1EA] transition shadow-xs"
                   >
                     <FiKey size={14} />
                     <span>Test OTP Recovery Flow</span>
@@ -843,15 +843,15 @@ export default function SettingsPage() {
 
       {/* Session Expired / Re-authentication Modal */}
       {authModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#242824]/60 backdrop-blur-sm p-4">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 text-[#242824]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-admin-ink/60 backdrop-blur-sm p-4">
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 text-admin-ink">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#EDF1EA] border border-[#D5DEC4] flex items-center justify-center text-[#586348]">
+              <div className="w-10 h-10 rounded-xl bg-[#EDF1EA] border border-[#D5DEC4] flex items-center justify-center text-admin-primary">
                 <FiLock size={20} />
               </div>
               <div>
-                <h3 className="font-serif text-lg font-bold text-[#242824]">Admin Session Expired</h3>
-                <p className="text-xs text-[#5A625A]">Please re-enter your admin password to save changes.</p>
+                <h3 className="font-serif text-lg font-bold text-admin-ink">Admin Session Expired</h3>
+                <p className="text-xs text-admin-muted">Please re-enter your admin password to save changes.</p>
               </div>
             </div>
 
@@ -863,7 +863,7 @@ export default function SettingsPage() {
 
             <form onSubmit={handleReauth} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#5A625A] mb-1.5">Master Password</label>
+                <label className="block text-xs font-semibold text-admin-muted mb-1.5">Master Password</label>
                 <input
                   type="password"
                   value={authPassword}
@@ -871,7 +871,7 @@ export default function SettingsPage() {
                   placeholder="Enter admin password"
                   autoFocus
                   required
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20"
+                  className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20"
                 />
               </div>
 
@@ -883,14 +883,14 @@ export default function SettingsPage() {
                     setAuthPassword("");
                     setAuthError("");
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-[#5A625A] hover:text-[#242824] transition-colors"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-admin-muted hover:text-admin-ink transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={reauthenticating || !authPassword}
-                  className="px-5 py-2.5 bg-[#242824] hover:bg-[#383E38] text-[#FCFAF7] rounded-xl text-xs font-semibold shadow-xs transition"
+                  className="px-5 py-2.5 bg-admin-ink hover:bg-admin-elevated text-admin-surface rounded-xl text-xs font-semibold shadow-xs transition"
                 >
                   {reauthenticating ? "Verifying..." : "Confirm & Save"}
                 </button>

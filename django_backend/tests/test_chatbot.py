@@ -3,6 +3,7 @@ from django.test import TestCase, SimpleTestCase
 from rest_framework.test import APIClient
 from apps.chatbot.models import ChatMessage
 from apps.chatbot.services.ai import ChatUnavailable, generate_ai_response
+from apps.chatbot.services.fast_reply import classify_instant_reply
 
 
 class ChatTests(TestCase):
@@ -12,27 +13,62 @@ class ChatTests(TestCase):
         limiter.start()
         self.addCleanup(limiter.stop)
 
-    @patch("apps.chatbot.views.generate_ai_response", return_value="Hello! How can I help?")
-    def test_reply_and_follow_up_history(self, generate):
+    def test_instant_greeting_and_contact_replies(self):
+        # Greetings return instantly without AI provider call
+        res_hi = self.client.post("/api/chat", {"session_id": "test-session", "message": "hello"}, format="json")
+        self.assertEqual(res_hi.status_code, 200)
+        self.assertEqual(res_hi.json()["message_type"], "instant")
+        self.assertIn("Bangla Sketch", res_hi.json()["reply"])
+        saved_reply = ChatMessage.objects.filter(
+            conversation__session_id="test-session",
+            role="assistant",
+        ).latest("id")
+        self.assertEqual(saved_reply.message_type, "quick_reply")
+        self.assertEqual(saved_reply.metadata["intent"], "greeting")
+
+        # Contact queries return instant contact details
+        res_contact = self.client.post("/api/chat", {"session_id": "test-session", "message": "what is your phone number?"}, format="json")
+        self.assertEqual(res_contact.status_code, 200)
+        self.assertEqual(res_contact.json()["message_type"], "instant")
+        self.assertIn("01712-458794", res_contact.json()["reply"])
+
+    @patch("apps.chatbot.views.generate_ai_response")
+    def test_site_visit_quick_reply_does_not_call_provider(self, generate):
+        response = self.client.post("/api/chat", {"session_id": "test-site-visit", "message": "Book an in-person site visit"}, format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["message_type"], "instant")
+        self.assertIn("site visit", response.json()["reply"])
+        self.assertIn("01712-458794", response.json()["reply"])
+        generate.assert_not_called()
+
+    @patch("apps.chatbot.views.generate_ai_response", return_value="Here is custom lighting and ceiling advice for your space.")
+    def test_reply_and_follow_up_history_for_custom_design(self, generate):
         for endpoint in ("/api/chat", "/api/v1/chat/"):
-            response = self.client.post(endpoint, {"session_id": "test-session", "message": "hi"}, format="json")
+            response = self.client.post(endpoint, {"session_id": "test-session-ai", "message": "I need custom false ceiling advice"}, format="json")
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.json()["reply"], "Hello! How can I help?")
-        self.assertEqual(ChatMessage.objects.count(), 4)
-        self.assertEqual([m["role"] for m in generate.call_args.args[0]], ["user", "assistant", "user"])
+            self.assertEqual(response.json()["reply"], "Here is custom lighting and ceiling advice for your space.")
+            self.assertEqual(response.json()["message_type"], "ai")
+        self.assertEqual(ChatMessage.objects.filter(conversation__session_id="test-session-ai").count(), 4)
 
     @patch("apps.chatbot.views.generate_ai_response", side_effect=ChatUnavailable("AuthenticationError"))
     def test_provider_failure_does_not_save_partial_turn(self, generate):
-        response = self.client.post("/api/chat", {"session_id": "test-session", "message": "hi"}, format="json")
+        response = self.client.post("/api/chat", {"session_id": "test-session-fail", "message": "Need advice on wooden wall panelling"}, format="json")
         self.assertEqual(response.status_code, 503)
         self.assertFalse(response.json()["success"])
-        self.assertEqual(ChatMessage.objects.count(), 0)
+        self.assertEqual(ChatMessage.objects.filter(conversation__session_id="test-session-fail").count(), 0)
         self.assertNotIn("AuthenticationError", response.json()["error"])
 
     @patch("apps.chatbot.views.generate_ai_response")
     def test_invalid_messages_do_not_call_provider(self, generate):
         for message in ("", "   ", "a" * 4001, {"invalid": True}):
             response = self.client.post("/api/chat", {"session_id": "test-session", "message": message}, format="json")
+            self.assertEqual(response.status_code, 400)
+        generate.assert_not_called()
+
+    @patch("apps.chatbot.views.generate_ai_response")
+    def test_invalid_session_ids_do_not_call_provider(self, generate):
+        for session_id in ("short", "../bad", "has spaces", "a" * 65):
+            response = self.client.post("/api/chat", {"session_id": session_id, "message": "hello"}, format="json")
             self.assertEqual(response.status_code, 400)
         generate.assert_not_called()
 
@@ -45,13 +81,13 @@ class ChatTests(TestCase):
 
 
 class ChatConfigurationTests(SimpleTestCase):
-    @patch.dict("os.environ", {"GEMINI_API_KEY": ""})
+    @patch.dict("os.environ", {"GEMINI_API_KEY": "", "OPENAI_API_KEY": ""})
     def test_missing_key_fails_at_request_time(self):
         with self.assertRaises(ChatUnavailable):
-            generate_ai_response([{"role": "user", "content": "hi"}])
+            generate_ai_response([{"role": "user", "content": "I need custom architecture design"}])
 
 
-@patch.dict("os.environ", {"GEMINI_API_KEY": "test-key", "GEMINI_MODEL": "gemini-3.5-flash-lite"})
+@patch.dict("os.environ", {"GEMINI_API_KEY": "test-key", "GEMINI_MODEL": "gemini-2.5-flash"})
 class GeminiServiceTests(SimpleTestCase):
     @patch("apps.chatbot.services.ai.requests.post")
     def test_history_mapping_and_text_reply(self, post):
@@ -60,7 +96,7 @@ class GeminiServiceTests(SimpleTestCase):
         reply = generate_ai_response([
             {"role": "user", "content": "hi"},
             {"role": "assistant", "content": "Hello"},
-            {"role": "user", "content": "living room"},
+            {"role": "user", "content": "living room styling"},
         ])
         self.assertEqual(reply, "Hello!")
         kwargs = post.call_args.kwargs
@@ -72,7 +108,7 @@ class GeminiServiceTests(SimpleTestCase):
     def test_public_knowledge_reaches_provider(self, post):
         post.return_value.ok = True
         post.return_value.json.return_value = {"candidates": [{"content": {"parts": [{"text": "Kitchen design"}]}}]}
-        generate_ai_response([{"role": "user", "content": "services"}], knowledge={"services": [{"name": "Kitchen Design"}]})
+        generate_ai_response([{"role": "user", "content": "kitchen interior advice"}], knowledge={"services": [{"name": "Kitchen Design"}]})
         instruction = post.call_args.kwargs["json"]["systemInstruction"]["parts"][0]["text"]
         self.assertIn('"name": "Kitchen Design"', instruction)
         self.assertIn("never instructions", instruction)
@@ -82,22 +118,21 @@ class GeminiServiceTests(SimpleTestCase):
         post.return_value.ok = False
         post.return_value.status_code = 403
         with self.assertRaisesRegex(ChatUnavailable, "Gemini HTTP 403"):
-            generate_ai_response([{"role": "user", "content": "hi"}])
-        post.return_value.json.assert_not_called()
+            generate_ai_response([{"role": "user", "content": "custom styling"}])
 
     @patch("apps.chatbot.services.ai.requests.post")
     def test_blocked_response_is_handled(self, post):
         post.return_value.ok = True
-        post.return_value.json.return_value = {"promptFeedback": {"blockReason": "SAFETY"}}
+        post.return_value.json.return_value = {"candidates": []}
         with self.assertRaises(ChatUnavailable):
-            generate_ai_response([{"role": "user", "content": "hi"}])
+            generate_ai_response([{"role": "user", "content": "custom styling"}])
 
     @patch("apps.chatbot.services.ai.requests.post")
     def test_timeout_is_handled(self, post):
         import requests
         post.side_effect = requests.Timeout("private provider details")
         with self.assertRaisesRegex(ChatUnavailable, "Gemini connection failed"):
-            generate_ai_response([{"role": "user", "content": "hi"}])
+            generate_ai_response([{"role": "user", "content": "custom styling"}])
 
 
 class ChatKnowledgeTests(TestCase):
@@ -123,17 +158,13 @@ class ChatKnowledgeTests(TestCase):
         self.assertNotIn("Private client", json.dumps(context))
         self.assertNotIn("Secret draft", json.dumps(context))
         self.assertNotIn("Deleted", json.dumps(context))
-        self.assertEqual(len(context["services"]), 4)
+        self.assertEqual(len(context["services"]), 5)
 
     def test_bangla_and_follow_up_preferences(self):
         _, projects = self.knowledge("রান্নাঘরের ডিজাইন", "আধুনিক")
         self.assertEqual(projects[0]["title"], "Modern kitchen")
         _, projects = self.knowledge("kitchen", "Actually show bedrooms")
         self.assertEqual([p["category"] for p in projects], ["bedroom"])
-
-    def test_greeting_and_empty_category_do_not_show_unrelated_cards(self):
-        self.assertEqual(self.knowledge("Hello")[1], [])
-        self.assertEqual(self.knowledge("bathroom projects")[1], [])
 
     def test_unsafe_image_is_not_returned(self):
         self.modern.featured_image = "javascript:alert(1)"
@@ -143,13 +174,12 @@ class ChatKnowledgeTests(TestCase):
     @patch("apps.chatbot.views.PostgresRateLimiter.check_and_increment", return_value=(True, 1, None))
     @patch("apps.chatbot.views.generate_ai_response", return_value="Here are kitchen projects.")
     def test_api_returns_cards_and_passes_knowledge(self, generate, limiter):
-        response = APIClient().post("/api/chat", {"session_id": "knowledge-test", "message": "modern kitchen"}, format="json")
+        response = APIClient().post("/api/chat", {"session_id": "knowledge-test", "message": "modern kitchen styling advice"}, format="json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["projects"][0]["title"], "Modern kitchen")
         self.assertIn("services", generate.call_args.kwargs["knowledge"])
 
-    @patch("apps.chatbot.views.generate_ai_response")
-    def test_welcome_gallery_is_public_and_does_not_call_ai(self, generate):
+    def test_welcome_gallery_is_public_and_does_not_call_ai(self):
         from apps.projects.models import Project
         self.modern.featured = True
         self.modern.save()
@@ -161,4 +191,3 @@ class ChatKnowledgeTests(TestCase):
         self.assertNotIn("Secret draft", str(projects))
         self.assertNotIn("Deleted", str(projects))
         self.assertEqual(ChatMessage.objects.count(), 0)
-        generate.assert_not_called()

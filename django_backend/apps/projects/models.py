@@ -3,9 +3,9 @@ from django.db import models
 class Project(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255, unique=True)
+    slug = models.SlugField(max_length=255, unique=True, db_index=True)
     description = models.TextField(blank=True, null=True)
-    category = models.CharField(max_length=50)
+    category = models.CharField(max_length=50, db_index=True)
     featured_image = models.TextField(blank=True, null=True)
     gallery = models.JSONField(default=list, blank=True)
     before_image = models.TextField(blank=True, null=True)
@@ -13,18 +13,22 @@ class Project(models.Model):
     client_name = models.CharField(max_length=255, blank=True, null=True)
     client_testimonial = models.TextField(blank=True, null=True)
     date_completed = models.DateField(blank=True, null=True)
-    featured = models.BooleanField(default=False)
-    published = models.BooleanField(default=True)
+    featured = models.BooleanField(default=False, db_index=True)
+    published = models.BooleanField(default=True, db_index=True)
     cloudinary_ids = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_at = models.DateTimeField(blank=True, null=True, db_index=True)
 
     class Meta:
         db_table = "projects"
         verbose_name = "Project"
         verbose_name_plural = "Projects"
         ordering = ["-id"]
+        indexes = [
+            models.Index(fields=["published", "deleted_at", "category"], name="proj_pub_del_cat_idx"),
+            models.Index(fields=["published", "deleted_at", "featured"], name="proj_pub_del_feat_idx"),
+        ]
 
     def __str__(self):
         return f"{self.title} ({self.category})"

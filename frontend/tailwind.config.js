@@ -4,6 +4,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        admin: {
+          canvas: "#F3F5F2",
+          surface: "#FFFFFF",
+          ink: "#202A24",
+          muted: "#56645B",
+          subtle: "#617065",
+          border: "#D7DED4",
+          primary: "#465D45",
+          hover: "#344B33",
+          tint: "#E8EEE5",
+          elevated: "#344139",
+        },
         // "From Space to Sanctuary" - Warm Architectural Studio Palette
         ivory: {
           DEFAULT: "#F4F0E8",

@@ -95,27 +95,27 @@ export default function VersionHistoryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-[#242824]/60 backdrop-blur-xs animate-fade-in">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-admin-ink/60 backdrop-blur-xs animate-fade-in">
       <div
-        className="relative w-full max-w-3xl max-h-[85vh] flex flex-col bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl shadow-xl overflow-hidden"
+        className="relative w-full max-w-3xl max-h-[85vh] flex flex-col bg-admin-surface border border-admin-border rounded-3xl shadow-xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#DED5C7] bg-[#F5F2EB]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-admin-border bg-admin-canvas">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[#EDF1EA] text-[#586348] border border-[#D5DEC4]">
+            <div className="p-2 rounded-xl bg-[#EDF1EA] text-admin-primary border border-[#D5DEC4]">
               <FiClock size={18} />
             </div>
             <div>
-              <h2 className="font-serif text-lg font-bold text-[#242824]">Version History & Revisions</h2>
-              <p className="text-xs text-[#5A625A]">
+              <h2 className="font-serif text-lg font-bold text-admin-ink">Version History & Revisions</h2>
+              <p className="text-xs text-admin-muted">
                 Browse point-in-time snapshots and restore any previous version.
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#737D73] hover:text-[#242824] hover:bg-[#EDE7DE] transition-colors"
+            className="p-1.5 rounded-lg text-admin-subtle hover:text-admin-ink hover:bg-admin-tint transition-colors"
           >
             <FiX size={18} />
           </button>
@@ -138,23 +138,23 @@ export default function VersionHistoryModal({
         {/* Content Body */}
         <div className="flex-1 overflow-hidden p-6 grid md:grid-cols-12 gap-6">
           {/* Versions List (Left) */}
-          <div className="md:col-span-5 flex flex-col border border-[#DED5C7] rounded-2xl overflow-hidden bg-white shadow-2xs">
-            <div className="px-4 py-2.5 bg-[#F5F2EB] border-b border-[#DED5C7] text-xs font-semibold text-[#586348] flex items-center justify-between uppercase tracking-wider">
+          <div className="md:col-span-5 flex flex-col border border-admin-border rounded-2xl overflow-hidden bg-white shadow-2xs">
+            <div className="px-4 py-2.5 bg-admin-canvas border-b border-admin-border text-xs font-semibold text-admin-primary flex items-center justify-between uppercase tracking-wider">
               <span>Saved Versions ({versions.length})</span>
               <button
                 onClick={loadVersions}
                 disabled={loading}
-                className="text-[#737D73] hover:text-[#242824] transition-colors"
+                className="text-admin-subtle hover:text-admin-ink transition-colors"
                 title="Refresh"
               >
                 <FiRefreshCw size={12} className={loading ? "animate-spin" : ""} />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto divide-y divide-[#DED5C7] max-h-[360px]">
+            <div className="flex-1 overflow-y-auto divide-y divide-admin-border max-h-[360px]">
               {loading ? (
-                <div className="p-6 text-center text-xs text-[#737D73]">Loading revisions...</div>
+                <div className="p-6 text-center text-xs text-admin-subtle">Loading revisions...</div>
               ) : versions.length === 0 ? (
-                <div className="p-6 text-center text-xs text-[#737D73]">
+                <div className="p-6 text-center text-xs text-admin-subtle">
                   No recorded revisions yet for this item.
                 </div>
               ) : (
@@ -166,23 +166,23 @@ export default function VersionHistoryModal({
                       onClick={() => setSelectedVersion(item)}
                       className={`w-full text-left p-3.5 text-xs transition-colors flex flex-col gap-1 ${
                         isSelected
-                          ? "bg-[#EDF1EA] border-l-4 border-[#586348]"
-                          : "hover:bg-[#F5F2EB]/60"
+                          ? "bg-[#EDF1EA] border-l-4 border-admin-primary"
+                          : "hover:bg-admin-canvas/60"
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#242824]">Version #{item.version}</span>
-                        <span className="text-[10px] text-[#737D73] tabular-nums">
+                        <span className="font-bold text-admin-ink">Version #{item.version}</span>
+                        <span className="text-[10px] text-admin-subtle tabular-nums">
                           {new Date(item.created_at).toLocaleDateString("en-GB", {
                             month: "short",
                             day: "numeric",
                           })}
                         </span>
                       </div>
-                      <div className="text-[11px] text-[#5A625A] truncate">
+                      <div className="text-[11px] text-admin-muted truncate">
                         {item.snapshot?.title || "Untitled"}
                       </div>
-                      <div className="text-[10px] text-[#8C948C] tabular-nums">
+                      <div className="text-[10px] text-admin-subtle tabular-nums">
                         {new Date(item.created_at).toLocaleTimeString("en-GB", {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -196,44 +196,44 @@ export default function VersionHistoryModal({
           </div>
 
           {/* Version Preview (Right) */}
-          <div className="md:col-span-7 flex flex-col border border-[#DED5C7] rounded-2xl overflow-hidden bg-white p-5 shadow-2xs">
+          <div className="md:col-span-7 flex flex-col border border-admin-border rounded-2xl overflow-hidden bg-white p-5 shadow-2xs">
             {selectedVersion ? (
               <div className="flex-1 flex flex-col justify-between overflow-y-auto space-y-4">
                 <div className="space-y-3.5">
-                  <div className="flex items-center justify-between border-b border-[#DED5C7] pb-3">
+                  <div className="flex items-center justify-between border-b border-admin-border pb-3">
                     <div>
-                      <span className="text-xs uppercase tracking-wider text-[#586348] font-bold">
+                      <span className="text-xs uppercase tracking-wider text-admin-primary font-bold">
                         Snapshot Preview (v{selectedVersion.version})
                       </span>
-                      <div className="text-[11px] text-[#737D73] mt-0.5">
+                      <div className="text-[11px] text-admin-subtle mt-0.5">
                         Saved on {new Date(selectedVersion.created_at).toLocaleString("en-GB")}
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[11px] uppercase font-semibold text-[#586348] tracking-wider block mb-1">
+                    <label className="text-[11px] uppercase font-semibold text-admin-primary tracking-wider block mb-1">
                       Title
                     </label>
-                    <div className="text-sm font-semibold text-[#242824] bg-[#FCFAF7] p-2.5 rounded-xl border border-[#DED5C7]">
+                    <div className="text-sm font-semibold text-admin-ink bg-admin-surface p-2.5 rounded-xl border border-admin-border">
                       {selectedVersion.snapshot?.title || "—"}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[11px] uppercase font-semibold text-[#586348] tracking-wider block mb-1">
+                      <label className="text-[11px] uppercase font-semibold text-admin-primary tracking-wider block mb-1">
                         Category
                       </label>
-                      <div className="text-xs font-medium text-[#242824] bg-[#FCFAF7] p-2.5 rounded-xl border border-[#DED5C7] truncate">
+                      <div className="text-xs font-medium text-admin-ink bg-admin-surface p-2.5 rounded-xl border border-admin-border truncate">
                         {selectedVersion.snapshot?.category || "—"}
                       </div>
                     </div>
                     <div>
-                      <label className="text-[11px] uppercase font-semibold text-[#586348] tracking-wider block mb-1">
+                      <label className="text-[11px] uppercase font-semibold text-admin-primary tracking-wider block mb-1">
                         Status
                       </label>
-                      <div className="text-xs font-medium text-[#242824] bg-[#FCFAF7] p-2.5 rounded-xl border border-[#DED5C7]">
+                      <div className="text-xs font-medium text-admin-ink bg-admin-surface p-2.5 rounded-xl border border-admin-border">
                         {selectedVersion.snapshot?.published ? "Published" : "Draft"}
                       </div>
                     </div>
@@ -241,10 +241,10 @@ export default function VersionHistoryModal({
 
                   {selectedVersion.snapshot?.slug && (
                     <div>
-                      <label className="text-[11px] uppercase font-semibold text-[#586348] tracking-wider block mb-1">
+                      <label className="text-[11px] uppercase font-semibold text-admin-primary tracking-wider block mb-1">
                         Slug
                       </label>
-                      <div className="text-xs font-mono text-[#5A625A] bg-[#FCFAF7] p-2.5 rounded-xl border border-[#DED5C7] truncate">
+                      <div className="text-xs font-mono text-admin-muted bg-admin-surface p-2.5 rounded-xl border border-admin-border truncate">
                         {selectedVersion.snapshot.slug}
                       </div>
                     </div>
@@ -252,21 +252,21 @@ export default function VersionHistoryModal({
 
                   {(selectedVersion.snapshot?.description || selectedVersion.snapshot?.excerpt) && (
                     <div>
-                      <label className="text-[11px] uppercase font-semibold text-[#586348] tracking-wider block mb-1">
+                      <label className="text-[11px] uppercase font-semibold text-admin-primary tracking-wider block mb-1">
                         Summary / Excerpt
                       </label>
-                      <div className="text-xs text-[#5A625A] bg-[#FCFAF7] p-3 rounded-xl border border-[#DED5C7] max-h-28 overflow-y-auto leading-relaxed">
+                      <div className="text-xs text-admin-muted bg-admin-surface p-3 rounded-xl border border-admin-border max-h-28 overflow-y-auto leading-relaxed">
                         {selectedVersion.snapshot.description || selectedVersion.snapshot.excerpt}
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div className="pt-4 border-t border-[#DED5C7] flex justify-end">
+                <div className="pt-4 border-t border-admin-border flex justify-end">
                   <button
                     onClick={() => handleRestore(selectedVersion.version)}
                     disabled={restoring}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#586348] hover:bg-[#444D37] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-admin-primary hover:bg-admin-hover text-white rounded-xl text-xs font-semibold shadow-xs transition-colors disabled:opacity-50"
                   >
                     <FiRotateCcw size={13} className={restoring ? "animate-spin" : ""} />
                     {restoring ? "Restoring..." : `Revert to Version ${selectedVersion.version}`}
@@ -274,7 +274,7 @@ export default function VersionHistoryModal({
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex items-center justify-center text-xs text-[#737D73]">
+              <div className="flex-1 flex items-center justify-center text-xs text-admin-subtle">
                 Select a version to preview its snapshot.
               </div>
             )}
@@ -282,11 +282,11 @@ export default function VersionHistoryModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 bg-[#F5F2EB] border-t border-[#DED5C7] flex justify-between items-center text-xs text-[#5A625A]">
+        <div className="px-6 py-3.5 bg-admin-canvas border-t border-admin-border flex justify-between items-center text-xs text-admin-muted">
           <span>Reverting replaces the current item draft with the selected snapshot.</span>
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl border border-[#DED5C7] bg-white text-[#242824] hover:bg-[#EDE7DE] font-semibold transition-colors shadow-2xs"
+            className="px-4 py-2 rounded-xl border border-admin-border bg-white text-admin-ink hover:bg-admin-tint font-semibold transition-colors shadow-2xs"
           >
             Close
           </button>

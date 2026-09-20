@@ -4,7 +4,7 @@ from django.conf import settings
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import BasePermission
-from .models import AdminUser, AdminCredential
+from .models import AdminUser
 
 ROLE_RANK = {
     "viewer": 0,
@@ -50,34 +50,20 @@ class AdminJWTAuthentication(BaseAuthentication):
             raise AuthenticationFailed("Invalid token")
 
         sub = payload.get("sub")
+        if sub is None:
+            raise AuthenticationFailed("Invalid token: missing subject")
+
         version = payload.get("version", 1)
 
-        if sub is not None:
-            try:
-                user = AdminUser.objects.get(id=int(sub))
-            except (AdminUser.DoesNotExist, ValueError):
-                raise AuthenticationFailed("User not found")
+        try:
+            user = AdminUser.objects.get(id=int(sub))
+        except (AdminUser.DoesNotExist, ValueError):
+            raise AuthenticationFailed("User not found")
 
-            if not user.active or user.token_version != version:
-                raise AuthenticationFailed("Session expired; please sign in again")
+        if not user.active or user.token_version != version:
+            raise AuthenticationFailed("Session expired; please sign in again")
 
-            return (user, token)
-        else:
-            # Check legacy credentials
-            cred = AdminCredential.objects.first()
-            if not cred or cred.version != version:
-                raise AuthenticationFailed("Session expired; please sign in again")
-
-            # Fallback mock admin user
-            dummy_user = AdminUser(
-                id=1,
-                email=payload.get("email", "admin@localhost"),
-                display_name="Administrator",
-                role="owner",
-                active=True,
-                token_version=version,
-            )
-            return (dummy_user, token)
+        return (user, token)
 
 
 class IsAdminUserAuthenticated(BasePermission):

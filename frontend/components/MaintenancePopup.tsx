@@ -2,12 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import { FiArrowUpRight, FiArrowRight, FiClock, FiMail, FiPhone, FiTool, FiX } from "react-icons/fi";
 import { DEFAULT_MAINTENANCE_CONFIG, MaintenanceConfig } from "../lib/maintenance.types";
 
 export function MaintenancePopup() {
+  const pathname = usePathname();
+  const isAdminRoute = pathname.startsWith("/admin");
   const [config, setConfig] = useState<MaintenanceConfig>(DEFAULT_MAINTENANCE_CONFIG);
   const [isAdmin, setIsAdmin] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -29,8 +32,8 @@ export function MaintenancePopup() {
       .then((data) => {
         if (data.success && data.data) {
           setConfig(data.data);
-          // Only check admin session if maintenance mode is enabled and an admin cookie might exist
-          if (data.data.enabled && typeof document !== "undefined" && document.cookie.includes("bs_admin_session")) {
+          // HttpOnly session cookies are verified by the server, never read in JavaScript.
+          if (data.data.enabled) {
             fetch("/api/admin/session", { cache: "no-store", credentials: "same-origin" })
               .then((res) => setIsAdmin(res.ok))
               .catch(() => setIsAdmin(false));
@@ -48,7 +51,7 @@ export function MaintenancePopup() {
   };
 
   useEffect(() => {
-    const isDismissibleOverlay = mounted && config.enabled && !isAdmin && config.mode !== "banner" && !(dismissed && config.allowDismiss && config.mode !== "fullscreen");
+    const isDismissibleOverlay = !isAdminRoute && mounted && config.enabled && !isAdmin && config.mode !== "banner" && !(dismissed && config.allowDismiss && config.mode !== "fullscreen");
     if (!isDismissibleOverlay) return;
 
     const previousActiveElement = document.activeElement as HTMLElement | null;
@@ -95,29 +98,29 @@ export function MaintenancePopup() {
       document.body.style.overflow = previousOverflow;
       previousActiveElement?.focus();
     };
-  }, [config.enabled, config.mode, config.allowDismiss, isAdmin, dismissed, mounted]);
+  }, [config.enabled, config.mode, config.allowDismiss, isAdmin, dismissed, mounted, isAdminRoute]);
 
-  if (!mounted || !config.enabled) return null;
+  if (isAdminRoute || !mounted || !config.enabled) return null;
 
   // If user is admin, allow them to view the site normally, but show a floating indicator
   if (isAdmin) {
     return (
-      <div className="fixed bottom-4 right-4 z-[9999] bg-[#0a2540] border-2 border-[#c5a059] text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-fade-in text-xs">
-        <div className="w-8 h-8 rounded-full bg-[#c5a059]/20 flex items-center justify-center text-[#c5a059] shrink-0 animate-pulse">
+      <div className="fixed bottom-4 right-4 z-[9999] bg-[#242824] border border-[#586348] text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-fade-in text-xs">
+        <div className="w-8 h-8 rounded-full bg-[#586348]/40 flex items-center justify-center text-[#DED5C7] shrink-0 animate-pulse">
           <FiTool size={16} />
         </div>
         <div>
-          <div className="font-bold text-[#c5a059] flex items-center gap-1.5">
+          <div className="font-bold text-[#FCFAF7] flex items-center gap-1.5">
             <span>Maintenance Mode Active</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#c5a059]/20 text-[#c5a059] uppercase">{config.mode}</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#586348] text-[#FCFAF7] uppercase font-semibold">{config.mode}</span>
           </div>
-          <div className="text-gray-300 text-[11px]">
+          <div className="text-[#A8B2A8] text-[11px]">
             You have admin access. Visitors see maintenance message.
           </div>
         </div>
         <Link
           href="/admin/settings"
-          className="ml-2 bg-[#c5a059] hover:bg-[#d4b76a] text-[#0a2540] font-bold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+          className="ml-2 bg-[#586348] hover:bg-[#727A61] text-white font-semibold px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap shadow-xs"
         >
           Manage
         </Link>
@@ -133,15 +136,15 @@ export function MaintenancePopup() {
   // MODE 1: BANNER
   if (config.mode === "banner") {
     return (
-      <div className="fixed top-0 left-0 right-0 z-[100] bg-gradient-to-r from-[#0a2540] via-[#8c5a35] to-[#0a2540] border-b-2 border-[#c5a059] text-white py-3 px-4 shadow-xl">
+      <div className="fixed top-0 left-0 right-0 z-[100] bg-[#242824] border-b border-[#586348]/40 text-[#FCFAF7] py-3 px-4 shadow-xl">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs md:text-sm">
           <div className="flex items-center gap-2.5 text-center sm:text-left">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#c5a059] animate-ping shrink-0" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#586348] animate-ping shrink-0" />
             <div>
-              <span className="font-bold text-[#f0e2c4]">{config.title}:</span>{" "}
+              <span className="font-bold text-[#DED5C7]">{config.title}:</span>{" "}
               <span className="text-gray-200">{config.message}</span>
               {config.estimatedEndTime && (
-                <span className="ml-2 inline-flex items-center gap-1 text-[#f0e2c4] bg-[#0a2540]/60 px-2 py-0.5 rounded-full text-xs">
+                <span className="ml-2 inline-flex items-center gap-1 text-[#DED5C7] bg-[#383E38] px-2.5 py-0.5 rounded-full text-xs">
                   <FiClock size={12} /> {config.estimatedEndTime}
                 </span>
               )}
@@ -154,7 +157,7 @@ export function MaintenancePopup() {
                 href={`https://wa.me/${config.contactWhatsApp.replace(/[^0-9]/g, "")}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold px-3 py-1 rounded-full text-xs transition-colors shadow-md"
+                className="inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold px-3.5 py-1.5 rounded-full text-xs transition-colors shadow-md"
               >
                 <FaWhatsapp size={14} /> WhatsApp Us
               </a>
@@ -183,23 +186,23 @@ export function MaintenancePopup() {
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="fixed inset-0 z-[99999] bg-gradient-to-br from-[#061a30] via-[#0a2540] to-[#1a1510] text-white flex items-center justify-center p-6 overflow-y-auto"
+        className="fixed inset-0 z-[99999] bg-[#242824] text-[#FCFAF7] flex items-center justify-center p-6 overflow-y-auto"
       >
         {/* Background ambient lighting */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#c5a059]/10 blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-10 right-10 w-[350px] h-[350px] rounded-full bg-[#e07b2a]/10 blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#586348]/15 blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-10 right-10 w-[350px] h-[350px] rounded-full bg-[#DED5C7]/10 blur-[100px] pointer-events-none" />
 
         <div className="relative max-w-xl w-full text-center space-y-8 my-auto py-12">
-          {/* Logo with glowing ring */}
+          {/* Logo with ring */}
           <div className="relative inline-block mx-auto">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#c5a059] to-[#e07b2a] blur-xl opacity-40 animate-pulse" />
-            <div className="relative w-32 h-32 mx-auto rounded-full shadow-[0_0_40px_rgba(197,160,89,0.35)]">
+            <div className="absolute inset-0 rounded-full bg-[#586348] blur-xl opacity-30 animate-pulse" />
+            <div className="relative w-32 h-32 mx-auto rounded-full shadow-2xl p-3 bg-[#383E38] border border-[#586348]/40 flex items-center justify-center">
               <Image
-                src="/logo.svg"
+                src="/logo-icon.svg"
                 alt="Bangla Sketch Logo"
                 width={128}
                 height={128}
-                className="w-full h-full"
+                className="w-full h-full object-contain"
                 priority
               />
             </div>
@@ -207,32 +210,32 @@ export function MaintenancePopup() {
 
           {/* Heading */}
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c5a059]/15 border border-[#c5a059]/30 text-[#c5a059] text-xs font-semibold uppercase tracking-widest">
-              <FiTool size={13} className="animate-spin" /> System Maintenance
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#586348]/20 border border-[#586348]/40 text-[#DED5C7] text-xs font-semibold uppercase tracking-widest">
+              <FiTool size={13} className="animate-spin text-[#A8B2A8]" /> System Maintenance
             </div>
-            <h1 id={titleId} className="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+            <h1 id={titleId} className="text-3xl md:text-5xl font-serif font-bold text-white tracking-tight leading-tight">
               {config.title}
             </h1>
             {config.titleBn && (
-              <p className="text-xl md:text-2xl text-[#c5a059] font-medium font-serif">
+              <p className="text-xl md:text-2xl text-[#DED5C7] font-medium font-serif">
                 {config.titleBn}
               </p>
             )}
           </div>
 
           {/* Description Card */}
-          <div id={descriptionId} className="bg-[#0a2540]/80 backdrop-blur-md border border-[#c5a059]/30 rounded-2xl p-6 shadow-2xl space-y-4">
-            <p className="text-gray-200 text-sm md:text-base leading-relaxed">
+          <div id={descriptionId} className="bg-[#383E38]/80 backdrop-blur-md border border-[#586348]/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4 text-center">
+            <p className="text-[#FCFAF7] text-sm md:text-base leading-relaxed">
               {config.message}
             </p>
             {config.messageBn && (
-              <p className="text-gray-300 text-xs md:text-sm leading-relaxed border-t border-[#c5a059]/20 pt-3">
+              <p className="text-[#DED5C7] text-xs md:text-sm leading-relaxed border-t border-white/10 pt-3">
                 {config.messageBn}
               </p>
             )}
 
             {config.estimatedEndTime && (
-              <div className="inline-flex items-center gap-2 bg-[#061a30] text-[#c5a059] border border-[#c5a059]/30 px-4 py-2 rounded-xl text-xs font-semibold mt-2">
+              <div className="inline-flex items-center gap-2 bg-[#242824] text-[#DED5C7] border border-[#586348]/40 px-4 py-2 rounded-xl text-xs font-semibold mt-2">
                 <FiClock size={15} /> Expected Back: {config.estimatedEndTime}
               </div>
             )}
@@ -241,7 +244,7 @@ export function MaintenancePopup() {
           {/* Urgent inquiries / Contact */}
           {config.showContactButtons && (
             <div className="space-y-3 pt-2">
-              <p className="text-xs uppercase tracking-widest text-[#c5a059]/80 font-semibold">
+              <p className="text-xs uppercase tracking-widest text-[#A8B2A8] font-semibold">
                 Need Immediate Assistance or Design Inquiry?
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3">
@@ -249,19 +252,19 @@ export function MaintenancePopup() {
                   href={`https://wa.me/${config.contactWhatsApp.replace(/[^0-9]/g, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-lg hover:shadow-[#25D366]/30 hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold px-6 py-3 rounded-xl text-sm transition-all shadow-lg hover:shadow-[#25D366]/30 hover:-translate-y-0.5"
                 >
                   <FaWhatsapp size={18} /> Chat on WhatsApp
                 </a>
                 <a
                   href={`tel:${config.contactPhone}`}
-                  className="inline-flex items-center gap-2 bg-[#0a2540] hover:bg-[#1a3a5c] text-[#c5a059] border border-[#c5a059]/40 font-bold px-5 py-3 rounded-xl text-sm transition-all shadow-md hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 bg-[#383E38] hover:bg-[#586348] text-[#FCFAF7] border border-[#586348]/40 font-semibold px-5 py-3 rounded-xl text-sm transition-all shadow-md hover:-translate-y-0.5"
                 >
                   <FiPhone size={16} /> {config.contactPhone}
                 </a>
                 <a
                   href={`mailto:${config.contactEmail}`}
-                  className="inline-flex items-center gap-2 bg-[#0a2540] hover:bg-[#1a3a5c] text-gray-300 border border-white/10 font-medium px-5 py-3 rounded-xl text-sm transition-all shadow-md hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 bg-[#383E38] hover:bg-[#586348] text-[#FCFAF7] border border-white/10 font-medium px-5 py-3 rounded-xl text-sm transition-all shadow-md hover:-translate-y-0.5"
                 >
                   <FiMail size={16} /> Email Us
                 </a>
@@ -269,8 +272,8 @@ export function MaintenancePopup() {
             </div>
           )}
 
-          <div className="text-[11px] text-gray-400 pt-6">
-            © {new Date().getFullYear()} Banglasketch (বাংলা স্কেচ) • All Rights Reserved
+          <div className="text-[11px] text-[#A8B2A8] pt-6">
+            © {new Date().getFullYear()} Bangla Sketch (বাংলা স্কেচ) • All Rights Reserved
           </div>
         </div>
       </div>
@@ -305,7 +308,7 @@ export function MaintenancePopup() {
             </button>
           )}
           <div className="relative flex items-center gap-3.5 pr-10">
-            <Image src="/logo.svg" alt="Bangla Sketch" width={56} height={56} className="h-14 w-14 shrink-0" />
+            <Image src="/logo-icon.svg" alt="Bangla Sketch" width={56} height={56} className="h-14 w-14 shrink-0 object-contain" />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ivory-light">Bangla Sketch</p>
               <p className="mt-1.5 text-xs text-gold">Thoughtful spaces. Beautiful living.</p>

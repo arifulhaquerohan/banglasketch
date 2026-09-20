@@ -44,7 +44,7 @@ class AdminUser(models.Model):
             return False
 
     def set_password(self, raw_password: str):
-        salt = bcrypt.gensalt(rounds=10)
+        salt = bcrypt.gensalt(rounds=12)
         self.password_hash = bcrypt.hashpw(raw_password.encode("utf-8"), salt).decode("utf-8")
 
     @property

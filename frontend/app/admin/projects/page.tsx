@@ -42,12 +42,12 @@ export default function ProjectsPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-[#242824] tracking-tight">Portfolio Projects</h1>
-          <p className="text-sm text-[#5A625A] mt-1">Manage architectural portfolio showcase projects visible on the public website.</p>
+          <h1 className="font-serif text-3xl font-bold text-admin-ink tracking-tight">Portfolio Projects</h1>
+          <p className="text-sm text-admin-muted mt-1">Manage architectural portfolio showcase projects visible on the public website.</p>
         </div>
         <Link
           href="/admin/projects/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#586348] hover:bg-[#444D37] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-admin-primary hover:bg-admin-hover text-white rounded-xl text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto"
         >
           <FiPlus size={15} /> New Project
         </Link>
@@ -55,20 +55,20 @@ export default function ProjectsPage() {
 
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[240px]">
-          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[#737D73]" size={16} />
+          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-admin-subtle" size={16} />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search projects by title, category, or style..."
-            className="w-full bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl pl-11 pr-4 py-3 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-xs"
+            className="w-full bg-admin-surface border border-admin-border rounded-2xl pl-11 pr-4 py-3 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all shadow-xs"
           />
         </div>
         <button
           onClick={loadProjects}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FCFAF7] border border-[#DED5C7] hover:border-[#586348] text-xs font-semibold text-[#242824] transition-colors shadow-xs disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-admin-surface border border-admin-border hover:border-admin-primary text-xs font-semibold text-admin-ink transition-colors shadow-xs disabled:opacity-50"
           disabled={loading}
         >
-          <FiRefreshCw className={loading ? "animate-spin text-[#586348]" : "text-[#586348]"} size={14} /> Refresh
+          <FiRefreshCw className={loading ? "animate-spin text-admin-primary" : "text-admin-primary"} size={14} /> Refresh
         </button>
       </div>
 
@@ -81,16 +81,16 @@ export default function ProjectsPage() {
       {loading ? (
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="h-72 animate-pulse rounded-3xl bg-[#EDE7DE] border border-[#DED5C7]" />
+            <div key={index} className="h-72 animate-pulse rounded-3xl bg-admin-tint border border-admin-border" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-12 text-center shadow-xs">
-          <div className="w-12 h-12 rounded-2xl bg-[#F5F2EB] border border-[#DED5C7] flex items-center justify-center mx-auto text-[#586348] mb-3">
+        <div className="bg-admin-surface border border-admin-border rounded-3xl p-12 text-center shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-admin-canvas border border-admin-border flex items-center justify-center mx-auto text-admin-primary mb-3">
             <FiImageIcon size={22} />
           </div>
-          <h2 className="font-serif text-base font-bold text-[#242824] mb-1">No projects found</h2>
-          <p className="text-xs text-[#5A625A]">
+          <h2 className="font-serif text-base font-bold text-admin-ink mb-1">No projects found</h2>
+          <p className="text-xs text-admin-muted">
             {search ? "No projects match your current search query." : "Create your first portfolio project to make it visible on the website."}
           </p>
         </div>
@@ -101,10 +101,10 @@ export default function ProjectsPage() {
             return (
               <article
                 key={project.id}
-                className="overflow-hidden rounded-3xl border border-[#DED5C7] bg-[#FCFAF7] shadow-xs hover:border-[#586348]/50 transition-all group flex flex-col justify-between"
+                className="overflow-hidden rounded-3xl border border-admin-border bg-admin-surface shadow-xs hover:border-admin-primary/50 transition-all group flex flex-col justify-between"
               >
                 <div>
-                  <div className="relative aspect-[16/9] bg-[#EDE7DE] overflow-hidden">
+                  <div className="relative aspect-[16/9] bg-admin-tint overflow-hidden">
                     {image ? (
                       <Image
                         src={image}
@@ -114,7 +114,7 @@ export default function ProjectsPage() {
                         className="object-cover group-hover:scale-102 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-[#8C948C]">
+                      <div className="absolute inset-0 flex items-center justify-center text-admin-subtle">
                         <FiImageIcon size={32} />
                       </div>
                     )}
@@ -132,10 +132,10 @@ export default function ProjectsPage() {
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-[11px] font-semibold text-[#586348] uppercase tracking-wider mb-1">
+                        <p className="text-[11px] font-semibold text-admin-primary uppercase tracking-wider mb-1">
                           {project.category.replace("-", " ")}
                         </p>
-                        <h2 className="font-serif text-base font-bold text-[#242824] truncate group-hover:text-[#586348] transition-colors">
+                        <h2 className="font-serif text-base font-bold text-admin-ink break-words group-hover:text-admin-primary transition-colors">
                           {project.title}
                         </h2>
                       </div>
@@ -143,7 +143,7 @@ export default function ProjectsPage() {
                         <Link
                           href={`/admin/projects/${project.id}`}
                           aria-label={`Edit ${project.title}`}
-                          className="rounded-xl p-2 border border-[#DED5C7] bg-white text-[#586348] hover:bg-[#EDF1EA] transition-colors shadow-2xs"
+                          className="rounded-xl p-2 border border-admin-border bg-white text-admin-primary hover:bg-[#EDF1EA] transition-colors shadow-2xs"
                         >
                           <FiEdit2 size={14} />
                         </Link>
@@ -151,24 +151,24 @@ export default function ProjectsPage() {
                           onClick={() => deleteProject(project)}
                           disabled={deletingId === project.id}
                           aria-label={`Delete ${project.title}`}
-                          className="rounded-xl p-2 border border-[#DED5C7] bg-white text-[#737D73] hover:text-red-700 hover:bg-red-50 hover:border-red-200 transition-colors disabled:opacity-50 shadow-2xs"
+                          className="rounded-xl p-2 border border-admin-border bg-white text-admin-subtle hover:text-red-700 hover:bg-red-50 hover:border-red-200 transition-colors disabled:opacity-50 shadow-2xs"
                         >
                           <FiTrash2 size={14} />
                         </button>
                       </div>
                     </div>
                     {project.description && (
-                      <p className="mt-2.5 line-clamp-2 text-xs text-[#5A625A] leading-relaxed">
+                      <p className="mt-2.5 line-clamp-2 text-xs text-admin-muted leading-relaxed">
                         {project.description}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="px-5 py-3 border-t border-[#DED5C7] bg-[#F5F2EB]/50 flex items-center justify-between text-[11px] text-[#737D73]">
+                <div className="px-5 py-3 border-t border-admin-border bg-admin-canvas/50 flex items-center justify-between text-[11px] text-admin-subtle">
                   <span>Slug: {project.slug || "—"}</span>
                   {project.featured && (
-                    <span className="font-semibold text-[#586348] uppercase text-[10px]">★ Featured</span>
+                    <span className="font-semibold text-admin-primary uppercase text-[10px]">★ Featured</span>
                   )}
                 </div>
               </article>

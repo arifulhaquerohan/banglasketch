@@ -17,11 +17,11 @@ interface PhaseStep {
 const PHASES: PhaseStep[] = [
   {
     step: "01",
-    title: "Consultation & Spatial Audit",
-    subtitle: "Understanding Daily Routines & Daylight",
+    title: "Consultation & Site Visit",
+    subtitle: "Understanding How You Live",
     timeline: "Week 01 – 02",
     description:
-      "We begin at your space in Dhaka, observing natural sun corridors, family living patterns, acoustic challenges, and structural column locations.",
+      "We visit your home in Dhaka, measure the space, study the natural light, and discuss how you actually use each room day to day.",
     deliverable: "Spatial Audit Document & Mood Intent Matrix",
     deliverableDetails: [
       "Precise laser site dimensional survey",
@@ -32,11 +32,11 @@ const PHASES: PhaseStep[] = [
   },
   {
     step: "02",
-    title: "Architectural Concept & 3D Modeling",
-    subtitle: "Resolving Volumes, Circulation & Sightlines",
+    title: "Layout Plan & 3D Design",
+    subtitle: "Seeing Your Space Before Building",
     timeline: "Week 03 – 04",
     description:
-      "Our architects draft CAD floor plans and photorealistic 3D models. You see exact lighting drops, joinery proportions, and materials before any construction begins.",
+      "We produce detailed 2D floor plans and photorealistic 3D views. You see the room proportions, cabinetry, and lighting before any construction begins.",
     deliverable: "Photorealistic 3D Renders & CAD Layout Blueprints",
     deliverableDetails: [
       "High-resolution 3D walkthroughs for each room",
@@ -47,8 +47,8 @@ const PHASES: PhaseStep[] = [
   },
   {
     step: "03",
-    title: "Material & Joinery Specification",
-    subtitle: "Curating the Tactile Swatch Board",
+    title: "Material Selection & Final Budget",
+    subtitle: "Touching Samples & Agreeing the Numbers",
     timeline: "Week 05 – 06",
     description:
       "We invite you to our studio to touch authentic marble slabs, natural teak veneers, textured linens, and aged brass samples. Zero ambiguous selections.",
@@ -62,8 +62,8 @@ const PHASES: PhaseStep[] = [
   },
   {
     step: "04",
-    title: "Artisan Execution & Site Supervision",
-    subtitle: "Turnkey Craftsmanship with Zero Deviation",
+    title: "Construction & Site Supervision",
+    subtitle: "Built Exactly as Designed",
     timeline: "Week 07 – 14",
     description:
       "Our dedicated full-time site architects oversee master carpenters, marble masons, and certified electricians. Every joint and shadowline is verified against drawings.",
@@ -77,8 +77,8 @@ const PHASES: PhaseStep[] = [
   },
   {
     step: "05",
-    title: "White-Glove Handover & Sanctuary Living",
-    subtitle: "The Seamless Transition to Your New Home",
+    title: "Handover & Warranty",
+    subtitle: "Moving into Your New Space",
     timeline: "Week 15",
     description:
       "Deep architectural cleaning, lighting scene calibration, custom soft furnishings placement, and formal handover of your completed sanctuary.",
@@ -102,15 +102,15 @@ export function TransformationSteps() {
         <div className="max-w-3xl mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF7F2] border border-[#DDD5C8] text-[11px] font-semibold tracking-widest uppercase text-[#727A61] mb-3">
             <span className="w-2 h-2 rounded-full bg-[#A45138]" />
-            <span>Structured Transparency</span>
+            <span>Our Process</span>
           </div>
 
           <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#242622] tracking-tight leading-[1.15]">
-            How the Transformation Happens
+            How It Works
           </h2>
 
           <p className="text-base sm:text-lg text-[#5A6057] mt-3 leading-relaxed">
-            Renovation is often fraught with uncertainty. We replace ambiguity with a rigorous 5-phase architectural roadmap where every milestone delivers a concrete, reviewable artifact.
+            Five clear steps from first conversation to finished home. At each stage you receive a concrete deliverable — so you always know exactly where your project stands.
           </p>
         </div>
 

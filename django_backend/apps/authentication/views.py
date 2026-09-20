@@ -16,6 +16,8 @@ from .models import AdminUser, AdminCredential, AdminPasswordReset, LoginHistory
 from .serializers import AdminUserSerializer, AdminUserCreateSerializer, LoginHistorySerializer
 from .auth import generate_jwt_token, IsAdminUserAuthenticated, require_role
 from .services.totp import encrypt_totp_secret, decrypt_totp_secret
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from apps.core.services.rate_limit import PostgresRateLimiter
 
 def get_client_ip(request):
@@ -42,22 +44,22 @@ class AdminLoginView(APIView):
     def post(self, request):
         email = (request.data.get("email") or "").strip().lower()
         if not email:
-            email = getattr(settings, "ADMIN_RECOVERY_EMAIL", "").strip().lower() or getattr(settings, "EMAIL_HOST_USER", "").strip().lower()
+            return Response({"success": False, "error": "Email is required"}, status=400)
 
         password = request.data.get("password", "")
         totp_code = (request.data.get("totp_code") or request.data.get("totp") or "").strip()
         ip = get_client_ip(request)
         user_agent = request.META.get("HTTP_USER_AGENT", "")
 
-        # Rate limiting: 5 attempts per 15 minutes in production
-        if not settings.DEBUG:
-            limiter = PostgresRateLimiter("login", 15 * 60 * 1000, 5)
-            allowed, hits, reset_at = limiter.check_and_increment(ip)
-            if not allowed:
-                return Response({
-                    "success": False,
-                    "error": "Too many login attempts. Try again in 15 minutes."
-                }, status=429)
+        # Rate limiting: 5 attempts per 15 minutes (relaxed to 50 in dev)
+        max_login_attempts = 5 if not settings.DEBUG else 50
+        limiter = PostgresRateLimiter("login", 15 * 60 * 1000, max_login_attempts)
+        allowed, hits, reset_at = limiter.check_and_increment(ip)
+        if not allowed:
+            return Response({
+                "success": False,
+                "error": "Too many login attempts. Try again in 15 minutes."
+            }, status=429)
 
         if not password:
             return Response({"success": False, "error": "Password required"}, status=400)
@@ -156,8 +158,10 @@ class AdminChangePasswordView(APIView):
         if not current_password or not new_password:
             return Response({"success": False, "error": "Current and new passwords required"}, status=400)
 
-        if len(new_password) < 8:
-            return Response({"success": False, "error": "New password must be at least 8 characters"}, status=400)
+        try:
+            validate_password(new_password)
+        except DjangoValidationError as e:
+            return Response({"success": False, "error": " ".join(e.messages)}, status=400)
 
         user = request.user
         if not user.check_password(current_password):
@@ -179,6 +183,12 @@ class Admin2FASetupView(APIView):
     permission_classes = [IsAdminUserAuthenticated]
 
     def get(self, request):
+        return self._generate_setup(request)
+
+    def post(self, request):
+        return self._generate_setup(request)
+
+    def _generate_setup(self, request):
         user = request.user
         secret = pyotp.random_base32()
         encrypted_secret = encrypt_totp_secret(secret)
@@ -186,12 +196,13 @@ class Admin2FASetupView(APIView):
         user.save(update_fields=["pending_totp_secret"])
 
         totp = pyotp.TOTP(secret)
-        uri = totp.provisioning_uri(name=user.email, issuer_name="Banglasketch Studio")
+        uri = totp.provisioning_uri(name=user.email, issuer_name="Bangla Sketch Studio")
 
         return Response({
             "success": True,
             "data": {
                 "secret": secret,
+                "otpauth": uri,
                 "qrCode": uri,
             }
         })
@@ -201,16 +212,19 @@ class Admin2FAVerifyView(APIView):
     permission_classes = [IsAdminUserAuthenticated]
 
     def post(self, request):
-        code = request.data.get("code", "").strip()
+        code = str(request.data.get("code") or request.data.get("totp") or "").strip().replace(" ", "").replace("-", "")
         user = request.user
 
         if not user.pending_totp_secret:
-            return Response({"success": False, "error": "2FA setup was not initiated"}, status=400)
+            return Response({"success": False, "error": "2FA setup was not initiated. Please click 'Configure 2FA' first."}, status=400)
+
+        if not code or len(code) != 6 or not code.isdigit():
+            return Response({"success": False, "error": "Please enter a valid 6-digit code."}, status=400)
 
         decrypted_secret = decrypt_totp_secret(user.pending_totp_secret)
         totp = pyotp.TOTP(decrypted_secret)
         if not totp.verify(code, valid_window=1):
-            return Response({"success": False, "error": "Invalid verification code"}, status=400)
+            return Response({"success": False, "error": "Invalid verification code. Please make sure your device time is synchronized."}, status=400)
 
         user.totp_secret = user.pending_totp_secret
         user.pending_totp_secret = None
@@ -225,13 +239,18 @@ class Admin2FADisableView(APIView):
 
     def post(self, request):
         password = request.data.get("password", "")
-        code = request.data.get("code", "").strip()
+        code = str(request.data.get("code") or request.data.get("totp") or "").strip().replace(" ", "").replace("-", "")
         user = request.user
+
+        if not password:
+            return Response({"success": False, "error": "Password is required to disable 2FA."}, status=400)
 
         if not user.check_password(password):
             return Response({"success": False, "error": "Incorrect password"}, status=400)
 
         if user.totp_enabled and user.totp_secret:
+            if not code:
+                return Response({"success": False, "error": "2FA code is required to disable 2FA."}, status=400)
             decrypted_secret = decrypt_totp_secret(user.totp_secret)
             totp = pyotp.TOTP(decrypted_secret)
             if not totp.verify(code, valid_window=1):
@@ -250,14 +269,14 @@ class AdminRequestResetOTPView(APIView):
 
     def post(self, request):
         ip = get_client_ip(request)
-        if not settings.DEBUG:
-            limiter = PostgresRateLimiter("otp_request", 60 * 1000, 3)
-            allowed, hits, reset_at = limiter.check_and_increment(ip)
-            if not allowed:
-                return Response({
-                    "success": False,
-                    "error": "Too many OTP requests. Please wait a minute."
-                }, status=429)
+        max_otp_requests = 3 if not settings.DEBUG else 30
+        limiter = PostgresRateLimiter("otp_request", 60 * 1000, max_otp_requests)
+        allowed, hits, reset_at = limiter.check_and_increment(ip)
+        if not allowed:
+            return Response({
+                "success": False,
+                "error": "Too many OTP requests. Please wait a minute."
+            }, status=429)
 
         email = request.data.get("email", "").strip().lower()
         if not email:
@@ -299,14 +318,14 @@ class AdminVerifyResetOTPView(APIView):
 
     def post(self, request):
         ip = get_client_ip(request)
-        if not settings.DEBUG:
-            limiter = PostgresRateLimiter("otp_verify", 15 * 60 * 1000, 10)
-            allowed, hits, reset_at = limiter.check_and_increment(ip)
-            if not allowed:
-                return Response({
-                    "success": False,
-                    "error": "Too many attempts. Please try again later."
-                }, status=429)
+        max_otp_verifies = 10 if not settings.DEBUG else 100
+        limiter = PostgresRateLimiter("otp_verify", 15 * 60 * 1000, max_otp_verifies)
+        allowed, hits, reset_at = limiter.check_and_increment(ip)
+        if not allowed:
+            return Response({
+                "success": False,
+                "error": "Too many attempts. Please try again later."
+            }, status=429)
 
         email = (request.data.get("email") or "").strip().lower()
         otp = str(request.data.get("otp") or "").strip()
@@ -357,8 +376,10 @@ class AdminVerifyResetOTPView(APIView):
 
         # If a new password is provided (complete reset step)
         if new_password:
-            if len(new_password) < 8:
-                return Response({"success": False, "error": "Master password must be at least 8 characters long."}, status=400)
+            try:
+                validate_password(new_password)
+            except DjangoValidationError as e:
+                return Response({"success": False, "error": " ".join(e.messages)}, status=400)
 
             if user:
                 user.set_password(new_password)

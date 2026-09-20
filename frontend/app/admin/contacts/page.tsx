@@ -101,17 +101,17 @@ export default function ContactsPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-[#242824] tracking-tight">Contact Submissions</h1>
-          <p className="text-[#5A625A] text-sm mt-1">
+          <h1 className="font-serif text-3xl font-bold text-admin-ink tracking-tight">Contact Submissions</h1>
+          <p className="text-admin-muted text-sm mt-1">
             {loading ? "Loading inquiries..." : `${unreadCount} unread ${unreadCount === 1 ? "inquiry" : "inquiries"} received from public portal.`}
           </p>
         </div>
         <button
           onClick={loadContacts}
           disabled={loading}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FCFAF7] border border-[#DED5C7] hover:border-[#586348] text-xs font-semibold text-[#242824] transition-colors shadow-xs disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-admin-surface border border-admin-border hover:border-admin-primary text-xs font-semibold text-admin-ink transition-colors shadow-xs disabled:opacity-50"
         >
-          <FiRefreshCw className={loading ? "animate-spin text-[#586348]" : "text-[#586348]"} size={14} /> Refresh
+          <FiRefreshCw className={loading ? "animate-spin text-admin-primary" : "text-admin-primary"} size={14} /> Refresh
         </button>
       </div>
 
@@ -122,63 +122,63 @@ export default function ContactsPage() {
       )}
 
       <div className="relative flex-1">
-        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[#737D73]" size={16} />
+        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-admin-subtle" size={16} />
         <input
           type="text"
           placeholder="Search messages by name, email, service, or keywords..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl pl-11 pr-4 py-3 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-xs"
+          className="w-full bg-admin-surface border border-admin-border rounded-2xl pl-11 pr-4 py-3 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all shadow-xs"
         />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Messages List */}
-        <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl overflow-hidden min-h-[420px] shadow-xs flex flex-col">
-          <div className="px-5 py-3.5 border-b border-[#DED5C7] bg-[#F5F2EB]/60 flex items-center justify-between text-xs font-semibold text-[#586348] uppercase tracking-wider">
+        <div className="bg-admin-surface border border-admin-border rounded-3xl overflow-hidden min-h-[420px] shadow-xs flex flex-col">
+          <div className="px-5 py-3.5 border-b border-admin-border bg-admin-canvas/60 flex items-center justify-between text-xs font-semibold text-admin-primary uppercase tracking-wider">
             <span>Inbox Messages</span>
-            <span className="text-[#737D73] font-normal lowercase">{filtered.length} total</span>
+            <span className="text-admin-subtle font-normal lowercase">{filtered.length} total</span>
           </div>
 
           {loading ? (
             <div className="p-6 space-y-4">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-20 animate-pulse rounded-2xl bg-[#EDE7DE]" />
+                <div key={i} className="h-20 animate-pulse rounded-2xl bg-admin-tint" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="p-12 text-center text-[#737D73] my-auto">
-              <div className="w-12 h-12 rounded-2xl bg-[#F5F2EB] border border-[#DED5C7] flex items-center justify-center mx-auto text-[#586348] mb-3">
+            <div className="p-12 text-center text-admin-subtle my-auto">
+              <div className="w-12 h-12 rounded-2xl bg-admin-canvas border border-admin-border flex items-center justify-center mx-auto text-admin-primary mb-3">
                 <FiMail size={22} />
               </div>
-              <p className="font-semibold text-[#242824]">No inquiries found</p>
-              <p className="text-xs text-[#5A625A] mt-1">Try adjusting your search criteria.</p>
+              <p className="font-semibold text-admin-ink">No inquiries found</p>
+              <p className="text-xs text-admin-muted mt-1">Try adjusting your search criteria.</p>
             </div>
           ) : (
-            <div className="divide-y divide-[#DED5C7] overflow-y-auto max-h-[600px]">
+            <div className="divide-y divide-admin-border overflow-y-auto max-h-[600px]">
               {filtered.map((contact) => {
                 const isSelected = String(selectedId) === String(contact.id);
                 return (
                   <div
                     key={contact.id}
                     onClick={() => handleSelect(contact)}
-                    className={`p-4 cursor-pointer hover:bg-[#F5F2EB] transition-colors ${
-                      isSelected ? "bg-[#EDE7DE] border-l-4 border-[#586348]" : ""
-                    } ${!contact.read ? "bg-[#586348]/5" : ""}`}
+                    className={`p-4 cursor-pointer hover:bg-admin-canvas transition-colors ${
+                      isSelected ? "bg-admin-tint border-l-4 border-admin-primary" : ""
+                    } ${!contact.read ? "bg-admin-primary/5" : ""}`}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-[#242824] text-[#FCFAF7] flex items-center justify-center font-serif font-bold text-xs shrink-0 shadow-xs">
+                        <div className="w-8 h-8 rounded-full bg-admin-ink text-admin-surface flex items-center justify-center font-serif font-bold text-xs shrink-0 shadow-xs">
                           {contact.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-xs font-bold text-[#242824] truncate flex items-center gap-2">
+                          <div className="text-xs font-bold text-admin-ink truncate flex items-center gap-2">
                             <span>{contact.name}</span>
                             {!contact.read && (
-                              <span className="w-2 h-2 rounded-full bg-[#586348]" title="Unread" />
+                              <span className="w-2 h-2 rounded-full bg-admin-primary" title="Unread" />
                             )}
                           </div>
-                          <div className="text-[11px] text-[#5A625A] truncate">{contact.email}</div>
+                          <div className="text-[11px] text-admin-muted truncate">{contact.email}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
@@ -191,15 +191,15 @@ export default function ContactsPage() {
                             New
                           </span>
                         ) : (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-[#F5F2EB] text-[#737D73] border-[#DED5C7]">
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-admin-canvas text-admin-subtle border-admin-border">
                             Read
                           </span>
                         )}
                       </div>
                     </div>
-                    <p className="text-xs text-[#5A625A] mb-2 line-clamp-2 leading-relaxed">{contact.message}</p>
-                    <div className="flex items-center justify-between text-[11px] text-[#737D73]">
-                      <span className="text-[#586348] font-semibold">{contact.service || "General Inquiry"}</span>
+                    <p className="text-xs text-admin-muted mb-2 line-clamp-2 leading-relaxed">{contact.message}</p>
+                    <div className="flex items-center justify-between text-[11px] text-admin-subtle">
+                      <span className="text-admin-primary font-semibold">{contact.service || "General Inquiry"}</span>
                       <span>{new Date(contact.submitted_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
                     </div>
                   </div>
@@ -210,18 +210,18 @@ export default function ContactsPage() {
         </div>
 
         {/* Message Detail */}
-        <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl overflow-hidden min-h-[420px] shadow-xs flex flex-col">
+        <div className="bg-admin-surface border border-admin-border rounded-3xl overflow-hidden min-h-[420px] shadow-xs flex flex-col">
           {selectedContact ? (
             <div className="p-6 sm:p-8 h-full flex flex-col justify-between space-y-6">
               <div>
-                <div className="flex items-center justify-between mb-6 pb-5 border-b border-[#DED5C7]">
+                <div className="flex items-center justify-between mb-6 pb-5 border-b border-admin-border">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-[#242824] text-[#FCFAF7] flex items-center justify-center font-serif font-bold text-base shadow-xs">
+                    <div className="w-11 h-11 rounded-2xl bg-admin-ink text-admin-surface flex items-center justify-center font-serif font-bold text-base shadow-xs">
                       {selectedContact.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <h2 className="font-serif text-lg font-bold text-[#242824]">{selectedContact.name}</h2>
-                      <p className="text-xs text-[#5A625A]">{selectedContact.email}</p>
+                      <h2 className="font-serif text-lg font-bold text-admin-ink">{selectedContact.name}</h2>
+                      <p className="text-xs text-admin-muted">{selectedContact.email}</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -230,7 +230,7 @@ export default function ContactsPage() {
                       disabled={actionLoading}
                       className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl border transition-colors ${
                         selectedContact.responded
-                          ? "bg-[#F5F2EB] text-[#5A625A] border-[#DED5C7] hover:bg-[#EDE7DE]"
+                          ? "bg-admin-canvas text-admin-muted border-admin-border hover:bg-admin-tint"
                           : "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
                       }`}
                     >
@@ -240,7 +240,7 @@ export default function ContactsPage() {
                       onClick={() => removeContact(selectedContact)}
                       disabled={actionLoading}
                       aria-label={`Delete message from ${selectedContact.name}`}
-                      className="p-2 rounded-xl hover:bg-red-50 text-[#737D73] hover:text-red-600 transition-colors border border-transparent hover:border-red-200"
+                      className="p-2 rounded-xl hover:bg-red-50 text-admin-subtle hover:text-red-600 transition-colors border border-transparent hover:border-red-200"
                     >
                       <FiTrash2 size={16} />
                     </button>
@@ -248,17 +248,17 @@ export default function ContactsPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-white rounded-2xl p-4 border border-[#DED5C7] shadow-2xs">
-                    <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#586348] uppercase tracking-wider mb-1">
+                  <div className="bg-white rounded-2xl p-4 border border-admin-border shadow-2xs">
+                    <div className="flex items-center gap-1.5 text-[11px] font-semibold text-admin-primary uppercase tracking-wider mb-1">
                       <FiPhone size={12} /> Phone
                     </div>
-                    <div className="text-xs font-semibold text-[#242824]">{selectedContact.phone || "Not provided"}</div>
+                    <div className="text-xs font-semibold text-admin-ink">{selectedContact.phone || "Not provided"}</div>
                   </div>
-                  <div className="bg-white rounded-2xl p-4 border border-[#DED5C7] shadow-2xs">
-                    <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#737D73] uppercase tracking-wider mb-1">
+                  <div className="bg-white rounded-2xl p-4 border border-admin-border shadow-2xs">
+                    <div className="flex items-center gap-1.5 text-[11px] font-semibold text-admin-subtle uppercase tracking-wider mb-1">
                       <FiClock size={12} /> Date Received
                     </div>
-                    <div className="text-xs font-semibold text-[#242824]">
+                    <div className="text-xs font-semibold text-admin-ink">
                       {new Date(selectedContact.submitted_at).toLocaleString("en-GB", {
                         day: "numeric",
                         month: "short",
@@ -271,26 +271,26 @@ export default function ContactsPage() {
                 </div>
 
                 <div className="mb-4">
-                  <div className="text-[11px] font-semibold text-[#586348] uppercase tracking-wider mb-1">Service Requested</div>
-                  <div className="text-sm font-semibold text-[#242824]">
+                  <div className="text-[11px] font-semibold text-admin-primary uppercase tracking-wider mb-1">Service Requested</div>
+                  <div className="text-sm font-semibold text-admin-ink">
                     {selectedContact.service || "General Inquiry"}
                   </div>
                 </div>
 
                 <div>
-                  <div className="text-[11px] font-semibold text-[#737D73] uppercase tracking-wider mb-2">Message Body</div>
-                  <div className="bg-white border border-[#DED5C7] rounded-2xl p-5 text-xs text-[#242824] leading-relaxed whitespace-pre-wrap shadow-2xs">
+                  <div className="text-[11px] font-semibold text-admin-subtle uppercase tracking-wider mb-2">Message Body</div>
+                  <div className="bg-white border border-admin-border rounded-2xl p-5 text-xs text-admin-ink leading-relaxed whitespace-pre-wrap shadow-2xs">
                     {selectedContact.message}
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-[#DED5C7] flex flex-col sm:flex-row gap-3">
+              <div className="pt-4 border-t border-admin-border flex flex-col sm:flex-row gap-3">
                 <a
                   href={`mailto:${selectedContact.email}?subject=${encodeURIComponent(
                     `Re: Bangla Sketch Inquiry (${selectedContact.service || "Consultation"})`
                   )}`}
-                  className="flex-1 px-5 py-3 bg-[#586348] hover:bg-[#444D37] text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-xs"
+                  className="flex-1 px-5 py-3 bg-admin-primary hover:bg-admin-hover text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-xs"
                 >
                   <FiMail size={15} /> Reply via Email
                 </a>
@@ -301,20 +301,20 @@ export default function ContactsPage() {
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-5 py-3 bg-[#FCFAF7] border border-[#DED5C7] hover:border-[#586348] text-[#242824] rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-xs"
+                    className="px-5 py-3 bg-admin-surface border border-admin-border hover:border-admin-primary text-admin-ink rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-xs"
                   >
-                    <FiPhone size={15} className="text-[#586348]" /> WhatsApp
+                    <FiPhone size={15} className="text-admin-primary" /> WhatsApp
                   </a>
                 )}
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full min-h-[350px] text-[#737D73] p-8 text-center my-auto">
-              <div className="w-12 h-12 rounded-2xl bg-[#F5F2EB] border border-[#DED5C7] flex items-center justify-center mx-auto text-[#586348] mb-3">
+            <div className="flex flex-col items-center justify-center h-full min-h-[350px] text-admin-subtle p-8 text-center my-auto">
+              <div className="w-12 h-12 rounded-2xl bg-admin-canvas border border-admin-border flex items-center justify-center mx-auto text-admin-primary mb-3">
                 <FiEye size={22} />
               </div>
-              <p className="font-semibold text-[#242824]">No message selected</p>
-              <p className="text-xs text-[#5A625A] mt-1 max-w-xs">Select an inquiry from the list on the left to read full message details and respond.</p>
+              <p className="font-semibold text-admin-ink">No message selected</p>
+              <p className="text-xs text-admin-muted mt-1 max-w-xs">Select an inquiry from the list on the left to read full message details and respond.</p>
             </div>
           )}
         </div>

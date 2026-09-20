@@ -4,7 +4,7 @@ Django settings for banglasketch_api project.
 
 import os
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 from dotenv import load_dotenv
 
 from django.core.exceptions import ImproperlyConfigured
@@ -13,26 +13,32 @@ from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from django_backend/.env or backend/.env or root .env
-for env_path in [
-    BASE_DIR / ".env",
-    BASE_DIR.parent / "backend" / ".env",
-    BASE_DIR.parent / ".env",
-]:
-    if env_path.exists():
-        load_dotenv(env_path)
-        break
+if not os.getenv("PYTHON_DOTENV_DISABLED"):
+    for env_path in [
+        BASE_DIR / ".env",
+        BASE_DIR.parent / "backend" / ".env",
+        BASE_DIR.parent / ".env",
+    ]:
+        if env_path.exists():
+            load_dotenv(env_path)
+            break
 
-DEBUG = os.getenv("NODE_ENV", "development") != "production"
+DEBUG = os.getenv("NODE_ENV", "production") != "production"
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-if not SECRET_KEY:
-    if not DEBUG:
-        raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set in production environment")
-    SECRET_KEY = "django-insecure-banglasketch-production-key-seed-98213974"
+# Fail before initializing integrations when deployment credentials are missing.
+if not DEBUG:
+    for required_secret in ("DJANGO_SECRET_KEY", "ADMIN_JWT_SECRET", "TOTP_ENCRYPTION_KEY"):
+        if not os.getenv(required_secret):
+            raise ImproperlyConfigured(f"{required_secret} must be set in production environment")
 
-allowed_hosts_str = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0,testserver")
-ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_str.split(",") if h.strip()]
-if "testserver" not in ALLOWED_HOSTS:
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-banglasketch-production-key-seed-98213974")
+
+allowed_hosts_str = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1")
+if allowed_hosts_str.strip() == "*":
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_str.split(",") if h.strip()]
+if "testserver" not in ALLOWED_HOSTS and "*" not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append("testserver")
 
 APPEND_SLASH = False
@@ -68,6 +74,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.core.middleware.SecurityHeadersMiddleware",
+    "apps.core.middleware.RequestIDMiddleware",
 ]
 
 ROOT_URLCONF = "banglasketch_api.urls"
@@ -91,8 +99,12 @@ WSGI_APPLICATION = "banglasketch_api.wsgi.application"
 
 # Database Configuration
 DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL and urlparse(DATABASE_URL).scheme not in ("postgres", "postgresql"):
+    raise ImproperlyConfigured("DATABASE_URL must use postgres:// or postgresql://")
 if DATABASE_URL and (DATABASE_URL.startswith("postgres://") or DATABASE_URL.startswith("postgresql://")):
     parsed = urlparse(DATABASE_URL)
+    if not parsed.hostname or not parsed.path.lstrip("/"):
+        raise ImproperlyConfigured("DATABASE_URL must include a host and database name")
     # Handle Supabase/PostgreSQL SSL options from environment
     ssl_mode = os.getenv("DB_SSL_MODE", "require")
     ssl_ca_file = os.getenv("DB_SSL_CA_FILE")
@@ -115,9 +127,9 @@ if DATABASE_URL and (DATABASE_URL.startswith("postgres://") or DATABASE_URL.star
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": parsed.path.lstrip("/"),
-            "USER": parsed.username or "",
-            "PASSWORD": parsed.password or "",
+            "NAME": unquote(parsed.path.lstrip("/")),
+            "USER": unquote(parsed.username or ""),
+            "PASSWORD": unquote(parsed.password or ""),
             "HOST": parsed.hostname or "localhost",
             "PORT": parsed.port or 5432,
             "CONN_MAX_AGE": int(os.getenv("CONN_MAX_AGE", default_conn_max_age)),
@@ -143,6 +155,14 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
 ]
 
+# Password Validation
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 10}},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
 # REST Framework Configuration
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "banglasketch_api.pagination.EnvelopePagination",
@@ -155,6 +175,14 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "300/minute",
+        "user": "1000/minute",
+    },
 }
 
 if DEBUG:
@@ -162,38 +190,25 @@ if DEBUG:
 
 # CORS Configuration
 frontend_url_str = os.getenv("FRONTEND_URL", "http://localhost:3000,http://127.0.0.1:3000")
-CORS_ALLOWED_ORIGINS = [u.strip() for u in frontend_url_str.split(",") if u.strip()]
+if frontend_url_str.strip() == "*":
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = [u.strip() for u in frontend_url_str.split(",") if u.strip()]
+    CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
 # JWT Secrets & Config
-ADMIN_JWT_SECRET = os.getenv("ADMIN_JWT_SECRET")
-if not ADMIN_JWT_SECRET:
-    if not DEBUG:
-        raise ImproperlyConfigured("ADMIN_JWT_SECRET must be set in production environment")
-    ADMIN_JWT_SECRET = "super-secret-jwt-key-banglasketch-32bytes"
+ADMIN_JWT_SECRET = os.getenv("ADMIN_JWT_SECRET", "super-secret-jwt-key-banglasketch-32bytes")
 ADMIN_TOKEN_TTL_HOURS = 8
 ADMIN_RECOVERY_EMAIL = os.getenv("ADMIN_RECOVERY_EMAIL", "arifulhaquerohan@gmail.com")
 
 # TOTP 2FA Encryption Key (AES-256-GCM 32-bytes base64 encoded)
-TOTP_ENCRYPTION_KEY = os.getenv("TOTP_ENCRYPTION_KEY")
-if not TOTP_ENCRYPTION_KEY:
-    if not DEBUG:
-        raise ImproperlyConfigured("TOTP_ENCRYPTION_KEY must be set in production environment")
-    TOTP_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI="
+TOTP_ENCRYPTION_KEY = os.getenv("TOTP_ENCRYPTION_KEY", "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=")
 
 # Cloudinary Configuration
 CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME", "")
 CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY", "")
 CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET", "")
-
-if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
-    import cloudinary
-    cloudinary.config(
-        cloud_name=CLOUDINARY_CLOUD_NAME,
-        api_key=CLOUDINARY_API_KEY,
-        api_secret=CLOUDINARY_API_SECRET,
-        secure=True,
-    )
 
 # Email / SMTP Configuration
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -234,3 +249,8 @@ MEDIA_URL = "uploads/"
 MEDIA_ROOT = BASE_DIR / "uploads"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Never allow the legacy/cPanel entry point to use development credentials.
+if not DEBUG:
+    if "*" in ALLOWED_HOSTS or CORS_ALLOW_ALL_ORIGINS:
+        raise ImproperlyConfigured("Production requires explicit ALLOWED_HOSTS and FRONTEND_URL")

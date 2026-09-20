@@ -18,8 +18,10 @@ from apps.media_assets.urls import (
 from apps.leads.urls import (
     contact_public_urlpatterns,
     newsletter_public_urlpatterns,
+    site_visit_public_urlpatterns,
     contact_admin_urlpatterns,
     newsletter_admin_urlpatterns,
+    site_visit_admin_urlpatterns,
 )
 from apps.clients.urls import (
     portal_public_urlpatterns,
@@ -38,6 +40,7 @@ admin_api_urlpatterns = [
     re_path(r"^videos(?:/|$)", include(video_admin_urlpatterns)),
     re_path(r"^testimonials(?:/|$)", include(testimonial_admin_urlpatterns)),
     re_path(r"^contacts(?:/|$)", include(contact_admin_urlpatterns)),
+    re_path(r"^site-visits(?:/|$)", include(site_visit_admin_urlpatterns)),
     re_path(r"^newsletter(?:/|$)", include(newsletter_admin_urlpatterns)),
     re_path(r"^", include(client_handling_admin_urlpatterns)),
     re_path(r"^", include(core_admin_urlpatterns)),
@@ -51,6 +54,7 @@ def get_public_api_urlpatterns():
         re_path(r"^videos(?:/|$)", include(video_public_urlpatterns)),
         re_path(r"^testimonials(?:/|$)", include(testimonial_public_urlpatterns)),
         re_path(r"^contact(?:/|$)", include(contact_public_urlpatterns)),
+        re_path(r"^site-visits(?:/|$)", include(site_visit_public_urlpatterns)),
         re_path(r"^newsletter(?:/|$)", include(newsletter_public_urlpatterns)),
         re_path(r"^chat(?:/|$)", include("apps.chatbot.urls")),
         re_path(r"^enquiries(?:/|$)", include(enquiries_public_urlpatterns)),

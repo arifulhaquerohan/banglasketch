@@ -64,15 +64,15 @@ export function SanctuaryEnquiryForm() {
           <div className="lg:col-span-5 space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF7F2] border border-[#DDD5C8] text-[11px] font-semibold tracking-widest uppercase text-[#727A61]">
               <span className="w-2 h-2 rounded-full bg-[#A45138]" />
-              <span>Initiate the Dialogue</span>
+              <span>Start Your Project</span>
             </div>
 
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#242622] tracking-tight leading-[1.15]">
-              Tell us about the space you’re imagining.
+              Tell us about your space.
             </h2>
 
             <p className="text-base text-[#5A6057] leading-relaxed">
-              Every home transformation begins with a conversation. Whether you have architectural blueprints in hand, are awaiting apartment handover, or are simply exploring what is possible, our studio architects are here to guide you.
+              Every project starts with a conversation. Share a few details about your property, timeline, and what you have in mind — our studio team will get back to you within 24 hours.
             </p>
 
             {/* Space Collection Attached Pill */}

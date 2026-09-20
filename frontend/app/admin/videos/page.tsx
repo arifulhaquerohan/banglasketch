@@ -16,12 +16,12 @@ export default function VideosPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-[#242824] tracking-tight">Videos & Site Vlogs</h1>
-          <p className="text-sm text-[#5A625A] mt-1">Manage architectural video walkthroughs, project timelapses, and media reels.</p>
+          <h1 className="font-serif text-3xl font-bold text-admin-ink tracking-tight">Videos & Site Vlogs</h1>
+          <p className="text-sm text-admin-muted mt-1">Manage architectural video walkthroughs, project timelapses, and media reels.</p>
         </div>
         <Link
           href="/admin/videos/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#586348] hover:bg-[#444D37] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-admin-primary hover:bg-admin-hover text-white rounded-xl text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto"
         >
           <FiPlus size={15} /> Add Video
         </Link>
@@ -29,20 +29,20 @@ export default function VideosPage() {
 
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[220px]">
-          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[#737D73]" size={16} />
+          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-admin-subtle" size={16} />
           <input
             placeholder="Search videos by title or topic..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl pl-11 pr-4 py-3 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-xs"
+            className="w-full bg-admin-surface border border-admin-border rounded-2xl pl-11 pr-4 py-3 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all shadow-xs"
           />
         </div>
         <button
           onClick={load}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FCFAF7] border border-[#DED5C7] hover:border-[#586348] text-xs font-semibold text-[#242824] transition-colors shadow-xs disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-admin-surface border border-admin-border hover:border-admin-primary text-xs font-semibold text-admin-ink transition-colors shadow-xs disabled:opacity-50"
           disabled={loading}
         >
-          <FiRefreshCw className={loading ? "animate-spin text-[#586348]" : "text-[#586348]"} size={14} /> Refresh
+          <FiRefreshCw className={loading ? "animate-spin text-admin-primary" : "text-admin-primary"} size={14} /> Refresh
         </button>
       </div>
 
@@ -55,15 +55,15 @@ export default function VideosPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {loading ? (
           Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="aspect-video animate-pulse rounded-3xl bg-[#EDE7DE] border border-[#DED5C7]" />
+            <div key={i} className="aspect-video animate-pulse rounded-3xl bg-admin-tint border border-admin-border" />
           ))
         ) : filtered.length === 0 ? (
-          <div className="col-span-full py-16 text-center rounded-3xl border border-[#DED5C7] bg-[#FCFAF7] shadow-xs">
-            <div className="w-12 h-12 rounded-2xl bg-[#F5F2EB] border border-[#DED5C7] flex items-center justify-center mx-auto text-[#586348] mb-3">
+          <div className="col-span-full py-16 text-center rounded-3xl border border-admin-border bg-admin-surface shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-admin-canvas border border-admin-border flex items-center justify-center mx-auto text-admin-primary mb-3">
               <FiVideo size={22} />
             </div>
-            <p className="font-serif text-base font-bold text-[#242824]">No videos found</p>
-            <p className="text-xs text-[#5A625A] mt-1">
+            <p className="font-serif text-base font-bold text-admin-ink">No videos found</p>
+            <p className="text-xs text-admin-muted mt-1">
               {search ? "No video titles match your search criteria." : "Add your first video to display on your portfolio."}
             </p>
           </div>
@@ -73,10 +73,10 @@ export default function VideosPage() {
             return (
               <article
                 key={video.id}
-                className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl overflow-hidden hover:border-[#586348]/50 transition-all shadow-xs group flex flex-col justify-between"
+                className="bg-admin-surface border border-admin-border rounded-3xl overflow-hidden hover:border-admin-primary/50 transition-all shadow-xs group flex flex-col justify-between"
               >
                 <div>
-                  <div className="relative aspect-video bg-[#EDE7DE] overflow-hidden">
+                  <div className="relative aspect-video bg-admin-tint overflow-hidden">
                     <Image
                       src={thumbnail}
                       alt={video.title}
@@ -85,13 +85,13 @@ export default function VideosPage() {
                       className="object-cover group-hover:scale-102 transition-transform duration-300"
                       unoptimized
                     />
-                    <div className="absolute inset-0 bg-[#242824]/20 flex items-center justify-center">
-                      <div className="w-12 h-12 rounded-full bg-[#586348] text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                    <div className="absolute inset-0 bg-admin-ink/20 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-admin-primary text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
                         <FiPlay className="ml-0.5 text-white" size={18} />
                       </div>
                     </div>
                     {video.duration && (
-                      <div className="absolute bottom-2.5 right-2.5 bg-[#242824]/85 text-white text-[10px] font-semibold px-2 py-0.5 rounded-lg backdrop-blur-xs">
+                      <div className="absolute bottom-2.5 right-2.5 bg-admin-ink/85 text-white text-[10px] font-semibold px-2 py-0.5 rounded-lg backdrop-blur-xs">
                         {video.duration}
                       </div>
                     )}
@@ -107,31 +107,31 @@ export default function VideosPage() {
                   </div>
 
                   <div className="p-5">
-                    <h2 className="font-serif text-base font-bold text-[#242824] mb-1.5 line-clamp-2 group-hover:text-[#586348] transition-colors">
+                    <h2 className="font-serif text-base font-bold text-admin-ink mb-1.5 line-clamp-2 group-hover:text-admin-primary transition-colors">
                       {video.title}
                     </h2>
-                    <p className="text-xs text-[#5A625A] line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-admin-muted line-clamp-2 leading-relaxed">
                       {video.description || "No description provided."}
                     </p>
                   </div>
                 </div>
 
-                <div className="px-5 py-3 border-t border-[#DED5C7] bg-[#F5F2EB]/50 flex items-center justify-between">
-                  <span className="text-[11px] text-[#737D73]">
-                    {video.featured ? <span className="font-semibold text-[#586348] uppercase text-[10px]">★ Featured</span> : "Standard Reel"}
+                <div className="px-5 py-3 border-t border-admin-border bg-admin-canvas/50 flex items-center justify-between">
+                  <span className="text-[11px] text-admin-subtle">
+                    {video.featured ? <span className="font-semibold text-admin-primary uppercase text-[10px]">★ Featured</span> : "Standard Reel"}
                   </span>
                   <div className="flex items-center gap-1.5">
                     <Link
                       href={`/admin/videos/${video.id}`}
                       aria-label={`Edit ${video.title}`}
-                      className="p-2 rounded-xl border border-[#DED5C7] bg-white text-[#586348] hover:bg-[#EDF1EA] transition-colors shadow-2xs"
+                      className="p-2 rounded-xl border border-admin-border bg-white text-admin-primary hover:bg-[#EDF1EA] transition-colors shadow-2xs"
                     >
                       <FiEdit2 size={14} />
                     </Link>
                     <button
                       onClick={() => remove(video)}
                       aria-label={`Delete ${video.title}`}
-                      className="p-2 rounded-xl border border-[#DED5C7] bg-white text-[#737D73] hover:text-red-700 hover:bg-red-50 hover:border-red-200 transition-colors shadow-2xs"
+                      className="p-2 rounded-xl border border-admin-border bg-white text-admin-subtle hover:text-red-700 hover:bg-red-50 hover:border-red-200 transition-colors shadow-2xs"
                     >
                       <FiTrash2 size={14} />
                     </button>

@@ -2,29 +2,37 @@ interface MarkdownContentProps {
   content: string;
 }
 
+function isSafeContentUrl(url: string, image = false) {
+  if (/^https?:\/\//i.test(url) || /^\/(?!\/)/.test(url)) return true;
+  return !image && (/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(url) || /^tel:\+?[0-9().\-\s]+$/i.test(url));
+}
+
 function inlineMarkdown(text: string) {
   const parts = text.split(/(\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|_[^_]+_|`[^`]+`|!?\[[^\]]*\]\([^\s)]+\))/g);
 
   return parts.map((part, index) => {
     if (/^\*\*[^*]+\*\*$/.test(part) || /^__[^_]+__$/.test(part)) {
-      return <strong key={index} className="font-bold text-white">{part.slice(2, -2)}</strong>;
+      return <strong key={index} className="font-bold text-charcoal">{part.slice(2, -2)}</strong>;
     }
     if (/^\*[^*]+\*$/.test(part) || /^_[^_]+_$/.test(part)) {
       return <em key={index}>{part.slice(1, -1)}</em>;
     }
     if (/^`[^`]+`$/.test(part)) {
-      return <code key={index} className="rounded bg-emerald-light/20 px-1.5 py-0.5 font-mono text-sm text-gold-light">{part.slice(1, -1)}</code>;
+      return <code key={index} className="rounded bg-olive-tint px-1.5 py-0.5 font-mono text-sm text-olive-dark">{part.slice(1, -1)}</code>;
     }
 
     const image = part.match(/^!\[([^\]]*)\]\(([^\s)]+)\)$/);
     if (image) {
+      if (!isSafeContentUrl(image[2], true)) return image[1];
       // eslint-disable-next-line @next/next/no-img-element
-      return <img key={index} src={image[2]} alt={image[1]} className="my-6 rounded-2xl border border-gold/20" />;
+      return <img key={index} src={image[2]} alt={image[1]} loading="lazy" referrerPolicy="no-referrer" className="my-6 rounded-2xl border border-gold/20" />;
     }
 
     const link = part.match(/^\[([^\]]+)\]\(([^\s)]+)\)$/);
     if (link) {
-      return <a key={index} href={link[2]} target="_blank" rel="noopener noreferrer" className="text-gold underline underline-offset-4 hover:text-clay-light">{link[1]}</a>;
+      if (!isSafeContentUrl(link[2])) return link[1];
+      const external = /^https?:\/\//i.test(link[2]);
+      return <a key={index} href={link[2]} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} className="text-clay-dark underline underline-offset-4 hover:text-clay-light">{link[1]}</a>;
     }
     return part;
   });
@@ -46,9 +54,9 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
     if (heading) {
       const headingLevel = heading[1].length;
       const text = inlineMarkdown(heading[2]);
-      if (headingLevel === 1) blocks.push(<h2 key={index} className="mt-10 text-3xl font-extrabold text-ivory-light">{text}</h2>);
-      if (headingLevel === 2) blocks.push(<h3 key={index} className="mt-9 text-2xl font-bold text-ivory-light">{text}</h3>);
-      if (headingLevel === 3) blocks.push(<h4 key={index} className="mt-7 text-xl font-bold text-gold-light">{text}</h4>);
+      if (headingLevel === 1) blocks.push(<h2 key={index} className="mt-10 text-3xl font-extrabold text-charcoal">{text}</h2>);
+      if (headingLevel === 2) blocks.push(<h3 key={index} className="mt-9 text-2xl font-bold text-charcoal">{text}</h3>);
+      if (headingLevel === 3) blocks.push(<h4 key={index} className="mt-7 text-xl font-bold text-olive-dark">{text}</h4>);
       index += 1;
       continue;
     }
@@ -62,7 +70,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
       blocks.push(
         <ul key={index} className="my-5 space-y-3 pl-1">
           {items.map((item, itemIndex) => (
-            <li key={itemIndex} className="flex gap-3"><span className="text-gold">✦</span><span>{inlineMarkdown(item)}</span></li>
+            <li key={itemIndex} className="flex gap-3"><span className="text-clay-dark">✦</span><span>{inlineMarkdown(item)}</span></li>
           ))}
         </ul>
       );
@@ -76,7 +84,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
         index += 1;
       }
       blocks.push(
-        <ol key={index} className="my-5 list-decimal space-y-3 pl-6 marker:text-gold">
+        <ol key={index} className="my-5 list-decimal space-y-3 pl-6 marker:text-clay-dark">
           {items.map((item, itemIndex) => <li key={itemIndex}>{inlineMarkdown(item)}</li>)}
         </ol>
       );
@@ -88,8 +96,8 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
       paragraph.push(lines[index].trim());
       index += 1;
     }
-    blocks.push(<p key={index} className="text-lg leading-relaxed text-limestone-light">{inlineMarkdown(paragraph.join(" "))}</p>);
+    blocks.push(<p key={index} className="text-lg leading-relaxed text-charcoal-muted">{inlineMarkdown(paragraph.join(" "))}</p>);
   }
 
-  return <div className="space-y-6">{blocks}</div>;
+  return <div className="article-content space-y-6">{blocks}</div>;
 }

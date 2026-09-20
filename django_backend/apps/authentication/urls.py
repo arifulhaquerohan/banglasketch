@@ -21,6 +21,7 @@ urlpatterns = [
     re_path(r"^change-password/?$", AdminChangePasswordView.as_view(), name="admin_change_password"),
     re_path(r"^2fa/setup/?$", Admin2FASetupView.as_view(), name="admin_2fa_setup"),
     re_path(r"^2fa/verify/?$", Admin2FAVerifyView.as_view(), name="admin_2fa_verify"),
+    re_path(r"^2fa/enable/?$", Admin2FAVerifyView.as_view(), name="admin_2fa_enable"),
     re_path(r"^2fa/disable/?$", Admin2FADisableView.as_view(), name="admin_2fa_disable"),
     re_path(r"^request-reset-otp/?$", AdminRequestResetOTPView.as_view(), name="admin_request_reset_otp"),
     re_path(r"^verify-reset-otp/?$", AdminVerifyResetOTPView.as_view(), name="admin_verify_reset_otp"),

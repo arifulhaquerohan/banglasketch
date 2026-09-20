@@ -42,7 +42,7 @@ def upload_image(file_obj, folder):
     if not isinstance(folder, str):
         raise ValidationError("Invalid upload folder")
     folder = folder.removeprefix("banglasketch/")
-    if not re.fullmatch(r"[a-zA-Z0-9_-]{1,40}", folder):
+    if not re.fullmatch(r"[a-zA-Z0-9_/-]{1,60}", folder) or folder.startswith("/") or "//" in folder:
         raise ValidationError("Invalid upload folder")
     if not file_obj or not 0 < file_obj.size <= MAX_BYTES:
         raise ValidationError("Select an image no larger than 10 MB")
@@ -66,6 +66,13 @@ def upload_image(file_obj, folder):
         "CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"
     )):
         raise ValidationError("Media storage is not configured")
+    import cloudinary
+    cloudinary.config(
+        cloud_name=settings.CLOUDINARY_CLOUD_NAME,
+        api_key=settings.CLOUDINARY_API_KEY,
+        api_secret=settings.CLOUDINARY_API_SECRET,
+        secure=True,
+    )
     sanitized = _sanitized_copy(file_obj)
     return cloudinary.uploader.upload(
         sanitized,

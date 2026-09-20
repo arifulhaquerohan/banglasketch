@@ -62,7 +62,7 @@ export default function EditVideoPage() {
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <FiRefreshCw className="animate-spin text-[#586348]" size={28} />
+        <FiRefreshCw className="animate-spin text-admin-primary" size={28} />
       </div>
     );
   }
@@ -75,7 +75,7 @@ export default function EditVideoPage() {
         </p>
         <Link
           href="/admin/videos"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FCFAF7] border border-[#DED5C7] text-xs font-semibold text-[#242824] hover:border-[#586348]"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-admin-surface border border-admin-border text-xs font-semibold text-admin-ink hover:border-admin-primary"
         >
           <FiArrowLeft size={14} /> Back to Videos
         </Link>
@@ -89,11 +89,11 @@ export default function EditVideoPage() {
         <div>
           <Link
             href="/admin/videos"
-            className="text-xs text-[#5A625A] hover:text-[#242824] flex items-center gap-1 mb-2 transition-colors"
+            className="text-xs text-admin-muted hover:text-admin-ink flex items-center gap-1 mb-2 transition-colors"
           >
             <FiArrowLeft size={14} /> Back to videos
           </Link>
-          <h1 className="font-serif text-3xl font-bold text-[#242824] tracking-tight">Edit Video</h1>
+          <h1 className="font-serif text-3xl font-bold text-admin-ink tracking-tight">Edit Video</h1>
         </div>
         <div className="flex gap-2">
           <button
@@ -108,7 +108,7 @@ export default function EditVideoPage() {
             type="button"
             onClick={() => save()}
             disabled={saving}
-            className="px-5 py-2.5 bg-[#586348] hover:bg-[#444D37] text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-xs disabled:opacity-50"
+            className="px-5 py-2.5 bg-admin-primary hover:bg-admin-hover text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-xs disabled:opacity-50"
           >
             <FiSave size={16} /> {saving ? "Saving..." : "Update Video"}
           </button>
@@ -123,41 +123,41 @@ export default function EditVideoPage() {
 
       <form onSubmit={save} className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 space-y-4 shadow-xs">
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 space-y-4 shadow-xs">
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-2">Title</label>
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-2">Title</label>
               <input
                 required
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-2">Description</label>
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-2">Description</label>
               <textarea
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows={4}
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-2xs resize-none"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all shadow-2xs resize-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-2">Hosted Video URL</label>
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-2">Hosted Video URL</label>
               <input
                 required
                 type="url"
                 value={form.videoUrl}
                 onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-2xs font-mono"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all shadow-2xs font-mono"
               />
             </div>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 space-y-4 shadow-xs">
-            <h2 className="font-serif text-lg font-bold text-[#242824]">Thumbnail</h2>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 space-y-4 shadow-xs">
+            <h2 className="font-serif text-lg font-bold text-admin-ink">Thumbnail</h2>
             <CloudinaryUpload
               value={form.thumbnail}
               onChange={(thumbnail) => setForm({ ...form, thumbnail })}
@@ -166,24 +166,24 @@ export default function EditVideoPage() {
             />
           </div>
 
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 space-y-4 shadow-xs">
-            <h2 className="font-serif text-lg font-bold text-[#242824]">Settings</h2>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 space-y-4 shadow-xs">
+            <h2 className="font-serif text-lg font-bold text-admin-ink">Settings</h2>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-2">Display Order</label>
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-2">Display Order</label>
               <input
                 type="number"
                 min="0"
                 value={form.displayOrder}
                 onChange={(e) => setForm({ ...form, displayOrder: e.target.value })}
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-2">Status</label>
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-2">Status</label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value as "draft" | "published" })}
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all shadow-2xs"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -194,9 +194,9 @@ export default function EditVideoPage() {
                 type="checkbox"
                 checked={form.featured}
                 onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                className="w-4 h-4 rounded text-[#586348] focus:ring-[#586348] border-[#DED5C7] accent-[#586348]"
+                className="w-4 h-4 rounded text-admin-primary focus:ring-admin-primary border-admin-border accent-admin-primary"
               />
-              <span className="text-xs font-semibold text-[#242824]">Featured</span>
+              <span className="text-xs font-semibold text-admin-ink">Featured</span>
             </label>
           </div>
         </div>

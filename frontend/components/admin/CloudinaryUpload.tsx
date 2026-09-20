@@ -79,17 +79,17 @@ export function CloudinaryUpload({ value, onChange, folder = "general", label = 
 
   return (
     <div>
-      {label && <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-2">{label}</label>}
+      {label && <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-2">{label}</label>}
       {value ? (
-        <div className="relative group rounded-2xl overflow-hidden border border-[#DED5C7] shadow-2xs">
+        <div className="relative group rounded-2xl overflow-hidden border border-admin-border shadow-2xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={value} alt="" className="w-full h-48 object-cover" />
-          <div className="absolute inset-0 bg-[#242824]/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+          <div className="absolute inset-0 bg-admin-ink/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
             <button
               type="button"
               disabled={uploading}
               onClick={() => inputRef.current?.click()}
-              className="px-4 py-2 bg-[#586348] text-white rounded-xl font-semibold text-xs hover:bg-[#444D37] transition-colors shadow-xs"
+              className="px-4 py-2 bg-admin-primary text-white rounded-xl font-semibold text-xs hover:bg-admin-hover transition-colors shadow-xs"
             >
               Replace
             </button>
@@ -111,20 +111,20 @@ export function CloudinaryUpload({ value, onChange, folder = "general", label = 
           onDrop={onDrop}
           className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
             dragging
-              ? "border-[#586348] bg-[#EDF1EA]"
-              : "border-[#DED5C7] hover:border-[#586348] hover:bg-[#F5F2EB]/60 bg-white"
+              ? "border-admin-primary bg-[#EDF1EA]"
+              : "border-admin-border hover:border-admin-primary hover:bg-admin-canvas/60 bg-white"
           }`}
         >
           {uploading ? (
             <div className="flex flex-col items-center">
-              <div className="w-9 h-9 border-3 border-[#586348] border-t-transparent rounded-full animate-spin mb-3" />
-              <p className="text-xs text-[#5A625A]">Uploading...</p>
+              <div className="w-9 h-9 border-3 border-admin-primary border-t-transparent rounded-full animate-spin mb-3" />
+              <p className="text-xs text-admin-muted">Uploading...</p>
             </div>
           ) : (
             <>
-              <FiUpload className="mx-auto text-[#586348] mb-2.5" size={28} />
-              <p className="text-xs font-semibold text-[#242824] mb-1">Drop image or click to upload</p>
-              <p className="text-[11px] text-[#737D73]">PNG, JPG, WebP up to 10MB</p>
+              <FiUpload className="mx-auto text-admin-primary mb-2.5" size={28} />
+              <p className="text-xs font-semibold text-admin-ink mb-1">Drop image or click to upload</p>
+              <p className="text-[11px] text-admin-subtle">PNG, JPG, WebP up to 10MB</p>
             </>
           )}
         </div>

@@ -65,15 +65,15 @@ export function TheLivingBlueprint() {
         <div className="max-w-3xl mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF7F2] border border-[#DDD5C8] text-[11px] font-semibold tracking-widest uppercase text-[#727A61] mb-3">
             <span className="w-2 h-2 rounded-full bg-[#727A61]" />
-            <span>The Signature Transformation</span>
+            <span>From Sketch to Home</span>
           </div>
 
           <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#242622] tracking-tight leading-[1.15]">
-            From Architectural Blueprint to Living Sanctuary
+            See How a Design Becomes a Home
           </h2>
 
           <p className="text-base sm:text-lg text-[#5A6057] mt-3.5 leading-relaxed">
-            Every sanctuary begins with rigorous spatial mathematics. Drag the cursor across to see how structural lines, joinery clearances, and daylight corridors materialize into a warm, finished home.
+            Every home starts with an architectural drawing. Use the slider to move between the initial blueprint and the finished room — and see exactly where craftsmanship meets design intent.
           </p>
         </div>
 

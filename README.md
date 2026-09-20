@@ -2,6 +2,14 @@
 
 Official production web application and Content Management System for **Bangla Sketch**, Dhaka's premier luxury interior design studio.
 
+## Website Screenshots
+
+Desktop and mobile previews captured from the local production build.
+
+![Bangla Sketch desktop homepage](docs/previews/website-desktop.png)
+
+<img src="docs/previews/website-mobile.png" alt="Bangla Sketch mobile homepage" width="390" />
+
 ## Architecture
 
 - **Frontend:** Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Next/Image, Next/Link.
@@ -44,7 +52,7 @@ See [backend setup and operations](django_backend/README.md) for database compat
 
 ```bash
 cd frontend
-cp .env.local.example .env.local
+cp .env.example .env.local
 npm install
 npm run dev
 ```

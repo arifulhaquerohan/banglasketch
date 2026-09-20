@@ -17,8 +17,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 def get_backup_key() -> bytes:
-    raw_key = os.getenv("BACKUP_ENCRYPTION_KEY") or os.getenv("DJANGO_SECRET_KEY") or "banglasketch-default-backup-seed-key-32b"
-    return hashlib.sha256(raw_key.encode("utf-8")).digest()
+    """Derive 32-byte AES key from BACKUP_ENCRYPTION_KEY or DJANGO_SECRET_KEY."""
+    raw_key = os.getenv("BACKUP_ENCRYPTION_KEY") or os.getenv("DJANGO_SECRET_KEY")
+    if not raw_key:
+        raise ValueError("Set BACKUP_ENCRYPTION_KEY or DJANGO_SECRET_KEY to verify a backup")
+    # Use PBKDF2 with a fixed salt for deterministic key derivation
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+    from cryptography.hazmat.primitives import hashes
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=b"banglasketch-backup-v1",
+        iterations=600_000,
+    )
+    return kdf.derive(raw_key.encode("utf-8"))
 
 def verify_backup(backup_path: Path) -> bool:
     if not backup_path.exists():

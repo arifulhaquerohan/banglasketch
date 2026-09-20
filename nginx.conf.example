@@ -7,6 +7,10 @@
 # SSL Setup: sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 # ==============================================================================
 
+# Rate limiting zones
+limit_req_zone $binary_remote_addr zone=api_general:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=api_auth:10m rate=5r/m;
+
 # 1. OPTION A: Separate Subdomain for Backend API (Recommended)
 # -------------------------------------------------------------
 # Frontend: yourdomain.com (Port 3000)
@@ -17,6 +21,12 @@ server {
     server_name yourdomain.com www.yourdomain.com;
 
     client_max_body_size 256k;
+
+    # Security Headers
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
 
     # Authenticated multipart images: 10 MiB file plus multipart overhead.
     location = /api/admin/upload {
@@ -54,8 +64,15 @@ server {
 
     client_max_body_size 256k;
 
+    # Security Headers
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+
     location / {
         proxy_pass http://127.0.0.1:5000;
+        limit_req zone=api_general burst=60 nodelay;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';

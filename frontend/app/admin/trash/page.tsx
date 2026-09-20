@@ -108,24 +108,24 @@ export default function RecycleBinPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-[#242824] tracking-tight flex items-center gap-2">
-            <FiTrash2 className="text-[#586348]" /> Recycle Bin
+          <h1 className="font-serif text-3xl font-bold text-admin-ink tracking-tight flex items-center gap-2">
+            <FiTrash2 className="text-admin-primary" /> Recycle Bin
           </h1>
-          <p className="text-sm text-[#5A625A] mt-1">
+          <p className="text-sm text-admin-muted mt-1">
             Recover soft-deleted items or permanently purge them to free up server storage.
           </p>
         </div>
         <button
           onClick={loadTrash}
           disabled={loading}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FCFAF7] border border-[#DED5C7] hover:border-[#586348] text-xs font-semibold text-[#242824] transition-colors shadow-xs self-start sm:self-auto disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-admin-surface border border-admin-border hover:border-admin-primary text-xs font-semibold text-admin-ink transition-colors shadow-xs self-start sm:self-auto disabled:opacity-50"
         >
-          <FiRefreshCw className={loading ? "animate-spin text-[#586348]" : "text-[#586348]"} size={14} /> Refresh
+          <FiRefreshCw className={loading ? "animate-spin text-admin-primary" : "text-admin-primary"} size={14} /> Refresh
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-[#DED5C7] pb-3">
+      <div className="flex flex-wrap gap-2 border-b border-admin-border pb-3">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -135,8 +135,8 @@ export default function RecycleBinPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
                 isActive
-                  ? "bg-[#586348] text-white shadow-xs"
-                  : "bg-[#FCFAF7] text-[#5A625A] hover:text-[#242824] hover:bg-[#F5F2EB] border border-[#DED5C7]"
+                  ? "bg-admin-primary text-white shadow-xs"
+                  : "bg-admin-surface text-admin-muted hover:text-admin-ink hover:bg-admin-canvas border border-admin-border"
               }`}
             >
               <Icon size={15} />
@@ -166,53 +166,53 @@ export default function RecycleBinPage() {
           {Array.from({ length: 4 }).map((_, idx) => (
             <div
               key={idx}
-              className="h-16 rounded-2xl bg-[#EDE7DE] animate-pulse border border-[#DED5C7]"
+              className="h-16 rounded-2xl bg-admin-tint animate-pulse border border-admin-border"
             />
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-12 text-center shadow-xs">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-[#F5F2EB] border border-[#DED5C7] flex items-center justify-center text-[#586348] mb-3">
+        <div className="bg-admin-surface border border-admin-border rounded-3xl p-12 text-center shadow-xs">
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-admin-canvas border border-admin-border flex items-center justify-center text-admin-primary mb-3">
             <FiTrash2 size={22} />
           </div>
-          <h3 className="font-serif text-base font-bold text-[#242824] mb-1">Recycle bin is empty</h3>
-          <p className="text-xs text-[#5A625A]">
+          <h3 className="font-serif text-base font-bold text-admin-ink mb-1">Recycle bin is empty</h3>
+          <p className="text-xs text-admin-muted">
             No deleted items found in {currentTabConfig.label.toLowerCase()}.
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl shadow-xs">
+        <div className="overflow-x-auto bg-admin-surface border border-admin-border rounded-3xl shadow-xs">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[#586348] bg-[#F5F2EB] border-b border-[#DED5C7] text-xs font-semibold uppercase tracking-wider">
+              <tr className="text-left text-admin-primary bg-admin-canvas border-b border-admin-border text-xs font-semibold uppercase tracking-wider">
                 <th className="p-4">Item Details</th>
                 <th className="p-4">Category / Info</th>
                 <th className="p-4">Deleted At</th>
                 <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#DED5C7] bg-white">
+            <tbody className="divide-y divide-admin-border bg-white">
               {items.map((item) => {
                 const title = item.title || item.client_name || item.name || `Item #${item.id}`;
                 const subtitle = item.slug || item.email || (item.quote ? `“${item.quote.slice(0, 60)}...”` : null);
                 const isOperating = actionId === item.id;
 
                 return (
-                  <tr key={item.id} className="hover:bg-[#F5F2EB]/50 transition-colors">
+                  <tr key={item.id} className="hover:bg-admin-canvas/50 transition-colors">
                     <td className="p-4">
-                      <div className="font-semibold text-[#242824]">{title}</div>
-                      {subtitle && <div className="text-xs text-[#5A625A] mt-0.5">{subtitle}</div>}
+                      <div className="font-semibold text-admin-ink">{title}</div>
+                      {subtitle && <div className="text-xs text-admin-muted mt-0.5">{subtitle}</div>}
                     </td>
                     <td className="p-4 text-xs">
                       {item.category ? (
-                        <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#EDF1EA] text-[#444D37] border border-[#D5DEC4] font-medium">
+                        <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#EDF1EA] text-admin-hover border border-[#D5DEC4] font-medium">
                           {item.category}
                         </span>
                       ) : (
-                        <span className="text-[#8C948C]">—</span>
+                        <span className="text-admin-subtle">—</span>
                       )}
                     </td>
-                    <td className="p-4 text-xs text-[#737D73] tabular-nums">
+                    <td className="p-4 text-xs text-admin-subtle tabular-nums">
                       {item.deleted_at ? new Date(item.deleted_at).toLocaleString("en-GB", {
                         day: "numeric",
                         month: "short",

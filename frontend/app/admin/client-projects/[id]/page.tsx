@@ -157,7 +157,7 @@ export default function ClientProjectDetailPage() {
         <p>{error || "Project not found"}</p>
         <Link
           href="/admin/client-projects"
-          className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FCFAF7] border border-[#DED5C7] text-xs font-semibold text-[#242824] hover:border-[#586348] transition-colors"
+          className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-admin-surface border border-admin-border text-xs font-semibold text-admin-ink hover:border-admin-primary transition-colors"
         >
           Back to Projects
         </Link>
@@ -174,23 +174,23 @@ export default function ClientProjectDetailPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/client-projects"
-            className="p-2 bg-white border border-[#DED5C7] rounded-xl hover:bg-[#F5F2EB] text-[#242824]"
+            className="p-2 bg-white border border-admin-border rounded-xl hover:bg-admin-canvas text-admin-ink"
           >
             <FiArrowLeft size={16} />
           </Link>
           <div>
-            <h1 className="font-serif text-2xl font-bold text-[#242824]">{project.title}</h1>
-            <p className="text-xs text-[#5A625A] mt-0.5">
+            <h1 className="font-serif text-2xl font-bold text-admin-ink">{project.title}</h1>
+            <p className="text-xs text-admin-muted mt-0.5">
               Client: {project.client_name} • {project.client_phone}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="px-3 py-1.5 bg-[#586348]/15 text-[#586348] rounded-xl text-xs font-bold uppercase tracking-wider border border-[#D5DEC4]">
+          <span className="px-3 py-1.5 bg-admin-primary/15 text-admin-primary rounded-xl text-xs font-bold uppercase tracking-wider border border-[#D5DEC4]">
             {project.stage.replace(/_/g, " ")}
           </span>
-          <span className="px-3 py-1.5 bg-white border border-[#DED5C7] text-[#242824] rounded-xl text-xs font-semibold flex items-center gap-1.5">
+          <span className="px-3 py-1.5 bg-white border border-admin-border text-admin-ink rounded-xl text-xs font-semibold flex items-center gap-1.5">
             <FiDollarSign size={13} />
             Agreed: BDT {Number(project.agreed_budget).toLocaleString()}
           </span>
@@ -201,9 +201,9 @@ export default function ClientProjectDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Project Overview */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-5">
-            <h2 className="font-semibold text-sm text-[#586348] uppercase tracking-wider mb-3">Project Overview</h2>
-            <div className="space-y-3 text-xs text-[#242824]">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5">
+            <h2 className="font-semibold text-sm text-admin-primary uppercase tracking-wider mb-3">Project Overview</h2>
+            <div className="space-y-3 text-xs text-admin-ink">
               <div className="flex justify-between">
                 <span className="text-[#788278]">Project Manager</span>
                 <span className="font-semibold">{project.project_manager_name || "Unassigned"}</span>
@@ -212,7 +212,7 @@ export default function ClientProjectDetailPage() {
                 <span className="text-[#788278]">Client Email</span>
                 <a
                   href={`mailto:${project.client_email || ""}`}
-                  className="text-[#586348] hover:underline"
+                  className="text-admin-primary hover:underline"
                 >
                   {project.client_email || "N/A"}
                 </a>
@@ -229,30 +229,30 @@ export default function ClientProjectDetailPage() {
           </div>
 
           {project.agreed_scope && (
-            <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-5">
-              <h2 className="font-semibold text-sm text-[#586348] uppercase tracking-wider mb-2">
+            <div className="bg-admin-surface border border-admin-border rounded-2xl p-5">
+              <h2 className="font-semibold text-sm text-admin-primary uppercase tracking-wider mb-2">
                 Agreed Scope
               </h2>
-              <p className="text-xs text-[#242824] leading-relaxed">{project.agreed_scope}</p>
+              <p className="text-xs text-admin-ink leading-relaxed">{project.agreed_scope}</p>
             </div>
           )}
 
           {/* Portal token for client access */}
           {project.portal_token && (
-            <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-5">
-              <h2 className="font-semibold text-sm text-[#586348] uppercase tracking-wider mb-2">
+            <div className="bg-admin-surface border border-admin-border rounded-2xl p-5">
+              <h2 className="font-semibold text-sm text-admin-primary uppercase tracking-wider mb-2">
                 Client Portal Access
               </h2>
               <p className="text-[11px] text-[#788278] mb-2">
                 Share this secure link with the client for their private portal.
               </p>
               <div className="flex items-center gap-2">
-                <code className="flex-1 bg-white border border-[#DED5C7] rounded-lg px-3 py-2 text-[11px] text-[#5A625A] break-all">
+                <code className="flex-1 bg-white border border-admin-border rounded-lg px-3 py-2 text-[11px] text-admin-muted break-all">
                   {typeof window !== "undefined" && window.location.origin}/portal/{project.portal_token}
                 </code>
                 <button
                   onClick={() => navigator.clipboard.writeText(`${window.location.origin}/portal/${project.portal_token}`)}
-                  className="px-2.5 py-2 bg-[#586348] text-white rounded-lg text-xs font-semibold hover:bg-[#444D37]"
+                  className="px-2.5 py-2 bg-admin-primary text-white rounded-lg text-xs font-semibold hover:bg-admin-hover"
                 >
                   Copy
                 </button>
@@ -264,8 +264,8 @@ export default function ClientProjectDetailPage() {
         {/* Right Column: Project Pipeline & Milestones */}
         <div className="lg:col-span-7 space-y-4">
           {/* Milestone Tracker */}
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-5">
-            <h2 className="font-semibold text-sm text-[#586348] uppercase tracking-wider mb-3">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5">
+            <h2 className="font-semibold text-sm text-admin-primary uppercase tracking-wider mb-3">
               Milestone Tracker
             </h2>
             <div className="space-y-2 text-xs">
@@ -282,15 +282,15 @@ export default function ClientProjectDetailPage() {
                   </span>
                 </div>
               )}
-              <div className="flex items-center gap-2 p-3 bg-[#F5F2EB] border border-[#DED5C7] rounded-xl">
+              <div className="flex items-center gap-2 p-3 bg-admin-canvas border border-admin-border rounded-xl">
                 <FiClock className="text-[#788278]" size={16} />
-                <span className="text-[#242824]">
+                <span className="text-admin-ink">
                   Current: {project.current_milestone || "Detailed Design & Layout Approval"}
                 </span>
               </div>
-              <div className="flex items-center gap-2 p-3 bg-white border border-[#DED5C7] rounded-xl">
+              <div className="flex items-center gap-2 p-3 bg-white border border-admin-border rounded-xl">
                 <FiCalendar className="text-[#788278]" size={16} />
-                <span className="text-[#5A625A]">
+                <span className="text-admin-muted">
                   Next: {project.next_milestone || "Construction & Installation"}
                 </span>
               </div>
@@ -298,15 +298,15 @@ export default function ClientProjectDetailPage() {
           </div>
 
           {/* Proposals & Approvals Section */}
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-5">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-sm text-[#586348] uppercase tracking-wider flex items-center gap-2">
+              <h2 className="font-semibold text-sm text-admin-primary uppercase tracking-wider flex items-center gap-2">
                 <FiFileText size={14} />
                 Proposals & Signoffs
               </h2>
               <button
                 onClick={() => setShowNewProposal(true)}
-                className="px-3 py-1.5 bg-[#586348] text-white rounded-xl text-xs font-semibold flex items-center gap-1 hover:bg-[#444D37]"
+                className="px-3 py-1.5 bg-admin-primary text-white rounded-xl text-xs font-semibold flex items-center gap-1 hover:bg-admin-hover"
               >
                 <FiPlus size={13} /> New Proposal
               </button>
@@ -321,10 +321,10 @@ export default function ClientProjectDetailPage() {
                 {proposals.map((proposal) => (
                   <div
                     key={proposal.id}
-                    className="bg-white border border-[#DED5C7] rounded-xl p-4"
+                    className="bg-white border border-admin-border rounded-xl p-4"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-sm text-[#242824]">{proposal.title}</span>
+                      <span className="font-semibold text-sm text-admin-ink">{proposal.title}</span>
                       <span
                         className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                           proposal.status === "approved"
@@ -333,7 +333,7 @@ export default function ClientProjectDetailPage() {
                             ? "bg-red-100 text-red-800"
                             : proposal.status === "sent"
                             ? "bg-amber-100 text-amber-800"
-                            : "bg-[#F5F2EB] text-[#5A625A]"
+                            : "bg-admin-canvas text-admin-muted"
                         }`}
                       >
                         {proposal.status.replace(/_/g, " ")}
@@ -352,7 +352,7 @@ export default function ClientProjectDetailPage() {
                             }`}
                           >
                             <div>
-                              <div className="font-semibold text-[#242824]">
+                              <div className="font-semibold text-admin-ink">
                                 Version {v.version}
                                 {proposal.approved_version === v.version && (
                                   <span className="ml-2 text-emerald-600">✓ Approved</span>
@@ -367,7 +367,7 @@ export default function ClientProjectDetailPage() {
                             {proposal.status !== "approved" && (
                               <button
                                 onClick={() => handleApproveProposal(proposal.id, v.version)}
-                                className="px-2.5 py-1 bg-[#586348] text-white rounded-lg text-[11px] font-semibold hover:bg-[#444D37]"
+                                className="px-2.5 py-1 bg-admin-primary text-white rounded-lg text-[11px] font-semibold hover:bg-admin-hover"
                               >
                                 Approve
                               </button>
@@ -383,15 +383,15 @@ export default function ClientProjectDetailPage() {
           </div>
 
           {/* Change Orders (Scope Add-ons) */}
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-5">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-sm text-[#586348] uppercase tracking-wider flex items-center gap-2">
+              <h2 className="font-semibold text-sm text-admin-primary uppercase tracking-wider flex items-center gap-2">
                 <FiBriefcase size={14} />
                 Change Orders & Additional Scope
               </h2>
               <button
                 onClick={() => setShowNewChange(true)}
-                className="px-3 py-1.5 bg-[#242824] text-white rounded-xl text-xs font-semibold flex items-center gap-1 hover:bg-[#181C18]"
+                className="px-3 py-1.5 bg-admin-ink text-white rounded-xl text-xs font-semibold flex items-center gap-1 hover:bg-[#181C18]"
               >
                 <FiPlus size={13} /> Log Change
               </button>
@@ -415,7 +415,7 @@ export default function ClientProjectDetailPage() {
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-[#242824]">{co.title}</span>
+                      <span className="font-bold text-admin-ink">{co.title}</span>
                       <span
                         className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                           co.status === "approved"
@@ -428,9 +428,9 @@ export default function ClientProjectDetailPage() {
                         {co.status.replace(/_/g, " ")}
                       </span>
                     </div>
-                    <p className="text-[#5A625A] leading-relaxed">{co.description}</p>
+                    <p className="text-admin-muted leading-relaxed">{co.description}</p>
                     <div className="flex items-center gap-3 mt-2 pt-2 border-t border-white/50 text-[11px]">
-                      <span className="font-semibold text-[#242824]">
+                      <span className="font-semibold text-admin-ink">
                         Proposed: BDT {Number(co.proposed_cost).toLocaleString()}
                       </span>
                       <span className="text-[#788278]">
@@ -470,12 +470,12 @@ export default function ClientProjectDetailPage() {
       {/* Create New Proposal Modal */}
       {showNewProposal && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 w-full max-w-md shadow-xl">
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 w-full max-w-md shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-serif text-lg font-bold text-[#242824]">Create New Proposal</h3>
+              <h3 className="font-serif text-lg font-bold text-admin-ink">Create New Proposal</h3>
               <button
                 onClick={() => setShowNewProposal(false)}
-                className="p-1 hover:bg-[#F5F2EB] rounded-lg"
+                className="p-1 hover:bg-admin-canvas rounded-lg"
               >
                 <FiX size={18} />
               </button>
@@ -489,7 +489,7 @@ export default function ClientProjectDetailPage() {
                   placeholder="e.g. Interior Design - Phase 1 Proposal"
                   value={newProposalTitle}
                   onChange={(e) => setNewProposalTitle(e.target.value)}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-3 py-2 focus:outline-none focus:border-[#586348]"
+                  className="w-full bg-white border border-admin-border rounded-xl px-3 py-2 focus:outline-none focus:border-admin-primary"
                 />
               </div>
               <div>
@@ -500,7 +500,7 @@ export default function ClientProjectDetailPage() {
                   placeholder="e.g. 1500000"
                   value={newProposalCost}
                   onChange={(e) => setNewProposalCost(e.target.value)}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-3 py-2 focus:outline-none focus:border-[#586348]"
+                  className="w-full bg-white border border-admin-border rounded-xl px-3 py-2 focus:outline-none focus:border-admin-primary"
                 />
               </div>
               <div>
@@ -510,21 +510,21 @@ export default function ClientProjectDetailPage() {
                   placeholder="e.g. 45"
                   value={newProposalDays}
                   onChange={(e) => setNewProposalDays(e.target.value)}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-3 py-2 focus:outline-none focus:border-[#586348]"
+                  className="w-full bg-white border border-admin-border rounded-xl px-3 py-2 focus:outline-none focus:border-admin-primary"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowNewProposal(false)}
-                  className="px-4 py-2 text-[#5A625A] hover:bg-[#F5F2EB] rounded-xl"
+                  className="px-4 py-2 text-admin-muted hover:bg-admin-canvas rounded-xl"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingProposal}
-                  className="px-4 py-2 bg-[#586348] text-white rounded-xl font-semibold hover:bg-[#444D37]"
+                  className="px-4 py-2 bg-admin-primary text-white rounded-xl font-semibold hover:bg-admin-hover"
                 >
                   {submittingProposal ? "Creating..." : "Create Proposal"}
                 </button>
@@ -537,14 +537,14 @@ export default function ClientProjectDetailPage() {
       {/* Create Change Order Modal */}
       {showNewChange && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 w-full max-w-md shadow-xl">
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 w-full max-w-md shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-serif text-lg font-bold text-[#242824]">
+              <h3 className="font-serif text-lg font-bold text-admin-ink">
                 Log Scope Change / Variation
               </h3>
               <button
                 onClick={() => setShowNewChange(false)}
-                className="p-1 hover:bg-[#F5F2EB] rounded-lg"
+                className="p-1 hover:bg-admin-canvas rounded-lg"
               >
                 <FiX size={18} />
               </button>
@@ -561,7 +561,7 @@ export default function ClientProjectDetailPage() {
                   placeholder="e.g. Master Bedroom Wardrobe Upgrade"
                   value={changeTitle}
                   onChange={(e) => setChangeTitle(e.target.value)}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-3 py-2 focus:outline-none focus:border-[#586348]"
+                  className="w-full bg-white border border-admin-border rounded-xl px-3 py-2 focus:outline-none focus:border-admin-primary"
                 />
               </div>
               <div>
@@ -572,7 +572,7 @@ export default function ClientProjectDetailPage() {
                   placeholder="Detail the scope change, material specs, or variation from agreed scope..."
                   value={changeDesc}
                   onChange={(e) => setChangeDesc(e.target.value)}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl px-3 py-2 focus:outline-none focus:border-[#586348] resize-none"
+                  className="w-full bg-white border border-admin-border rounded-xl px-3 py-2 focus:outline-none focus:border-admin-primary resize-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -584,7 +584,7 @@ export default function ClientProjectDetailPage() {
                     placeholder="e.g. 120000"
                     value={changeCost}
                     onChange={(e) => setChangeCost(e.target.value)}
-                    className="w-full bg-white border border-[#DED5C7] rounded-xl px-3 py-2 focus:outline-none focus:border-[#586348]"
+                    className="w-full bg-white border border-admin-border rounded-xl px-3 py-2 focus:outline-none focus:border-admin-primary"
                   />
                 </div>
                 <div>
@@ -594,7 +594,7 @@ export default function ClientProjectDetailPage() {
                     placeholder="e.g. 5"
                     value={changeDays}
                     onChange={(e) => setChangeDays(e.target.value)}
-                    className="w-full bg-white border border-[#DED5C7] rounded-xl px-3 py-2 focus:outline-none focus:border-[#586348]"
+                    className="w-full bg-white border border-admin-border rounded-xl px-3 py-2 focus:outline-none focus:border-admin-primary"
                   />
                 </div>
               </div>
@@ -602,14 +602,14 @@ export default function ClientProjectDetailPage() {
                 <button
                   type="button"
                   onClick={() => setShowNewChange(false)}
-                  className="px-4 py-2 text-[#5A625A] hover:bg-[#F5F2EB] rounded-xl"
+                  className="px-4 py-2 text-admin-muted hover:bg-admin-canvas rounded-xl"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingChange}
-                  className="px-4 py-2 bg-[#242824] text-white rounded-xl font-semibold hover:bg-[#181C18] flex items-center gap-1.5"
+                  className="px-4 py-2 bg-admin-ink text-white rounded-xl font-semibold hover:bg-[#181C18] flex items-center gap-1.5"
                 >
                   <FiSend size={13} />
                   {submittingChange ? "Submitting..." : "Log Change Order"}

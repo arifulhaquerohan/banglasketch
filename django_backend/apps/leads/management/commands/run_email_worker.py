@@ -69,21 +69,22 @@ class Command(BaseCommand):
         # Fetch candidate job IDs using SKIP LOCKED in transaction
         with transaction.atomic():
             jobs = list(
-                ContactEmailJob.objects.select_for_update(skip_locked=True)
+                ContactEmailJob.objects.select_for_update(of=("self",), skip_locked=True)
                 .filter(
                     delivered_at__isnull=True,
                     attempts__lt=8,
                     available_at__lte=now,
                 )
-                .select_related("submission")[:limit]
+                .select_related("submission", "site_visit_booking")[:limit]
             )
 
             for job in jobs:
                 try:
                     success = process_email_job(job)
                     if success:
+                        target = f"submission #{job.submission_id}" if job.submission_id else f"site visit #{job.site_visit_booking_id}"
                         self.stdout.write(self.style.SUCCESS(
-                            f"Delivered job #{job.id} ({job.kind}) for submission #{job.submission_id}"
+                            f"Delivered job #{job.id} ({job.kind}) for {target}"
                         ))
                     else:
                         self.stdout.write(self.style.WARNING(

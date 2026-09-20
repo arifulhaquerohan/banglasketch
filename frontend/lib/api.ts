@@ -12,6 +12,10 @@ export interface Project {
   slug: string;
   description: string;
   category: ServiceCategory;
+  location?: string;
+  area?: string;
+  style?: string;
+  year?: string;
   featured_image?: string;
   coverImage?: string;
   gallery?: string[];
@@ -84,6 +88,14 @@ function getApiUrl(): string {
   return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 }
 
+// Legacy imports can contain malformed JSON; one row must not break the collection.
+function normalizeStringArray(value: unknown): string[] {
+  if (typeof value === "string") {
+    try { value = JSON.parse(value); } catch { return []; }
+  }
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
+
 // Normalizers
 function normalizeProject(raw: any): Project {
   const img = raw.featured_image || raw.featuredImage || raw.coverImage || "";
@@ -91,13 +103,13 @@ function normalizeProject(raw: any): Project {
     ...raw,
     featured_image: img,
     coverImage: img,
+    location: raw.location || (raw.client_location ? raw.client_location : "Dhaka, Bangladesh"),
+    area: raw.area || (raw.space_size ? raw.space_size : "Bespoke Residence"),
+    style: raw.style || "Quiet Luxury",
+    year: raw.year || (raw.date_completed ? new Date(raw.date_completed).getFullYear().toString() : "2026"),
     beforeImage: raw.before_image || raw.beforeImage,
     afterImage: raw.after_image || raw.afterImage,
-    gallery: Array.isArray(raw.gallery)
-      ? raw.gallery
-      : typeof raw.gallery === "string"
-      ? JSON.parse(raw.gallery || "[]")
-      : [],
+    gallery: normalizeStringArray(raw.gallery),
   };
 }
 
@@ -107,11 +119,7 @@ function normalizeBlogPost(raw: any): BlogPost {
     ...raw,
     featured_image: img,
     coverImage: img,
-    tags: Array.isArray(raw.tags)
-      ? raw.tags
-      : typeof raw.tags === "string"
-      ? JSON.parse(raw.tags || "[]")
-      : [],
+    tags: normalizeStringArray(raw.tags),
   };
 }
 

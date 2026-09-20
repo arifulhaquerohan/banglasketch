@@ -40,8 +40,8 @@ export default async function BlogPage({
                   href={category === "All" ? "/blog" : `/blog?category=${encodeURIComponent(category)}`}
                   className={`px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide uppercase transition-all duration-300 ${
                     isActive
-                      ? "bg-gradient-to-r from-[#e07b2a] to-[#c5a059] text-[#0a2540] shadow-lg shadow-[#e07b2a]/20"
-                      : "bg-[#0a2540] text-gray-300 border border-[#c5a059]/20 hover:border-[#c5a059] hover:text-[#c5a059]"
+                      ? "bg-[#586348] text-white shadow-xs"
+                      : "bg-[#FCFAF7] text-[#5A625A] border border-[#DED5C7] hover:border-[#586348] hover:text-[#242824]"
                   }`}
                 >
                   {category}
@@ -60,9 +60,9 @@ export default async function BlogPage({
               ))}
             </div>
           ) : (
-            <div className="text-center py-20 bg-[#0a2540]/40 rounded-3xl border border-[#c5a059]/20 max-w-xl mx-auto p-8">
-              <p className="text-lg font-bold text-white mb-2">No articles found in this category</p>
-              <p className="text-sm text-gray-400 mb-6">New stories and practical design advice are on their way.</p>
+            <div className="text-center py-20 bg-[#FCFAF7] rounded-3xl border border-[#DED5C7] max-w-xl mx-auto p-8 shadow-xs">
+              <p className="font-serif text-xl font-bold text-[#242824] mb-2">No articles found in this category</p>
+              <p className="text-xs sm:text-sm text-[#5A625A] mb-6">New architectural stories and design advice will be published soon.</p>
               <Link href="/blog" className="btn btn-primary py-2.5 text-xs">View All Articles</Link>
             </div>
           )}

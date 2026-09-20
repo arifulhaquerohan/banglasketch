@@ -1,7 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FiShield, FiKey, FiAlertCircle, FiCheckCircle, FiUserPlus, FiActivity } from "react-icons/fi";
+import {
+  FiShield,
+  FiKey,
+  FiAlertCircle,
+  FiCheckCircle,
+  FiUserPlus,
+  FiActivity,
+  FiCopy,
+  FiCheck,
+  FiX,
+  FiUnlock,
+} from "react-icons/fi";
 import { adminFetch } from "@/lib/api";
 
 type User = {
@@ -24,6 +35,7 @@ type Audit = {
 };
 
 export default function SecurityPage() {
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [audit, setAudit] = useState<Audit[]>([]);
   const [error, setError] = useState("");
@@ -34,17 +46,26 @@ export default function SecurityPage() {
     role: "viewer",
   });
 
-  // 2FA states
-  const [totpSetup, setTotpSetup] = useState<{ secret: string; otpauth: string } | null>(null);
+  // 2FA setup states
+  const [totpSetup, setTotpSetup] = useState<{ secret: string; otpauth: string; qrCode?: string } | null>(null);
   const [totpCode, setTotpCode] = useState("");
   const [totpLoading, setTotpLoading] = useState(false);
   const [totpMsg, setTotpMsg] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [copiedSecret, setCopiedSecret] = useState(false);
+
+  // 2FA disable modal/states
+  const [disableModalOpen, setDisableModalOpen] = useState(false);
+  const [disablePassword, setDisablePassword] = useState("");
+  const [disableTotpCode, setDisableTotpCode] = useState("");
+  const [disableLoading, setDisableLoading] = useState(false);
 
   const load = async () => {
-    const [u, a] = await Promise.all([
+    const [p, u, a] = await Promise.all([
+      adminFetch<User>("profile"),
       adminFetch<User[]>("users"),
       adminFetch<Audit[]>("audit?limit=50"),
     ]);
+    if (p.success && p.data) setCurrentUser(p.data);
     if (u.success) setUsers(u.data || []);
     else setError(u.error || "Unable to load users");
     if (a.success) setAudit(a.data || []);
@@ -77,16 +98,23 @@ export default function SecurityPage() {
   const setup2fa = async () => {
     setTotpSetup(null);
     setTotpMsg(null);
-    const result = await adminFetch<{ secret: string; otpauth: string }>("2fa/setup", {
+    setTotpLoading(true);
+    const result = await adminFetch<{ secret: string; otpauth?: string; qrCode?: string }>("2fa/setup", {
       method: "POST",
       body: JSON.stringify({}),
     });
-    if (result.success && result.data) setTotpSetup(result.data);
-    else setTotpMsg({ text: result.error || "Failed to generate 2FA secret", type: "error" });
+    setTotpLoading(false);
+    if (result.success && result.data) {
+      const otpauth = result.data.otpauth || result.data.qrCode || "";
+      setTotpSetup({ secret: result.data.secret, otpauth, qrCode: result.data.qrCode });
+    } else {
+      setTotpMsg({ text: result.error || "Failed to generate 2FA secret", type: "error" });
+    }
   };
 
   const enable2fa = async () => {
-    if (!totpCode || !/^\d{6}$/.test(totpCode)) {
+    const cleaned = totpCode.replace(/\D/g, "");
+    if (!cleaned || cleaned.length !== 6) {
       setTotpMsg({
         text: "Please enter the 6-digit code from your authenticator app.",
         type: "error",
@@ -95,34 +123,68 @@ export default function SecurityPage() {
     }
     setTotpLoading(true);
     setTotpMsg(null);
-    const result = await adminFetch("2fa/enable", {
+    const result = await adminFetch("2fa/verify", {
       method: "POST",
-      body: JSON.stringify({ code: totpCode }),
+      body: JSON.stringify({ code: cleaned, totp: cleaned }),
     });
     setTotpLoading(false);
     if (result.success) {
       setTotpMsg({
-        text: "Two-factor authentication enabled successfully. You will be redirected shortly.",
+        text: "Two-factor authentication enabled successfully! Your account is now secured.",
         type: "success",
       });
       setTotpSetup(null);
       setTotpCode("");
-      setTimeout(() => {
-        window.location.reload();
-      }, 2500);
+      await load();
     } else {
-      setTotpMsg({ text: result.error || "Invalid verification code", type: "error" });
+      setTotpMsg({ text: result.error || "Invalid verification code. Check your device time and try again.", type: "error" });
     }
   };
+
+  const disable2fa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!disablePassword.trim() && !disableTotpCode.trim()) {
+      setTotpMsg({ text: "Please enter your current password or 2FA code to confirm.", type: "error" });
+      return;
+    }
+    setDisableLoading(true);
+    setTotpMsg(null);
+    const result = await adminFetch("2fa/disable", {
+      method: "POST",
+      body: JSON.stringify({
+        password: disablePassword || undefined,
+        code: disableTotpCode.replace(/\D/g, "") || undefined,
+      }),
+    });
+    setDisableLoading(false);
+    if (result.success) {
+      setDisableModalOpen(false);
+      setDisablePassword("");
+      setDisableTotpCode("");
+      setTotpMsg({ text: "Two-factor authentication has been disabled.", type: "success" });
+      await load();
+    } else {
+      setTotpMsg({ text: result.error || "Failed to disable 2FA. Check your credentials.", type: "error" });
+    }
+  };
+
+  const copySecret = () => {
+    if (!totpSetup?.secret) return;
+    navigator.clipboard.writeText(totpSetup.secret);
+    setCopiedSecret(true);
+    setTimeout(() => setCopiedSecret(false), 2000);
+  };
+
+  const isCurrent2faActive = Boolean(currentUser?.totp_enabled);
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div>
-        <h1 className="font-serif text-3xl font-bold text-[#242824] tracking-tight">
+        <h1 className="font-serif text-3xl font-bold text-admin-ink tracking-tight">
           Security & Access Audit
         </h1>
-        <p className="text-sm text-[#5A625A] mt-1">
+        <p className="text-sm text-admin-muted mt-1">
           Manage architectural staff credentials, enforce two-factor authentication, and monitor operational audit logs.
         </p>
       </div>
@@ -148,81 +210,234 @@ export default function SecurityPage() {
       )}
 
       {/* 2FA Section */}
-      <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-5 shadow-xs">
+      <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-5 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-[#EDF1EA] border border-[#D5DEC4] text-[#586348] flex items-center justify-center shadow-xs">
+            <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center shadow-xs ${
+              isCurrent2faActive
+                ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                : "bg-[#EDF1EA] border-[#D5DEC4] text-admin-primary"
+            }`}>
               <FiShield size={22} />
             </div>
             <div>
-              <h2 className="font-serif text-lg font-bold text-[#242824]">Two-Factor Authentication (2FA)</h2>
-              <p className="text-xs text-[#5A625A] mt-0.5">
-                Strengthen administrator session security with time-based one-time passwords (TOTP).
+              <div className="flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-admin-ink">Two-Factor Authentication (2FA)</h2>
+                {isCurrent2faActive ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                    <FiCheckCircle size={12} /> Active
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-admin-muted bg-admin-canvas border border-admin-border px-2 py-0.5 rounded-full">
+                    Disabled
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-admin-muted mt-0.5">
+                {isCurrent2faActive
+                  ? "Your administrator account is protected with TOTP one-time passwords."
+                  : "Strengthen administrator session security with time-based one-time passwords (TOTP)."}
               </p>
             </div>
           </div>
-          {!totpSetup && (
-            <button
-              onClick={setup2fa}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#242824] hover:bg-[#383E38] text-[#FCFAF7] rounded-xl text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto disabled:opacity-50"
-              disabled={totpLoading}
-            >
-              <FiKey size={14} /> Configure 2FA
-            </button>
-          )}
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {isCurrent2faActive ? (
+              <button
+                type="button"
+                onClick={() => setDisableModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-xl text-xs font-semibold shadow-xs transition-colors"
+              >
+                <FiUnlock size={14} /> Disable 2FA
+              </button>
+            ) : (
+              !totpSetup && (
+                <button
+                  type="button"
+                  onClick={setup2fa}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-admin-ink hover:bg-admin-elevated text-admin-surface rounded-xl text-xs font-semibold shadow-xs transition-colors disabled:opacity-50"
+                  disabled={totpLoading}
+                >
+                  <FiKey size={14} /> Configure 2FA
+                </button>
+              )
+            )}
+          </div>
         </div>
 
-        {totpSetup ? (
-          <div className="space-y-4 border border-[#DED5C7] rounded-2xl bg-white p-6">
+        {/* Setup Card */}
+        {totpSetup && !isCurrent2faActive && (
+          <div className="space-y-4 border border-admin-border rounded-2xl bg-white p-6 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-admin-ink flex items-center gap-2">
+                <FiKey className="text-admin-primary" size={15} /> Authenticator Setup
+              </h3>
+              <button
+                type="button"
+                onClick={() => setTotpSetup(null)}
+                className="text-admin-muted hover:text-admin-ink p-1 rounded-lg hover:bg-admin-canvas"
+                title="Cancel setup"
+              >
+                <FiX size={16} />
+              </button>
+            </div>
+
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1">
-                Secret Key
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1">
+                1. Secret Key (Manual Entry)
               </label>
-              <div className="font-mono text-xs text-[#242824] bg-[#F5F2EB] px-3.5 py-2.5 rounded-xl border border-[#DED5C7] break-all">
-                {totpSetup.secret}
+              <div className="flex items-center gap-2">
+                <div className="font-mono text-xs text-admin-ink bg-admin-canvas px-3.5 py-2.5 rounded-xl border border-admin-border flex-1 select-all tracking-wider">
+                  {totpSetup.secret}
+                </div>
+                <button
+                  type="button"
+                  onClick={copySecret}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-admin-canvas hover:bg-admin-border/50 border border-admin-border rounded-xl text-xs font-semibold text-admin-ink transition-colors"
+                >
+                  {copiedSecret ? (
+                    <>
+                      <FiCheck className="text-emerald-600" size={14} />
+                      <span className="text-emerald-600">Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiCopy size={14} />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
+
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1">
-                Authenticator URI (Scan QR / Manual Input)
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1">
+                2. Authenticator URI
               </label>
-              <div className="font-mono text-xs text-[#5A625A] bg-[#F5F2EB] px-3.5 py-2.5 rounded-xl border border-[#DED5C7] break-all">
+              <div className="font-mono text-[11px] text-admin-muted bg-admin-canvas px-3.5 py-2.5 rounded-xl border border-admin-border break-all select-all">
                 {totpSetup.otpauth}
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <input
-                value={totpCode}
-                onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                placeholder="Enter 6-digit code"
-                maxLength={6}
-                className="bg-[#FCFAF7] border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] font-mono tracking-widest text-center w-48 focus:outline-none focus:border-[#586348] focus:ring-2 focus:ring-[#586348]/20"
-              />
-              <button
-                onClick={enable2fa}
-                disabled={totpLoading || !totpCode}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#586348] hover:bg-[#444D37] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors disabled:opacity-50"
-              >
-                <FiCheckCircle size={14} /> Confirm & Enable
-              </button>
+
+            <div>
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1">
+                3. Enter 6-Digit Code from App
+              </label>
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <input
+                  inputMode="numeric"
+                  pattern="[0-9]{6}"
+                  value={totpCode}
+                  onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="000000"
+                  maxLength={6}
+                  className="bg-admin-surface border border-admin-border rounded-xl px-4 py-2.5 text-base text-admin-ink font-mono tracking-widest text-center w-40 focus:outline-none focus:border-admin-primary focus:ring-2 focus:ring-admin-primary/20"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && totpCode.length === 6) {
+                      e.preventDefault();
+                      enable2fa();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={enable2fa}
+                  disabled={totpLoading || totpCode.length !== 6}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-admin-primary hover:bg-admin-hover text-white rounded-xl text-xs font-semibold shadow-xs transition-colors disabled:opacity-50"
+                >
+                  <FiCheckCircle size={14} /> {totpLoading ? "Verifying..." : "Confirm & Enable 2FA"}
+                </button>
+              </div>
             </div>
-            <p className="text-xs text-[#737D73] leading-relaxed">
-              Open Google Authenticator, Authy, or your preferred authenticator app, register the secret key above, and enter the generated 6-digit code.
+
+            <p className="text-xs text-admin-subtle leading-relaxed">
+              Open Google Authenticator, Microsoft Authenticator, Authy, or 1Password, add account by entering the secret key, and enter the generated 6-digit code.
             </p>
           </div>
-        ) : (
-          <div className="flex items-center gap-2 text-xs text-[#5A625A] bg-[#F5F2EB] border border-[#DED5C7] px-4 py-3 rounded-xl">
-            <FiAlertCircle size={14} className="text-[#586348]" />
+        )}
+
+        {!totpSetup && !isCurrent2faActive && (
+          <div className="flex items-center gap-2 text-xs text-admin-muted bg-admin-canvas border border-admin-border px-4 py-3 rounded-xl">
+            <FiAlertCircle size={14} className="text-admin-primary" />
             <span>Click &ldquo;Configure 2FA&rdquo; to begin the authenticator setup process for this account.</span>
           </div>
         )}
       </div>
 
+      {/* Disable 2FA Modal */}
+      {disableModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-admin-border rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5 text-red-700">
+                <FiUnlock size={20} />
+                <h3 className="font-serif text-lg font-bold text-admin-ink">Disable Two-Factor Authentication</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDisableModalOpen(false)}
+                className="text-admin-muted hover:text-admin-ink p-1 rounded-lg hover:bg-admin-canvas"
+              >
+                <FiX size={18} />
+              </button>
+            </div>
+
+            <p className="text-xs text-admin-muted leading-relaxed">
+              Disabling 2FA reduces account security. Please enter your administrator password or current 6-digit TOTP code to confirm.
+            </p>
+
+            <form onSubmit={disable2fa} className="space-y-3 pt-1">
+              <div>
+                <label className="block text-xs font-semibold text-admin-ink mb-1">Admin Password</label>
+                <input
+                  type="password"
+                  value={disablePassword}
+                  onChange={(e) => setDisablePassword(e.target.value)}
+                  placeholder="Enter your current password"
+                  className="w-full bg-admin-canvas border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:outline-none focus:border-admin-primary focus:ring-2 focus:ring-admin-primary/20"
+                />
+              </div>
+
+              <div className="text-center text-xs text-admin-muted py-0.5">— OR —</div>
+
+              <div>
+                <label className="block text-xs font-semibold text-admin-ink mb-1">Current 6-Digit 2FA Code</label>
+                <input
+                  inputMode="numeric"
+                  value={disableTotpCode}
+                  onChange={(e) => setDisableTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="000000"
+                  maxLength={6}
+                  className="w-full bg-admin-canvas border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink font-mono tracking-widest text-center focus:outline-none focus:border-admin-primary focus:ring-2 focus:ring-admin-primary/20"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setDisableModalOpen(false)}
+                  className="px-4 py-2 text-xs font-semibold text-admin-muted hover:text-admin-ink rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={disableLoading || (!disablePassword && disableTotpCode.length !== 6)}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors disabled:opacity-50"
+                >
+                  {disableLoading ? "Disabling..." : "Confirm Disable"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Add Staff User Form */}
-      <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+      <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
         <div className="flex items-center gap-2.5">
-          <FiUserPlus size={18} className="text-[#586348]" />
-          <h2 className="font-serif text-lg font-bold text-[#242824]">Provision Administrator Account</h2>
+          <FiUserPlus size={18} className="text-admin-primary" />
+          <h2 className="font-serif text-lg font-bold text-admin-ink">Provision Administrator Account</h2>
         </div>
         <form onSubmit={add} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <input
@@ -230,7 +445,7 @@ export default function SecurityPage() {
             placeholder="Full Name"
             value={form.display_name}
             onChange={(e) => setForm({ ...form, display_name: e.target.value })}
-            className="bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] placeholder:text-[#8C948C] focus:outline-none focus:border-[#586348] focus:ring-2 focus:ring-[#586348]/20"
+            className="bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink placeholder:text-admin-subtle focus:outline-none focus:border-admin-primary focus:ring-2 focus:ring-admin-primary/20"
           />
           <input
             required
@@ -238,7 +453,7 @@ export default function SecurityPage() {
             placeholder="Email Address"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] placeholder:text-[#8C948C] focus:outline-none focus:border-[#586348] focus:ring-2 focus:ring-[#586348]/20"
+            className="bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink placeholder:text-admin-subtle focus:outline-none focus:border-admin-primary focus:ring-2 focus:ring-admin-primary/20"
           />
           <input
             required
@@ -247,12 +462,12 @@ export default function SecurityPage() {
             placeholder="Temporary Password (min 12)"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className="bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] placeholder:text-[#8C948C] focus:outline-none focus:border-[#586348] focus:ring-2 focus:ring-[#586348]/20"
+            className="bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink placeholder:text-admin-subtle focus:outline-none focus:border-admin-primary focus:ring-2 focus:ring-admin-primary/20"
           />
           <select
             value={form.role}
             onChange={(e) => setForm({ ...form, role: e.target.value })}
-            className="bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-sm text-[#242824] focus:outline-none focus:border-[#586348] focus:ring-2 focus:ring-[#586348]/20"
+            className="bg-white border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-ink focus:outline-none focus:border-admin-primary focus:ring-2 focus:ring-admin-primary/20"
           >
             <option value="viewer">Viewer (Read-only)</option>
             <option value="editor">Editor (Studio Content)</option>
@@ -261,7 +476,7 @@ export default function SecurityPage() {
           </select>
           <button
             type="submit"
-            className="bg-[#242824] hover:bg-[#383E38] text-[#FCFAF7] rounded-xl px-4 py-2.5 text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-1.5"
+            className="bg-admin-ink hover:bg-admin-elevated text-admin-surface rounded-xl px-4 py-2.5 text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-1.5"
           >
             <FiUserPlus size={14} /> Add User
           </button>
@@ -269,15 +484,15 @@ export default function SecurityPage() {
       </div>
 
       {/* Users Table */}
-      <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl overflow-hidden shadow-xs">
-        <div className="p-6 border-b border-[#DED5C7]">
-          <h2 className="font-serif text-lg font-bold text-[#242824]">Authorized Studio Personnel</h2>
-          <p className="text-xs text-[#5A625A] mt-0.5">Active and provisioned administrative users with CMS roles.</p>
+      <div className="bg-admin-surface border border-admin-border rounded-3xl overflow-hidden shadow-xs">
+        <div className="p-6 border-b border-admin-border">
+          <h2 className="font-serif text-lg font-bold text-admin-ink">Authorized Studio Personnel</h2>
+          <p className="text-xs text-admin-muted mt-0.5">Active and provisioned administrative users with CMS roles.</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs uppercase tracking-wider text-[#586348] bg-[#F5F2EB] border-b border-[#DED5C7]">
+              <tr className="text-left text-xs uppercase tracking-wider text-admin-primary bg-admin-canvas border-b border-admin-border">
                 <th className="p-4 font-semibold">User</th>
                 <th className="p-4 font-semibold">Role</th>
                 <th className="p-4 font-semibold">2FA</th>
@@ -285,15 +500,15 @@ export default function SecurityPage() {
                 <th className="p-4 font-semibold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#DED5C7] bg-white">
+            <tbody className="divide-y divide-admin-border bg-white">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-[#F5F2EB]/50 transition-colors">
+                <tr key={user.id} className="hover:bg-admin-canvas/50 transition-colors">
                   <td className="p-4">
-                    <div className="font-semibold text-[#242824]">{user.display_name}</div>
-                    <div className="text-xs text-[#5A625A] font-mono mt-0.5">{user.email}</div>
+                    <div className="font-semibold text-admin-ink">{user.display_name}</div>
+                    <div className="text-xs text-admin-muted font-mono mt-0.5">{user.email}</div>
                   </td>
                   <td className="p-4">
-                    <span className="capitalize text-xs font-semibold px-2.5 py-1 bg-[#F5F2EB] text-[#242824] rounded-lg border border-[#DED5C7]">
+                    <span className="capitalize text-xs font-semibold px-2.5 py-1 bg-admin-canvas text-admin-ink rounded-lg border border-admin-border">
                       {user.role}
                     </span>
                   </td>
@@ -303,7 +518,7 @@ export default function SecurityPage() {
                         <FiCheckCircle size={12} /> Enabled
                       </span>
                     ) : (
-                      <span className="text-xs text-[#8C948C]">Disabled</span>
+                      <span className="text-xs text-admin-subtle">Disabled</span>
                     )}
                   </td>
                   <td className="p-4">
@@ -323,7 +538,7 @@ export default function SecurityPage() {
                       className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition ${
                         user.active
                           ? "border-red-200 text-red-700 hover:bg-red-50"
-                          : "border-[#586348]/30 text-[#586348] hover:bg-[#EDF1EA]"
+                          : "border-admin-primary/30 text-admin-primary hover:bg-[#EDF1EA]"
                       }`}
                     >
                       {user.active ? "Disable" : "Enable"}
@@ -337,28 +552,28 @@ export default function SecurityPage() {
       </div>
 
       {/* Audit Activity */}
-      <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+      <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
         <div className="flex items-center gap-2.5">
-          <FiActivity size={18} className="text-[#586348]" />
-          <h2 className="font-serif text-lg font-bold text-[#242824]">Recent Audit Activity</h2>
+          <FiActivity size={18} className="text-admin-primary" />
+          <h2 className="font-serif text-lg font-bold text-admin-ink">Recent Audit Activity</h2>
         </div>
-        <p className="text-xs text-[#5A625A]">Chronological record of sensitive actions, logins, and project modifications.</p>
+        <p className="text-xs text-admin-muted">Chronological record of sensitive actions, logins, and project modifications.</p>
 
         <div className="space-y-2 pt-2">
           {audit.length === 0 ? (
-            <p className="text-xs text-[#8C948C] italic">No audit records found.</p>
+            <p className="text-xs text-admin-subtle italic">No audit records found.</p>
           ) : (
             audit.map((row) => (
               <div
                 key={row.id}
-                className="text-xs border-b border-[#DED5C7] last:border-0 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1"
+                className="text-xs border-b border-admin-border last:border-0 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1"
               >
                 <div className="space-x-1.5">
-                  <span className="font-mono font-semibold text-[#586348]">{row.actor_email || "system"}</span>
-                  <span className="text-[#242824] font-medium">{row.action}</span>
-                  {row.entity_type && <span className="text-[#5A625A]">({row.entity_type} {row.entity_id})</span>}
+                  <span className="font-mono font-semibold text-admin-primary">{row.actor_email || "system"}</span>
+                  <span className="text-admin-ink font-medium">{row.action}</span>
+                  {row.entity_type && <span className="text-admin-muted">({row.entity_type} {row.entity_id})</span>}
                 </div>
-                <time className="text-[#737D73] text-[11px] tabular-nums shrink-0">
+                <time className="text-admin-subtle text-[11px] tabular-nums shrink-0">
                   {new Date(row.created_at).toLocaleString("en-GB", {
                     day: "numeric",
                     month: "short",

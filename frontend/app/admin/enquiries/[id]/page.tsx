@@ -139,7 +139,7 @@ export default function EnquiryDetailPage() {
         <p>{error || "Client record not found"}</p>
         <Link
           href="/admin/enquiries"
-          className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FCFAF7] border border-[#DED5C7] text-xs font-semibold text-[#242824] hover:border-[#586348] transition-colors"
+          className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-admin-surface border border-admin-border text-xs font-semibold text-admin-ink hover:border-admin-primary transition-colors"
         >
           Return to Pipeline
         </Link>
@@ -160,14 +160,14 @@ export default function EnquiryDetailPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/enquiries"
-            className="p-2 bg-white border border-[#DED5C7] rounded-xl hover:bg-[#F5F2EB] text-[#242824]"
+            className="p-2 bg-white border border-admin-border rounded-xl hover:bg-admin-canvas text-admin-ink"
           >
             <FiArrowLeft size={16} />
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-serif text-2xl font-bold text-[#242824]">{enquiry.name}</h1>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-[#586348]/15 text-[#586348] border border-[#D5DEC4]">
+              <h1 className="font-serif text-2xl font-bold text-admin-ink">{enquiry.name}</h1>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-admin-primary/15 text-admin-primary border border-[#D5DEC4]">
                 {enquiry.status.replace(/_/g, " ")}
               </span>
               {isOverdue && (
@@ -176,7 +176,7 @@ export default function EnquiryDetailPage() {
                 </span>
               )}
             </div>
-            <p className="text-xs text-[#5A625A] mt-0.5">
+            <p className="text-xs text-admin-muted mt-0.5">
               Enquiry #{enquiry.id} • Created on {new Date(enquiry.created_at).toLocaleDateString()}
             </p>
           </div>
@@ -188,7 +188,7 @@ export default function EnquiryDetailPage() {
             <button
               onClick={handleConvertToProject}
               disabled={converting}
-              className="px-4 py-2 bg-[#586348] text-white rounded-xl text-xs font-semibold hover:bg-[#444D37] flex items-center gap-2 shadow-sm transition-all"
+              className="px-4 py-2 bg-admin-primary text-white rounded-xl text-xs font-semibold hover:bg-admin-hover flex items-center gap-2 shadow-sm transition-all"
             >
               <FiBriefcase size={14} />
               <span>{converting ? "Promoting..." : "Convert to Active Project"}</span>
@@ -202,12 +202,12 @@ export default function EnquiryDetailPage() {
         {/* LEFT COLUMN: Client & Requirement Dossier (5 cols) */}
         <div className="lg:col-span-5 space-y-6">
           {/* Client Contact Profile */}
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-5 space-y-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#586348] block">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5 space-y-4">
+            <span className="text-xs font-bold uppercase tracking-wider text-admin-primary block">
               Contact Details
             </span>
 
-            <div className="space-y-2.5 text-xs text-[#242824]">
+            <div className="space-y-2.5 text-xs text-admin-ink">
               <div className="flex items-center gap-3">
                 <FiPhone className="text-[#788278]" size={14} />
                 <a href={`tel:${enquiry.phone}`} className="font-bold hover:underline">
@@ -245,29 +245,29 @@ export default function EnquiryDetailPage() {
           </div>
 
           {/* Project Requirements & Scope */}
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-5 space-y-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#586348] block">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5 space-y-4">
+            <span className="text-xs font-bold uppercase tracking-wider text-admin-primary block">
               Project Requirements
             </span>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="bg-white p-3 rounded-xl border border-[#EBE4D8]">
                 <span className="text-[#788278] block text-[11px]">Space Type</span>
-                <span className="font-semibold text-[#242824] capitalize">{enquiry.property_type}</span>
+                <span className="font-semibold text-admin-ink capitalize">{enquiry.property_type}</span>
               </div>
               <div className="bg-white p-3 rounded-xl border border-[#EBE4D8]">
                 <span className="text-[#788278] block text-[11px]">Service Scope</span>
-                <span className="font-semibold text-[#242824] capitalize">
+                <span className="font-semibold text-admin-ink capitalize">
                   {enquiry.service_scope.replace(/_/g, " ")}
                 </span>
               </div>
               <div className="bg-white p-3 rounded-xl border border-[#EBE4D8]">
                 <span className="text-[#788278] block text-[11px]">Approximate Budget</span>
-                <span className="font-semibold text-[#242824]">{enquiry.approx_budget || "Not stated"}</span>
+                <span className="font-semibold text-admin-ink">{enquiry.approx_budget || "Not stated"}</span>
               </div>
               <div className="bg-white p-3 rounded-xl border border-[#EBE4D8]">
                 <span className="text-[#788278] block text-[11px]">Target Start</span>
-                <span className="font-semibold text-[#242824]">
+                <span className="font-semibold text-admin-ink">
                   {enquiry.preferred_start_date || "Flexible"}
                 </span>
               </div>
@@ -276,7 +276,7 @@ export default function EnquiryDetailPage() {
             {enquiry.notes && (
               <div className="pt-2">
                 <span className="text-xs text-[#788278] block font-medium mb-1">Client Notes:</span>
-                <p className="text-xs bg-white p-3 rounded-xl border border-[#EBE4D8] leading-relaxed text-[#242824]">
+                <p className="text-xs bg-white p-3 rounded-xl border border-[#EBE4D8] leading-relaxed text-admin-ink">
                   {enquiry.notes}
                 </p>
               </div>
@@ -284,8 +284,8 @@ export default function EnquiryDetailPage() {
           </div>
 
           {/* Status & Next Step Controller */}
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-5">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#586348] block mb-3">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5">
+            <span className="text-xs font-bold uppercase tracking-wider text-admin-primary block mb-3">
               Stage & Next Step Controller
             </span>
 
@@ -295,7 +295,7 @@ export default function EnquiryDetailPage() {
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl p-2 font-medium"
+                  className="w-full bg-white border border-admin-border rounded-xl p-2 font-medium"
                 >
                   <option value="new_enquiry">New Enquiry</option>
                   <option value="contacted">Contacted</option>
@@ -318,7 +318,7 @@ export default function EnquiryDetailPage() {
                     placeholder="e.g. Budget mismatch / postponed to next year"
                     value={statusReason}
                     onChange={(e) => setStatusReason(e.target.value)}
-                    className="w-full bg-white border border-[#DED5C7] rounded-xl p-2"
+                    className="w-full bg-white border border-admin-border rounded-xl p-2"
                   />
                 </div>
               )}
@@ -330,7 +330,7 @@ export default function EnquiryDetailPage() {
                   placeholder="e.g. Call back with material samples"
                   value={nextAction}
                   onChange={(e) => setNextAction(e.target.value)}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl p-2"
+                  className="w-full bg-white border border-admin-border rounded-xl p-2"
                 />
               </div>
 
@@ -340,14 +340,14 @@ export default function EnquiryDetailPage() {
                   type="date"
                   value={nextFollowUpDate}
                   onChange={(e) => setNextFollowUpDate(e.target.value)}
-                  className="w-full bg-white border border-[#DED5C7] rounded-xl p-2"
+                  className="w-full bg-white border border-admin-border rounded-xl p-2"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={updatingEnquiry}
-                className="w-full py-2.5 bg-[#242824] text-white rounded-xl font-semibold hover:bg-[#383E38] transition-all"
+                className="w-full py-2.5 bg-admin-ink text-white rounded-xl font-semibold hover:bg-admin-elevated transition-all"
               >
                 {updatingEnquiry ? "Saving..." : "Update Pipeline Stage & Step"}
               </button>
@@ -358,8 +358,8 @@ export default function EnquiryDetailPage() {
         {/* RIGHT COLUMN: Communication History & Timeline (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
           {/* Add Interaction Log Box */}
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-5">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#586348] block mb-3">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5">
+            <span className="text-xs font-bold uppercase tracking-wider text-admin-primary block mb-3">
               Log Follow-up Interaction
             </span>
 
@@ -373,8 +373,8 @@ export default function EnquiryDetailPage() {
                     onClick={() => setChannel(ch)}
                     className={`px-3 py-1.5 text-xs font-semibold rounded-xl border capitalize transition-all ${
                       channel === ch
-                        ? "bg-[#586348] text-white border-[#586348]"
-                        : "bg-white text-[#5A625A] border-[#DED5C7] hover:bg-[#F5F2EB]"
+                        ? "bg-admin-primary text-white border-admin-primary"
+                        : "bg-white text-admin-muted border-admin-border hover:bg-admin-canvas"
                     }`}
                   >
                     {ch.replace("_", " ")}
@@ -388,7 +388,7 @@ export default function EnquiryDetailPage() {
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
                 placeholder="Log discussion notes, client preferences, or site measurement notes..."
-                className="w-full bg-white border border-[#DED5C7] rounded-xl p-3 text-xs focus:outline-none focus:border-[#586348] resize-none"
+                className="w-full bg-white border border-admin-border rounded-xl p-3 text-xs focus:outline-none focus:border-admin-primary resize-none"
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
@@ -397,13 +397,13 @@ export default function EnquiryDetailPage() {
                   placeholder="Next Action Step"
                   value={newNextAction}
                   onChange={(e) => setNewNextAction(e.target.value)}
-                  className="bg-white border border-[#DED5C7] rounded-xl px-3 py-2"
+                  className="bg-white border border-admin-border rounded-xl px-3 py-2"
                 />
                 <input
                   type="date"
                   value={newScheduleDate}
                   onChange={(e) => setNewScheduleDate(e.target.value)}
-                  className="bg-white border border-[#DED5C7] rounded-xl px-3 py-2"
+                  className="bg-white border border-admin-border rounded-xl px-3 py-2"
                 />
               </div>
 
@@ -411,7 +411,7 @@ export default function EnquiryDetailPage() {
                 <button
                   type="submit"
                   disabled={submittingNote}
-                  className="px-4 py-2 bg-[#586348] text-white rounded-xl text-xs font-semibold hover:bg-[#444D37] flex items-center gap-1.5 transition-all"
+                  className="px-4 py-2 bg-admin-primary text-white rounded-xl text-xs font-semibold hover:bg-admin-hover flex items-center gap-1.5 transition-all"
                 >
                   <FiSend size={13} />
                   <span>{submittingNote ? "Saving..." : "Record Follow-up"}</span>
@@ -421,34 +421,34 @@ export default function EnquiryDetailPage() {
           </div>
 
           {/* Chronological Timeline */}
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-2xl p-5">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#586348] block mb-4">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5">
+            <span className="text-xs font-bold uppercase tracking-wider text-admin-primary block mb-4">
               Communication & Activity History ({followUps.length})
             </span>
 
             {followUps.length === 0 ? (
               <p className="text-xs text-[#788278] italic">No communication logged yet.</p>
             ) : (
-              <div className="space-y-4 relative before:absolute before:left-3.5 before:top-2 before:bottom-2 before:w-[1px] before:bg-[#DED5C7]">
+              <div className="space-y-4 relative before:absolute before:left-3.5 before:top-2 before:bottom-2 before:w-[1px] before:bg-admin-border">
                 {followUps.map((item) => (
                   <div key={item.id} className="relative pl-8 text-xs">
                     {/* Circle Node */}
-                    <div className="absolute left-2 top-1 -translate-x-1/2 w-3 h-3 rounded-full bg-[#586348] border-2 border-white ring-1 ring-[#586348]/40" />
+                    <div className="absolute left-2 top-1 -translate-x-1/2 w-3 h-3 rounded-full bg-admin-primary border-2 border-white ring-1 ring-admin-primary/40" />
 
                     <div className="bg-white border border-[#EBE4D8] rounded-xl p-3.5 shadow-2xs">
                       <div className="flex items-center justify-between text-[#788278] text-[11px] mb-1">
-                        <span className="font-bold text-[#586348] uppercase tracking-wider">
+                        <span className="font-bold text-admin-primary uppercase tracking-wider">
                           {item.channel.replace(/_/g, " ")}
                         </span>
                         <span>{new Date(item.created_at).toLocaleString()}</span>
                       </div>
 
-                      <p className="text-xs text-[#242824] leading-relaxed whitespace-pre-wrap">
+                      <p className="text-xs text-admin-ink leading-relaxed whitespace-pre-wrap">
                         {item.summary}
                       </p>
 
                       {item.next_action && (
-                        <div className="mt-2 pt-2 border-t border-[#F5F2EB] text-[11px] text-[#5A625A]">
+                        <div className="mt-2 pt-2 border-t border-admin-canvas text-[11px] text-admin-muted">
                           <strong>Next Action:</strong> {item.next_action}
                         </div>
                       )}

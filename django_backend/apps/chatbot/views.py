@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
 from .services.knowledge import build_knowledge
+from .services.fast_reply import classify_instant_reply
 from .models import ChatConversation, ChatMessage
 from .services.ai import ChatUnavailable, generate_ai_response
 from apps.core.services.rate_limit import PostgresRateLimiter
@@ -16,8 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 class ChatRequestSerializer(serializers.Serializer):
-    session_id = serializers.CharField(max_length=64)
-    message = serializers.CharField(max_length=4000)
+    session_id = serializers.RegexField(regex=r"^[A-Za-z0-9_-]{8,64}$", max_length=64)
+    message = serializers.CharField(max_length=4000, trim_whitespace=True)
 
 
 class PublicChatView(APIView):
@@ -39,21 +40,36 @@ class PublicChatView(APIView):
         if not allowed:
             return Response({"success": False, "error": "Too many messages. Please wait a minute and try again."}, status=429)
 
-        recent = ChatMessage.objects.filter(conversation__session_id=session_id).order_by("-created_at", "-id")[:10]
+        # Truncate conversation history to last 6 messages
+        recent = ChatMessage.objects.filter(conversation__session_id=session_id).order_by("-created_at", "-id")[:6]
         messages = [{"role": m.role, "content": m.content} for m in reversed(list(recent))]
         messages.append({"role": "user", "content": content})
         knowledge, projects = build_knowledge(messages)
-        try:
-            ai_reply = generate_ai_response(messages, knowledge=knowledge)
-        except ChatUnavailable as exc:
-            logger.warning("Chat provider unavailable: %s", exc)
-            return Response({"success": False, "error": "The assistant is temporarily unavailable. Please try again shortly or contact our team."}, status=503)
+
+        # 1. Check instant local rule matcher (~5ms zero-latency reply)
+        instant_match = classify_instant_reply(content)
+        if instant_match:
+            ai_reply, intent = instant_match
+            message_type = "instant"
+        else:
+            try:
+                ai_reply = generate_ai_response(messages, knowledge=knowledge)
+                message_type = "ai"
+            except ChatUnavailable as exc:
+                logger.warning("Chat provider unavailable: %s", exc)
+                return Response({"success": False, "error": "The assistant is temporarily unavailable. Please try again shortly or contact our team."}, status=503)
 
         # Save the completed exchange together, without holding a transaction
-        # open while waiting for the external AI service.
+        # open while waiting for external services.
         with transaction.atomic():
             conversation, _ = ChatConversation.objects.get_or_create(session_id=session_id)
             ChatMessage.objects.create(conversation=conversation, role="user", content=content)
-            ChatMessage.objects.create(conversation=conversation, role="assistant", content=ai_reply)
+            ChatMessage.objects.create(
+                conversation=conversation,
+                role="assistant",
+                content=ai_reply,
+                message_type="quick_reply" if message_type == "instant" else "text",
+                metadata={"intent": intent} if message_type == "instant" else {},
+            )
 
-        return Response({"success": True, "reply": ai_reply, "message_type": "text", "projects": projects})
+        return Response({"success": True, "reply": ai_reply, "message_type": message_type, "projects": projects})

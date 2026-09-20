@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FiSave, FiArrowLeft } from "react-icons/fi";
 import { CloudinaryUpload } from "../../../../components/admin/CloudinaryUpload";
+import { GalleryUpload } from "../../../../components/admin/GalleryUpload";
 import { RichTextEditor } from "../../../../components/admin/RichTextEditor";
 import { adminFetch } from "../../../../lib/api";
 
@@ -19,6 +20,7 @@ export default function NewProjectPage() {
     description: "",
     content: "",
     image: "",
+    gallery: [] as string[],
     location: "",
     client: "",
     year: new Date().getFullYear().toString(),
@@ -47,7 +49,7 @@ export default function NewProjectPage() {
         date_completed: `${form.year || new Date().getFullYear()}-01-01`,
         featured: form.featured,
         published: form.status === "published",
-        gallery: [],
+        gallery: form.gallery,
       }),
     });
     setSaving(false);
@@ -61,18 +63,18 @@ export default function NewProjectPage() {
         <div>
           <Link
             href="/admin/projects"
-            className="text-xs font-semibold text-[#5A625A] hover:text-[#586348] inline-flex items-center gap-1.5 mb-2 transition-colors"
+            className="text-xs font-semibold text-admin-muted hover:text-admin-primary inline-flex items-center gap-1.5 mb-2 transition-colors"
           >
             <FiArrowLeft size={14} /> Back to projects
           </Link>
-          <h1 className="font-serif text-3xl font-bold text-[#242824] tracking-tight">New Project</h1>
-          <p className="text-sm text-[#5A625A] mt-0.5">Draft and publish a new architectural project to your portfolio.</p>
+          <h1 className="font-serif text-3xl font-bold text-admin-ink tracking-tight">New Project</h1>
+          <p className="text-sm text-admin-muted mt-0.5">Draft and publish a new architectural project to your portfolio.</p>
         </div>
         <button
           type="button"
           onClick={() => handleSubmit()}
           disabled={saving}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#586348] hover:bg-[#444D37] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-admin-primary hover:bg-admin-hover text-white rounded-xl text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto disabled:opacity-50"
         >
           <FiSave size={15} /> {saving ? "Publishing..." : "Publish Project"}
         </button>
@@ -86,10 +88,10 @@ export default function NewProjectPage() {
 
       <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <h2 className="font-serif text-lg font-bold text-[#242824]">Project Narrative</h2>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h2 className="font-serif text-lg font-bold text-admin-ink">Project Narrative</h2>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Project Title
               </label>
               <input
@@ -98,11 +100,11 @@ export default function NewProjectPage() {
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="e.g. Modern Minimalist Kitchen Renovation"
                 required
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 URL Slug
               </label>
               <input
@@ -110,11 +112,11 @@ export default function NewProjectPage() {
                 value={form.slug}
                 onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })}
                 placeholder="modern-minimalist-kitchen"
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all font-mono shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all font-mono shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Short Description
               </label>
               <textarea
@@ -122,7 +124,7 @@ export default function NewProjectPage() {
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows={3}
                 placeholder="A brief overview of the space, layout, and client brief..."
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 transition-all resize-none shadow-2xs leading-relaxed"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all resize-none shadow-2xs leading-relaxed"
               />
             </div>
             <RichTextEditor
@@ -133,25 +135,20 @@ export default function NewProjectPage() {
             />
           </div>
 
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-bold text-[#242824]">Gallery Media</h3>
-            <p className="text-xs text-[#5A625A]">Additional perspectives, render angles, and layout sketches.</p>
-            <div className="grid grid-cols-3 gap-3 pt-1">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="aspect-square bg-white border-2 border-dashed border-[#DED5C7] rounded-2xl flex items-center justify-center text-[#737D73] text-xs hover:border-[#586348] hover:bg-[#F5F2EB]/50 cursor-pointer transition-colors shadow-2xs"
-                >
-                  + Add Media
-                </div>
-              ))}
-            </div>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-admin-ink">Gallery Media</h3>
+            <p className="text-xs text-admin-muted">Additional perspectives, render angles, and layout sketches.</p>
+            <GalleryUpload
+              value={form.gallery}
+              onChange={(gallery) => setForm({ ...form, gallery })}
+              folder="banglasketch/projects/gallery"
+            />
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-bold text-[#242824]">Cover Showcase</h3>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-admin-ink">Cover Showcase</h3>
             <CloudinaryUpload
               value={form.image}
               onChange={(image) => setForm({ ...form, image })}
@@ -160,16 +157,16 @@ export default function NewProjectPage() {
             />
           </div>
 
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-bold text-[#242824]">Project Metadata</h3>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-admin-ink">Project Metadata</h3>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Category
               </label>
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 shadow-2xs"
               >
                 <option value="kitchen">Kitchen</option>
                 <option value="bedroom">Bedroom</option>
@@ -179,7 +176,7 @@ export default function NewProjectPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Location
               </label>
               <input
@@ -187,11 +184,11 @@ export default function NewProjectPage() {
                 value={form.location}
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
                 placeholder="e.g. Gulshan-2, Dhaka"
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Client / Studio Partner
               </label>
               <input
@@ -199,32 +196,32 @@ export default function NewProjectPage() {
                 value={form.client}
                 onChange={(e) => setForm({ ...form, client: e.target.value })}
                 placeholder="e.g. Private Residence"
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] placeholder:text-[#8C948C] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Completion Year
               </label>
               <input
                 type="number"
                 value={form.year}
                 onChange={(e) => setForm({ ...form, year: e.target.value })}
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 shadow-2xs"
               />
             </div>
           </div>
 
-          <div className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-bold text-[#242824]">Visibility & Publication</h3>
+          <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-admin-ink">Visibility & Publication</h3>
             <div>
-              <label className="block text-xs font-semibold text-[#586348] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Status
               </label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full bg-white border border-[#DED5C7] rounded-xl px-4 py-2.5 text-xs text-[#242824] focus:border-[#586348] focus:outline-none focus:ring-2 focus:ring-[#586348]/20 shadow-2xs"
+                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 shadow-2xs"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -236,9 +233,9 @@ export default function NewProjectPage() {
                 type="checkbox"
                 checked={form.featured}
                 onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                className="w-4 h-4 accent-[#586348] rounded"
+                className="w-4 h-4 accent-admin-primary rounded"
               />
-              <span className="text-xs font-medium text-[#242824]">Feature this project on homepage</span>
+              <span className="text-xs font-medium text-admin-ink">Feature this project on homepage</span>
             </label>
           </div>
         </div>

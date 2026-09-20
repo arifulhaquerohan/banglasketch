@@ -14,18 +14,23 @@ from apps.projects.models import Project
 
 CATALOG_PATH = Path(__file__).resolve().parents[4] / "shared" / "services.json"
 ROOMS = {
-    "kitchen": ("kitchen", "রান্নাঘর", "রান্না ঘর", "কিচেন", "rannaghor"),
-    "bedroom": ("bedroom", "bed room", "শোবার", "বেডরুম"),
-    "living-room": ("living room", "living space", "drawing room", "লিভিং", "বসার", "ড্রয়িং"),
+    "kitchen": ("kitchen", "রান্নাঘর", "রান্না ঘর", "কিচেন", "rannaghor", "cabinet", "ক্যাবিনেট"),
+    "bedroom": ("bedroom", "bed room", "শোবার", "বেডরুম", "master bed", "মাস্টার বেড", "wardrobe", "ওয়ারড্রব"),
+    "living-room": ("living room", "living space", "drawing room", "লিভিং", "বসার", "ড্রয়িং", "tv unit", "টিভি ইউনিট", "dining", "ডাইনিং"),
     "bathroom": ("bathroom", "bath room", "washroom", "বাথরুম", "বাথরুমের", "গোসল"),
+    "residential": ("apartment", "flat", "duplex", "home", "residence", "ফ্ল্যাট", "ডুপ্লেক্স", "বাসা", "বাড়ি", "রেসিডেনশিয়াল"),
+    "commercial": ("commercial", "office", "workplace", "restaurant", "cafe", "shop", "অফিস", "কমার্শিয়াল", "রেস্টুরেন্ট"),
 }
 STYLES = {
-    "modern": ("modern", "মডার্ন", "আধুনিক"),
-    "minimal": ("minimal", "minimalist", "মিনিমাল"),
-    "luxury": ("luxury", "luxurious", "লাক্সারি", "বিলাসবহুল"),
-    "classic": ("classic", "classical", "ক্লাসিক"),
+    "modern": ("modern", "মডার্ন", "আধুনিক", "contemporary"),
+    "minimal": ("minimal", "minimalist", "মিনিমাল", "সিম্পল", "simple"),
+    "luxury": ("luxury", "luxurious", "লাক্সারি", "বিলাসবহুল", "premium", "প্রিমিয়াম"),
+    "classic": ("classic", "classical", "ক্লাসিক", "traditional", "ঐতিহ্যবাহী"),
 }
-BROWSE = ("project", "portfolio", "inspiration", "example", "apartment", "flat", "প্রজেক্ট", "পোর্টফোলিও", "ফ্ল্যাট", "উদাহরণ")
+BROWSE = (
+    "project", "portfolio", "inspiration", "example", "apartment", "flat", "work", "design",
+    "প্রজেক্ট", "পোর্টফোলিও", "ফ্ল্যাট", "উদাহরণ", "কাজ", "ডিজাইন", "ছবি", "গ্যালারি", "gallery"
+)
 
 
 def contains(text, word):

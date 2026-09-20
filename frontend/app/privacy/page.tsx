@@ -3,10 +3,11 @@ import Link from "next/link";
 import { FiArrowUpRight, FiChevronRight, FiMail, FiPhone, FiShield } from "react-icons/fi";
 import { AnimateOnScroll } from "../../components/AnimateOnScroll";
 import { BRAND_NAME_BN, CONTACT, SITE_NAME } from "../../lib/constants";
+import { ArchitecturalDivider } from "../../components/ServiceIcons";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Banglasketch",
-  description: "Learn how Banglasketch collects, uses, and protects your information when you use our website and interior design services.",
+  title: "Privacy Policy | Bangla Sketch",
+  description: "Learn how Bangla Sketch collects, uses, and protects your information when you use our website and interior design services.",
 };
 
 const SECTIONS = [
@@ -26,9 +27,9 @@ const SECTIONS = [
 function PrivacyNavigation({ mobile = false }: { mobile?: boolean }) {
   return (
     <nav aria-label="Privacy policy sections" className={mobile ? "lg:hidden" : "hidden lg:block sticky top-28"}>
-      <div className={mobile ? "flex gap-2 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-none" : "bg-[#0a2540] border border-[#c5a059]/20 rounded-2xl p-4"}>
+      <div className={mobile ? "flex gap-2 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-none" : "bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-5 shadow-xs"}>
         {!mobile && (
-          <p className="px-3 pb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#c5a059] border-b border-[#c5a059]/15">
+          <p className="px-3 pb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#586348] border-b border-[#DED5C7]">
             On this page
           </p>
         )}
@@ -38,10 +39,10 @@ function PrivacyNavigation({ mobile = false }: { mobile?: boolean }) {
               key={section.id}
               href={`#${section.id}`}
               className={mobile
-                ? "shrink-0 rounded-full border border-[#c5a059]/25 bg-[#0a2540] px-3 py-1.5 text-xs text-gray-300 transition-colors hover:border-[#c5a059] hover:text-[#c5a059] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c5a059]"
-                : "group flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-gray-400 transition-colors hover:bg-[#c5a059]/10 hover:text-[#c5a059] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c5a059]"}
+                ? "shrink-0 rounded-full border border-[#DED5C7] bg-[#FCFAF7] px-3.5 py-1.5 text-xs text-[#5A625A] transition-colors hover:border-[#586348] hover:text-[#242824] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#586348]"
+                : "group flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-[#5A625A] transition-colors hover:bg-[#EDF1EA] hover:text-[#242824] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#586348]"}
             >
-              {!mobile && <span className="text-[#c5a059]/50 group-hover:text-[#c5a059]">{String(index + 1).padStart(2, "0")}</span>}
+              {!mobile && <span className="text-[#8C9678] font-mono text-[11px] group-hover:text-[#586348]">{String(index + 1).padStart(2, "0")}</span>}
               {section.label}
             </a>
           ))}
@@ -63,53 +64,55 @@ function PolicySection({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-32 space-y-3 border-b border-[#c5a059]/15 pb-8 last:border-0 last:pb-0">
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#c5a059]/40 bg-[#c5a059]/10 text-xs font-bold text-[#c5a059]">
+    <section id={id} className="scroll-mt-32 space-y-3 border-b border-[#DED5C7] pb-8 last:border-0 last:pb-0">
+      <div className="flex items-start gap-3.5">
+        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#D5DEC4] bg-[#EDF1EA] text-xs font-bold text-[#586348] shadow-2xs">
           {number}
         </span>
-        <h2 className="pt-0.5 text-xl font-bold text-white md:text-2xl">{title}</h2>
+        <h2 className="pt-0.5 text-xl font-serif font-semibold text-[#242824] md:text-2xl">{title}</h2>
       </div>
-      <div className="pl-0 md:pl-10 text-sm leading-relaxed text-gray-300 md:text-base">{children}</div>
+      <div className="pl-0 md:pl-10 text-sm leading-relaxed text-[#5A625A] md:text-base">{children}</div>
     </section>
   );
 }
 
 export default function PrivacyPage() {
   return (
-    <div id="top" className="pt-28 pb-20">
-      <div className="container max-w-6xl">
-        <AnimateOnScroll>
-          <nav aria-label="Breadcrumb" className="mb-7 flex items-center gap-1.5 text-xs text-gray-400">
-            <Link href="/" className="transition-colors hover:text-[#c5a059]">Home</Link>
-            <FiChevronRight aria-hidden="true" size={13} />
-            <span>Legal</span>
-            <FiChevronRight aria-hidden="true" size={13} />
-            <span className="text-gray-200">Privacy Policy</span>
-          </nav>
-        </AnimateOnScroll>
+    <div id="top" className="pt-24 pb-20 bg-[#F5F2EB]">
+      {/* Header Banner */}
+      <section className="py-14 md:py-20 bg-[#EDE7DE] border-b border-[#DED5C7]">
+        <div className="container max-w-4xl text-center">
+          <AnimateOnScroll>
+            <nav aria-label="Breadcrumb" className="mb-4 flex items-center justify-center gap-1.5 text-xs text-[#737D73]">
+              <Link href="/" className="transition-colors hover:text-[#586348]">Home</Link>
+              <FiChevronRight aria-hidden="true" size={13} />
+              <span>Legal</span>
+              <FiChevronRight aria-hidden="true" size={13} />
+              <span className="text-[#242824] font-medium">Privacy Policy</span>
+            </nav>
+            <span className="text-xs font-bold uppercase tracking-widest text-[#586348] inline-flex items-center gap-1.5 mb-2">
+              <FiShield aria-hidden="true" size={13} /> Your Privacy Matters
+            </span>
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#242824] mt-1 mb-4">
+              Privacy Policy
+            </h1>
+            <ArchitecturalDivider />
+            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-[#5A625A] md:text-base mt-4">
+              We handle your inquiry and project information with the same care and precision we bring to every architectural space.
+            </p>
+            <p className="text-xs text-[#737D73] mt-2 font-medium">Last updated: September 6, 2026</p>
+          </AnimateOnScroll>
+        </div>
+      </section>
 
-        <AnimateOnScroll delay={60}>
-          <header className="relative overflow-hidden rounded-3xl border border-[#c5a059]/25 bg-gradient-to-br from-[#0a2540] via-[#0a2540] to-[#061a30] px-6 py-10 text-center shadow-2xl md:px-10 md:py-14">
-            <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#c5a059]/10 blur-3xl" />
-            <div className="relative mx-auto max-w-3xl space-y-4">
-              <span className="badge badge-gold inline-flex items-center gap-2"><FiShield aria-hidden="true" size={13} /> Your privacy matters</span>
-              <h1 className="text-3xl font-extrabold text-white md:text-5xl">Privacy Policy</h1>
-              <p className="mx-auto max-w-2xl text-sm leading-relaxed text-gray-300 md:text-base">
-                We handle your inquiry and project information with the same care we bring to every Banglasketch space.
-              </p>
-              <p className="text-xs text-gray-400">Last updated: September 6, 2026</p>
-            </div>
-          </header>
-        </AnimateOnScroll>
+      <div className="container max-w-6xl mt-10">
+        <div className="lg:hidden mb-6"><PrivacyNavigation mobile /></div>
 
-        <div className="mt-7"><PrivacyNavigation mobile /></div>
-
-        <div className="mt-6 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
+        <div className="grid gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start">
           <PrivacyNavigation />
           <AnimateOnScroll delay={100}>
-            <article className="rounded-3xl border border-[#c5a059]/20 bg-[#0a2540] p-6 shadow-xl md:p-10">
-              <div className="mb-8 rounded-2xl border border-[#c5a059]/15 bg-[#061a30] p-5 text-sm leading-relaxed text-gray-300">
+            <article className="rounded-3xl border border-[#DED5C7] bg-[#FCFAF7] p-6 shadow-xs md:p-10">
+              <div className="mb-8 rounded-2xl border border-[#D5DEC4] bg-[#EDF1EA] p-5 text-sm leading-relaxed text-[#383E38] font-medium">
                 This policy explains how {SITE_NAME} ({BRAND_NAME_BN}) collects and manages personal information when you browse our website, send an inquiry, or discuss an interior design project with us.
               </div>
 
@@ -119,7 +122,7 @@ export default function PrivacyPage() {
                 </PolicySection>
 
                 <PolicySection id="information" number={2} title="Information we collect">
-                  <ul className="list-disc space-y-2 pl-5 marker:text-[#c5a059]">
+                  <ul className="list-disc space-y-2 pl-5 marker:text-[#586348]">
                     <li>Contact details, such as your name, email address, and phone number, when you submit an inquiry.</li>
                     <li>Project details you choose to share, including location, room type, design requirements, budget expectations, and timeline.</li>
                     <li>Limited technical and usage information, such as browser type, pages visited, and device information, used to improve the website.</li>
@@ -159,26 +162,26 @@ export default function PrivacyPage() {
                 </PolicySection>
 
                 <PolicySection id="contact" number={11} title="Contact us">
-                  <p>If you have a privacy question or wish to make a data request, please contact us:</p>
-                  <div className="mt-4 grid gap-3 rounded-2xl border border-[#c5a059]/15 bg-[#061a30] p-4 text-sm sm:grid-cols-2">
-                    <a href={`mailto:${CONTACT.email}`} className="group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-[#c5a059]/10">
-                      <FiMail aria-hidden="true" className="shrink-0 text-[#c5a059]" size={17} />
-                      <span><span className="block text-xs text-gray-400">Email</span><span className="text-gray-100 group-hover:text-[#c5a059]">{CONTACT.email}</span></span>
+                  <p>If you have a privacy question or wish to make a data request, please contact our studio team:</p>
+                  <div className="mt-4 grid gap-3 rounded-2xl border border-[#DED5C7] bg-[#EDE7DE] p-4 text-sm sm:grid-cols-2">
+                    <a href={`mailto:${CONTACT.email}`} className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors bg-[#FCFAF7] border border-[#DED5C7] hover:border-[#586348]">
+                      <FiMail aria-hidden="true" className="shrink-0 text-[#586348]" size={17} />
+                      <span><span className="block text-xs text-[#737D73]">Email</span><span className="text-[#242824] font-medium group-hover:text-[#586348]">{CONTACT.email}</span></span>
                     </a>
-                    <a href={`tel:${CONTACT.phone}`} className="group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-[#c5a059]/10">
-                      <FiPhone aria-hidden="true" className="shrink-0 text-[#c5a059]" size={17} />
-                      <span><span className="block text-xs text-gray-400">Phone</span><span className="text-gray-100 group-hover:text-[#c5a059]">{CONTACT.phone}</span></span>
+                    <a href={`tel:${CONTACT.phone}`} className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors bg-[#FCFAF7] border border-[#DED5C7] hover:border-[#586348]">
+                      <FiPhone aria-hidden="true" className="shrink-0 text-[#586348]" size={17} />
+                      <span><span className="block text-xs text-[#737D73]">Phone</span><span className="text-[#242824] font-medium group-hover:text-[#586348]">{CONTACT.phone}</span></span>
                     </a>
-                    <p className="sm:col-span-2 px-2 pt-1 text-xs text-gray-400">{CONTACT.address}</p>
+                    <p className="sm:col-span-2 px-2 pt-1 text-xs text-[#5A625A]">{CONTACT.address}</p>
                   </div>
                 </PolicySection>
               </div>
 
-              <div className="mt-10 flex flex-col gap-4 border-t border-[#c5a059]/15 pt-6 text-sm sm:flex-row sm:items-center sm:justify-between">
-                <Link href="/terms" className="inline-flex items-center gap-1.5 font-medium text-[#c5a059] transition-colors hover:text-[#e07b2a]">
+              <div className="mt-10 flex flex-col gap-4 border-t border-[#DED5C7] pt-6 text-sm sm:flex-row sm:items-center sm:justify-between">
+                <Link href="/terms" className="inline-flex items-center gap-1.5 font-semibold text-[#586348] transition-colors hover:text-[#242824]">
                   Read our Terms of Service <FiArrowUpRight aria-hidden="true" size={15} />
                 </Link>
-                <a href="#top" className="inline-flex items-center gap-1.5 text-gray-400 transition-colors hover:text-[#c5a059]">
+                <a href="#top" className="inline-flex items-center gap-1.5 text-[#737D73] transition-colors hover:text-[#242824] font-medium">
                   Back to top <FiArrowUpRight aria-hidden="true" size={15} className="-rotate-45" />
                 </a>
               </div>

@@ -12,7 +12,7 @@ import hashlib
 import datetime
 import subprocess
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from dotenv import load_dotenv
 
@@ -21,17 +21,30 @@ load_dotenv(BASE_DIR / ".env")
 
 def get_backup_key() -> bytes:
     """Derive 32-byte AES key from BACKUP_ENCRYPTION_KEY or DJANGO_SECRET_KEY."""
-    raw_key = os.getenv("BACKUP_ENCRYPTION_KEY") or os.getenv("DJANGO_SECRET_KEY") or "banglasketch-default-backup-seed-key-32b"
-    # Ensure 32 bytes via SHA-256 derivation
-    return hashlib.sha256(raw_key.encode("utf-8")).digest()
+    raw_key = os.getenv("BACKUP_ENCRYPTION_KEY") or os.getenv("DJANGO_SECRET_KEY")
+    if not raw_key:
+        raise ValueError("Set BACKUP_ENCRYPTION_KEY or DJANGO_SECRET_KEY before creating a backup")
+    # Use PBKDF2 with a fixed salt for deterministic key derivation
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+    from cryptography.hazmat.primitives import hashes
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=b"banglasketch-backup-v1",
+        iterations=600_000,
+    )
+    return kdf.derive(raw_key.encode("utf-8"))
 
 def create_backup(output_dir: Path = None) -> Path:
+    key = get_backup_key()
     if output_dir is None:
         output_dir = BASE_DIR / "backups"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d_%H%M%SZ")
     database_url = os.getenv("DATABASE_URL")
+    if database_url and urlparse(database_url).scheme not in ("postgres", "postgresql"):
+        raise ValueError("DATABASE_URL must use postgres:// or postgresql://")
 
     raw_data: bytes = b""
     is_postgres = False
@@ -41,12 +54,15 @@ def create_backup(output_dir: Path = None) -> Path:
         parsed = urlparse(database_url)
         env = os.environ.copy()
         if parsed.password:
-            env["PGPASSWORD"] = parsed.password
+            env["PGPASSWORD"] = unquote(parsed.password)
+        env["PGSSLMODE"] = os.getenv("DB_SSL_MODE", "require")
+        if os.getenv("DB_SSL_CA_FILE"):
+            env["PGSSLROOTCERT"] = os.environ["DB_SSL_CA_FILE"]
 
         host = parsed.hostname or "localhost"
         port = str(parsed.port or 5432)
-        user = parsed.username or "postgres"
-        dbname = parsed.path.lstrip("/")
+        user = unquote(parsed.username or "postgres")
+        dbname = unquote(parsed.path.lstrip("/"))
 
         pg_dump_cmd = [
             "pg_dump",
@@ -94,7 +110,6 @@ def create_backup(output_dir: Path = None) -> Path:
     sha256_unencrypted = hashlib.sha256(compressed).hexdigest()
 
     # 2. Encrypt with AES-256-GCM
-    key = get_backup_key()
     aesgcm = AESGCM(key)
     iv = os.urandom(12)
     # encrypt returns ciphertext + 16-byte tag

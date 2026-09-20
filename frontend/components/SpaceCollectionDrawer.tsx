@@ -41,7 +41,7 @@ export function SpaceCollectionDrawer() {
     <>
       {/* Floating Trigger Pill (Fixed on bottom right above WhatsApp) */}
       <button
-        onClick={() => (isDrawerOpen ? closeDrawer() : (items.length > 0 || true) && closeDrawer(), void 0)}
+        onClick={openDrawer}
         type="button"
         aria-label="Open your Space Collection"
         className="sr-only"

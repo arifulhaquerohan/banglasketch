@@ -40,7 +40,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const backendUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const rawUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const backendUrl = rawUrl.replace(/\/+$/, "");
     try {
       const res = await fetch(`${backendUrl}/api/contact`, {
         method: "POST",

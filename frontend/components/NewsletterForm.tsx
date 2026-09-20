@@ -22,8 +22,8 @@ export function NewsletterForm() {
 
   if (status === "success") {
     return (
-      <div className="flex items-center gap-2 text-[#c5a059] text-sm">
-        <FiCheck /> Subscribed! Welcome aboard.
+      <div className="flex items-center gap-2 text-[#586348] text-sm font-medium">
+        <FiCheck /> Subscribed! Welcome to Bangla Sketch Journal.
       </div>
     );
   }
@@ -31,12 +31,12 @@ export function NewsletterForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
       <div className="flex gap-2">
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" className="input text-sm py-2 flex-1" required aria-label="Email address for newsletter" />
-        <button type="submit" disabled={status === "loading"} className="btn btn-primary px-4 py-2 text-sm" aria-label="Subscribe to newsletter">
-          {status === "loading" ? <span className="w-4 h-4 border-2 border-navy/30 border-t-navy rounded-full animate-spin" /> : <FiSend size={14} />}
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" className="input text-sm py-2.5 flex-1 bg-[#FCFAF7] border-[#DED5C7] text-[#242824] placeholder:text-[#8C948C]" required aria-label="Email address for newsletter" />
+        <button type="submit" disabled={status === "loading"} className="btn btn-primary px-4 py-2.5 text-sm" aria-label="Subscribe to newsletter">
+          {status === "loading" ? <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <FiSend size={14} />}
         </button>
       </div>
-      {status === "error" && <p role="alert" className="flex items-center gap-1.5 text-xs text-red-300"><FiAlertCircle /> We could not subscribe you right now. Please try again.</p>}
+      {status === "error" && <p role="alert" className="flex items-center gap-1.5 text-xs text-red-400"><FiAlertCircle /> We could not subscribe you right now. Please try again.</p>}
     </form>
   );
 }

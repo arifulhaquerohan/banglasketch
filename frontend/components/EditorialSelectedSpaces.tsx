@@ -200,15 +200,15 @@ export function EditorialSelectedSpaces() {
         <div className="max-w-3xl mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF7F2] border border-[#DDD5C8] text-[11px] font-semibold tracking-widest uppercase text-[#727A61] mb-3">
             <span className="w-2 h-2 rounded-full bg-[#A45138]" />
-            <span>Curated Portfolio</span>
+            <span>Selected Homes</span>
           </div>
 
           <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#242622] tracking-tight leading-[1.15]">
-            Selected Spaces
+            Recent Projects
           </h2>
 
           <p className="text-base sm:text-lg text-[#5A6057] mt-3 leading-relaxed">
-            An editorial study of recent interior architectural handovers. Each project represents a unique spatial equation resolved through craftsmanship, authentic materials, and quiet restraint.
+            Each project tells a story — the client&apos;s need, our design approach, and the finished result. Explore the materials, craftsmanship, and thinking behind these Dhaka homes.
           </p>
         </div>
 

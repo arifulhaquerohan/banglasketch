@@ -31,10 +31,10 @@ export default function ClientProjectsListPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#242824]">
+          <h1 className="font-serif text-2xl md:text-3xl font-bold text-admin-ink">
             Active Client Projects
           </h1>
-          <p className="text-xs md:text-sm text-[#5A625A] mt-1">
+          <p className="text-xs md:text-sm text-admin-muted mt-1">
             Track project milestones, versioned proposal signoffs, and scope change orders.
           </p>
         </div>
@@ -43,15 +43,15 @@ export default function ClientProjectsListPage() {
       {loading ? (
         <div className="p-12 text-center text-sm text-[#788278]">Loading client projects...</div>
       ) : projects.length === 0 ? (
-        <div className="p-12 text-center bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl">
+        <div className="p-12 text-center bg-admin-surface border border-admin-border rounded-3xl">
           <FiBriefcase className="mx-auto text-[#788278] mb-3" size={32} />
-          <h3 className="font-serif text-lg font-bold text-[#242824]">No active projects yet</h3>
-          <p className="text-xs text-[#5A625A] max-w-md mx-auto mt-1">
+          <h3 className="font-serif text-lg font-bold text-admin-ink">No active projects yet</h3>
+          <p className="text-xs text-admin-muted max-w-md mx-auto mt-1">
             When a client approves a proposal in the Pipeline, promote their enquiry to create an active project.
           </p>
           <Link
             href="/admin/enquiries"
-            className="mt-4 inline-block px-4 py-2 bg-[#586348] text-white rounded-xl text-xs font-semibold hover:bg-[#444D37]"
+            className="mt-4 inline-block px-4 py-2 bg-admin-primary text-white rounded-xl text-xs font-semibold hover:bg-admin-hover"
           >
             View Client Pipeline
           </Link>
@@ -61,11 +61,11 @@ export default function ClientProjectsListPage() {
           {projects.map((project) => (
             <div
               key={project.id}
-              className="bg-[#FCFAF7] border border-[#DED5C7] rounded-3xl p-5 flex flex-col justify-between hover:border-[#586348] transition-all"
+              className="bg-admin-surface border border-admin-border rounded-3xl p-5 flex flex-col justify-between hover:border-admin-primary transition-all"
             >
               <div>
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase bg-[#586348]/15 text-[#586348] border border-[#D5DEC4]">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase bg-admin-primary/15 text-admin-primary border border-[#D5DEC4]">
                     {project.stage.replace(/_/g, " ")}
                   </span>
                   {(project.pending_change_orders_count ?? 0) > 0 && (
@@ -77,12 +77,12 @@ export default function ClientProjectsListPage() {
 
                 <Link
                   href={`/admin/client-projects/${project.id}`}
-                  className="font-serif text-lg font-bold text-[#242824] hover:text-[#586348] transition-colors block line-clamp-1"
+                  className="font-serif text-lg font-bold text-admin-ink hover:text-admin-primary transition-colors block line-clamp-1"
                 >
                   {project.title}
                 </Link>
 
-                <p className="text-xs text-[#5A625A] mt-1 font-medium">
+                <p className="text-xs text-admin-muted mt-1 font-medium">
                   Client: {project.client_name} ({project.client_phone})
                 </p>
 
@@ -90,13 +90,13 @@ export default function ClientProjectsListPage() {
                 <div className="mt-4 pt-3 border-t border-[#EBE4D8] space-y-1.5 text-xs">
                   <div>
                     <span className="text-[11px] text-[#788278] block">Current Milestone:</span>
-                    <span className="font-semibold text-[#242824]">
+                    <span className="font-semibold text-admin-ink">
                       {project.current_milestone || "Concept & Planning"}
                     </span>
                   </div>
                   <div>
                     <span className="text-[11px] text-[#788278] block">Next Milestone:</span>
-                    <span className="text-[#5A625A]">
+                    <span className="text-admin-muted">
                       {project.next_milestone || "Detailed Architectural Drawing"}
                     </span>
                   </div>
@@ -105,7 +105,7 @@ export default function ClientProjectsListPage() {
                 {/* Agreed baseline budget */}
                 <div className="mt-4 p-3 bg-white border border-[#EBE4D8] rounded-xl flex items-center justify-between">
                   <span className="text-[11px] text-[#788278] font-medium">Agreed Budget:</span>
-                  <span className="text-sm font-bold text-[#242824]">
+                  <span className="text-sm font-bold text-admin-ink">
                     BDT {Number(project.agreed_budget).toLocaleString()}
                   </span>
                 </div>
@@ -117,7 +117,7 @@ export default function ClientProjectsListPage() {
                 </span>
                 <Link
                   href={`/admin/client-projects/${project.id}`}
-                  className="px-3 py-1.5 bg-[#586348] text-white rounded-xl text-xs font-semibold flex items-center gap-1 hover:bg-[#444D37]"
+                  className="px-3 py-1.5 bg-admin-primary text-white rounded-xl text-xs font-semibold flex items-center gap-1 hover:bg-admin-hover"
                 >
                   <span>Manage</span>
                   <FiArrowRight size={13} />
