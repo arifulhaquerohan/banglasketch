@@ -1,14 +1,30 @@
-# Bangla Sketch (বাংলা স্কেচ) — Interior Design Platform
+# Bangla Sketch
 
-Official production web application and Content Management System for **Bangla Sketch**, Dhaka's premier luxury interior design studio.
+### বাংলা স্কেচ · Interior spaces with soul
 
-## Feature Screenshots
-
-The gallery below documents the responsive public website and the CMS admin panel included in this project. These previews were captured from the local production build.
-
-### Public website
+Bangla Sketch is a production-ready interior design platform and content management system for a luxury design studio in Dhaka. It brings the public portfolio, editorial journal, lead capture, design assistant, and secure operations dashboard into one carefully crafted experience.
 
 ![Bangla Sketch desktop homepage](docs/previews/website-desktop.png)
+
+<p align="center"><a href="#highlights">Highlights</a> · <a href="#screenshots">Screenshots</a> · <a href="#local-development">Run locally</a> · <a href="docs/DEPLOYMENT_GUIDE.md">Deployment guide</a></p>
+
+## Highlights
+
+| Public experience | Studio operations |
+| --- | --- |
+| Editorial portfolio with project detail pages | Secure admin dashboard with protected routes |
+| Blog and design journal with SEO metadata | Projects, blog, videos, testimonials, and clients |
+| Guided enquiry and design brief forms | Site-visit booking and availability management |
+| Cost estimator and conversational design assistant | Media uploads, version history, restore, and trash |
+| Responsive mobile-first layouts | Rate limits, audit trails, and database constraints |
+
+The platform is designed for real enquiries: submissions are persisted safely, email work is processed asynchronously, and Cloudinary handles optimized project media.
+
+## Screenshots
+
+The previews below were captured from the local production build.
+
+### Public website
 
 <img src="docs/previews/website-mobile.png" alt="Bangla Sketch mobile homepage" width="390" />
 
@@ -18,31 +34,22 @@ The gallery below documents the responsive public website and the CMS admin pane
 
 <img src="docs/previews/admin-mobile.png" alt="Bangla Sketch admin dashboard on mobile" width="390" />
 
-The admin panel includes project, blog, video, testimonial, enquiry, contact, client-project, site-visit booking, settings, security, media upload, version history, and trash management screens.
+## Technology
 
-## Architecture
+- **Frontend:** Next.js 15 App Router, React 19, TypeScript, Tailwind CSS, Framer Motion
+- **Backend:** Django REST Framework, PostgreSQL, JWT authentication, Bcrypt
+- **Media:** Cloudinary upload signatures with WebP/AVIF optimization
+- **Operations:** PM2, Nginx, Gunicorn, cPanel-compatible Node runner
 
-- **Frontend:** Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Next/Image, Next/Link.
-- **Backend:** Django REST Framework, PostgreSQL, JWT, Bcrypt.
-- **Media:** Cloudinary with automatic WebP/AVIF compression pipeline.
-- **Directory Structure:** See [STRUCTURE.md](docs/STRUCTURE.md) for full project layout and developer architecture guide.
-- **Security:**
-  - Next.js Edge Middleware route guards on `/admin/*`.
-  - Server-verified `httpOnly`, `sameSite: strict`, `secure` session cookies.
-  - Zero exposure of bearer tokens or administrative secrets in client bundles or storage.
-  - Strict SQL parameterization and schema allowlists on dynamic filters.
-  - Rate limiting on public lead capture endpoints.
+## Local development
 
----
-
-## Getting Started
-
-### Prerequisites
+### Requirements
 
 - Node.js 22+
-- PostgreSQL database instance
+- Python 3.12+
+- PostgreSQL
 
-### 1. Backend Setup
+### Backend
 
 ```bash
 cd django_backend
@@ -50,15 +57,13 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-# Configure the database and secrets in .env before continuing.
+# Configure database and secrets in .env
 python manage.py migrate
 python manage.py setup_admin
 python manage.py runserver 5000
 ```
 
-See [backend setup and operations](django_backend/README.md) for database compatibility and deployment details.
-
-### 2. Frontend Setup
+### Frontend
 
 ```bash
 cd frontend
@@ -67,43 +72,43 @@ npm install
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) for the public site and [http://localhost:3000/admin](http://localhost:3000/admin) for the administrative CMS.
+Open [localhost:3000](http://localhost:3000) for the public site and [localhost:3000/admin](http://localhost:3000/admin) for the CMS.
 
----
+## Quality and security
 
-## Production Build & Deployment
+- `npm test --prefix frontend` runs frontend regression coverage.
+- `npm run lint --prefix frontend` checks the Next.js codebase.
+- `npm run build --prefix frontend` creates the production bundle.
+- Admin sessions use secure, server-verified cookies and middleware route guards.
+- Public lead endpoints use validation, honeypot checks, rate limiting, and durable database writes.
+- Dynamic filters are parameterized and constrained by explicit allowlists.
 
-### Build Frontend
+## Production
+
 ```bash
 cd frontend
 npm run build
 npm run start
 ```
 
-### Run Backend in Production
 ```bash
 cd django_backend
-DJANGO_SETTINGS_MODULE=config.settings.production .venv/bin/gunicorn config.wsgi:application --bind 127.0.0.1:5000 --workers 3
+DJANGO_SETTINGS_MODULE=config.settings.production \
+  .venv/bin/gunicorn config.wsgi:application \
+  --bind 127.0.0.1:5000 --workers 3
 ```
 
----
+Read the [deployment guide](docs/DEPLOYMENT_GUIDE.md), [backend operations guide](django_backend/README.md), and [hardening notes](docs/BACKEND_HARDENING.md) before deploying.
 
-## Features & Highlights
+## Repository map
 
-1. **Full CMS Functionality:**
-   - Manage Projects, Blog Posts (with rich markdown parsing), Videos, Testimonials, Contact Submissions, and Global Settings.
-2. **Maintenance Mode:**
-   - Multi-mode configurable maintenance system (modal dialog, top banner, or fullscreen takeover) with emergency WhatsApp and phone links.
-3. **Durable Lead Capture:**
-   - Submissions to contact and newsletter endpoints are safely stored in PostgreSQL; email notifications are dispatched asynchronously without blocking or dropping user requests.
-4. **SEO & Discoverability:**
-   - Dynamic XML sitemaps (`/sitemap.xml`) reflecting published projects and posts.
-   - Search engine crawling directives (`/robots.txt`).
-   - JSON-LD LocalBusiness / InteriorDesignService structured schemas.
-5. **Accessibility:**
-   - WCAG-compliant skip links.
-   - Slider controls with full ARIA semantics and keyboard navigation (`ArrowLeft`, `ArrowRight`, `Home`, `End`).
-   - Accessible modal focus trapping and `Escape` key handlers.
-   - High-contrast visual focus indicators and `prefers-reduced-motion` support.
+```text
+frontend/        Next.js website and admin CMS
+django_backend/  Django API, authentication, lead workflows
+shared/          Shared service configuration
+docs/            Architecture, deployment, and visual previews
+```
 
-See [backend security and scaling deployment notes](docs/BACKEND_HARDENING.md) before deploying an existing installation.
+## License
+
+Private product source for Bangla Sketch. Contact the project owner before reusing brand assets, copy, or production data.
