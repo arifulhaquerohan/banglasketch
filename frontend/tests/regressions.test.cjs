@@ -76,3 +76,33 @@ test("browser voices and overlay body styles are restored safely", () => {
   assert.match(lightbox, /document\.body\.style\.overflow = previousOverflow/);
   assert.match(lightbox, /document\.body\.style\.touchAction = previousTouchAction/);
 });
+
+const { invoiceTotals } = require("../app/admin/invoices/calculations.ts");
+test("invoice discounts apply before tax and deposits reduce the balance", () => {
+  const totals = invoiceTotals([{ quantity: 2, rate: 1250, description: "Design" }, { quantity: 1.5, rate: 100, description: "Visit" }], 10, 15, 1000);
+  assert.deepEqual(totals, { lines: [2500, 150], subtotal: 2650, discount: 265, tax: 357.75, total: 2742.75, due: 1742.75, credit: 0 });
+});
+test("invoice rounds line prices and shows overpayments as credit", () => {
+  const totals = invoiceTotals([{ quantity: 3, rate: 0.1, description: "Item" }], 0, 0, 1);
+  assert.equal(totals.total, 0.3);
+  assert.equal(totals.due, 0);
+  assert.equal(totals.credit, 0.7);
+  assert.equal(invoiceTotals([{ quantity: 1, rate: 100, description: "Item" }], 100, 15, 0).total, 0);
+});
+
+test("invoice half-cent products match backend decimal ROUND_HALF_UP", () => {
+  assert.equal(invoiceTotals([{ quantity: 0.03, rate: 72.50, description: "Fraction" }], 0, 0, 0).total, 2.18);
+  // Exhaustively cover two-decimal quantities/rates around half-cent boundaries.
+  for (let q = 1; q <= 100; q++) for (let r = 1; r <= 1000; r++) {
+    const expected = Math.floor((q * r + 50) / 100) / 100;
+    assert.equal(invoiceTotals([{ quantity: q / 100, rate: r / 100, description: "Item" }], 0, 0, 0).total, expected);
+  }
+});
+
+const { adminReturnPath } = require("../lib/admin-return-path.ts");
+test("login only redirects to local admin pages", () => {
+  assert.equal(adminReturnPath("/admin/invoices?view=recent"), "/admin/invoices?view=recent");
+  for (const path of [null, "javascript:alert(1)", "https://evil.example", "//evil.example", "/\\evil.example", "/admin/../../contact", "/admin/login", "/administer", " /admin"]) {
+    assert.equal(adminReturnPath(path), "/admin");
+  }
+});

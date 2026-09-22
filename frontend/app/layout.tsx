@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
-import {
-  Instrument_Serif,
-  Manrope,
-  Noto_Serif_Bengali,
-  Noto_Sans_Bengali,
-} from "next/font/google";
+import localFont from "next/font/local";
 import { ChatWidget } from "../components/ChatWidget";
 import { FloatingWhatsApp } from "../components/FloatingWhatsApp";
 import { Footer } from "../components/Footer";
@@ -15,29 +10,30 @@ import { SpaceCollectionProvider } from "../components/SpaceCollectionContext";
 import { SpaceCollectionDrawer } from "../components/SpaceCollectionDrawer";
 import "../styles/globals.css";
 
-const instrumentSerif = Instrument_Serif({
+const instrumentSerif = localFont({
+  src: "./fonts/instrument-serif.ttf",
   weight: "400",
-  subsets: ["latin"],
   variable: "--font-instrument",
   display: "swap",
 });
 
-const manrope = Manrope({
-  subsets: ["latin"],
+const manrope = localFont({
+  src: "./fonts/manrope.ttf",
+  weight: "200 800",
   variable: "--font-manrope",
   display: "swap",
 });
 
-const notoSerifBengali = Noto_Serif_Bengali({
-  subsets: ["bengali"],
-  weight: ["400", "600", "700"],
+const notoSerifBengali = localFont({
+  src: "./fonts/noto-serif-bengali.ttf",
+  weight: "100 900",
   variable: "--font-serif-bn",
   display: "swap",
 });
 
-const notoSansBengali = Noto_Sans_Bengali({
-  subsets: ["bengali"],
-  weight: ["400", "500", "600"],
+const notoSansBengali = localFont({
+  src: "./fonts/noto-sans-bengali.ttf",
+  weight: "100 900",
   variable: "--font-sans-bn",
   display: "swap",
 });

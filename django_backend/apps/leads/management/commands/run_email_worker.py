@@ -1,9 +1,10 @@
 import time
 import signal
 import sys
+import datetime
 import logging
 from django.core.management.base import BaseCommand
-from django.db import transaction
+from django.db import connection, transaction
 from django.utils import timezone
 from apps.leads.models import ContactEmailJob
 from apps.leads.services.email import process_email_job
@@ -63,36 +64,50 @@ class Command(BaseCommand):
                 time.sleep(interval)
 
     def process_batch(self, limit: int) -> int:
-        now = timezone.now()
         processed = 0
 
-        # Fetch candidate job IDs using SKIP LOCKED in transaction
-        with transaction.atomic():
-            jobs = list(
-                ContactEmailJob.objects.select_for_update(of=("self",), skip_locked=True)
-                .filter(
+        for _ in range(limit):
+            now = timezone.now()
+            with transaction.atomic():
+                qs = ContactEmailJob.objects.filter(
                     delivered_at__isnull=True,
                     attempts__lt=8,
                     available_at__lte=now,
-                )
-                .select_related("submission", "site_visit_booking")[:limit]
-            )
+                ).order_by("available_at", "id")
 
-            for job in jobs:
-                try:
-                    success = process_email_job(job)
-                    if success:
-                        target = f"submission #{job.submission_id}" if job.submission_id else f"site visit #{job.site_visit_booking_id}"
-                        self.stdout.write(self.style.SUCCESS(
-                            f"Delivered job #{job.id} ({job.kind}) for {target}"
-                        ))
-                    else:
-                        self.stdout.write(self.style.WARNING(
-                            f"Retrying job #{job.id} ({job.kind}) on next cycle (attempt #{job.attempts})"
-                        ))
-                    processed += 1
-                except Exception as e:
-                    logger.exception(f"Unexpected error processing job #{job.id}: {e}")
-                    self.stdout.write(self.style.ERROR(f"Error processing job #{job.id}: {e}"))
+                if connection.features.has_select_for_update_skip_locked:
+                    qs = qs.select_for_update(of=("self",), skip_locked=True)
+                else:
+                    qs = qs.select_for_update()
+
+                job_id = qs.values_list("id", flat=True).first()
+                if not job_id:
+                    break
+
+                # Advance available_at immediately so concurrent workers won't pick it up
+                ContactEmailJob.objects.filter(pk=job_id).update(
+                    available_at=now + datetime.timedelta(minutes=5)
+                )
+
+            job = ContactEmailJob.objects.select_related("submission", "site_visit_booking").filter(pk=job_id).first()
+            if not job:
+                continue
+
+            # Process outside active DB transaction to avoid connection starvation during SMTP I/O
+            try:
+                success = process_email_job(job)
+                if success:
+                    target = f"submission #{job.submission_id}" if job.submission_id else f"site visit #{job.site_visit_booking_id}"
+                    self.stdout.write(self.style.SUCCESS(
+                        f"Delivered job #{job.id} ({job.kind}) for {target}"
+                    ))
+                else:
+                    self.stdout.write(self.style.WARNING(
+                        f"Retrying job #{job.id} ({job.kind}) on next cycle (attempt #{job.attempts})"
+                    ))
+                processed += 1
+            except Exception as e:
+                logger.exception(f"Unexpected error processing job #{job.id}: {e}")
+                self.stdout.write(self.style.ERROR(f"Error processing job #{job.id}: {e}"))
 
         return processed

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { FiCheckCircle, FiCompass, FiFeather, FiLayers, FiShield, FiHeart, FiAward, FiArrowRight } from "react-icons/fi";
@@ -5,6 +6,16 @@ import { STATS, SAMPLE_TESTIMONIALS } from "../../lib/constants";
 import { TestimonialCard } from "../../components/TestimonialCard";
 import { AnimateOnScroll } from "../../components/AnimateOnScroll";
 import { ArchitecturalDivider } from "../../components/ServiceIcons";
+
+export const metadata: Metadata = {
+  title: "About Us • Bangla Sketch Architectural Studio",
+  description: "Learn about Bangla Sketch's 10+ years of architectural practice, design philosophy, and commitment to bespoke interior architecture in Dhaka.",
+  openGraph: {
+    title: "About Bangla Sketch • Architectural Studio Dhaka",
+    description: "10+ years of dedicated architectural & interior practice in Dhaka. Over 200 bespoke handovers completed.",
+    images: [{ url: "/logo-512.png", width: 512, height: 512 }],
+  },
+};
 
 const PHILOSOPHIES = [
   {

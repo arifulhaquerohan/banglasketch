@@ -1,17 +1,42 @@
 """Validated, metadata-scrubbed uploads for public website images only."""
 from io import BytesIO
+from pathlib import Path
 import re
 import uuid
 import warnings
 
 import cloudinary.uploader
 from django.conf import settings
-from PIL import Image, ImageOps, UnidentifiedImageError
+from PIL import Image, ImageOps, ImageStat, UnidentifiedImageError
 from rest_framework.exceptions import ValidationError
 
 MAX_BYTES = 10 * 1024 * 1024
 MAX_PIXELS = 40_000_000
 FORMATS = {"JPEG", "PNG", "WEBP", "AVIF"}
+WATERMARK_PATH = Path(__file__).resolve().parent.parent / "assets" / "watermark.png"
+
+
+def _watermarked_copy(image):
+    """Apply a discreet, contrast-aware brand mark within the top-right corner."""
+    canvas = image.convert("RGBA")
+    with Image.open(WATERMARK_PATH) as source:
+        mark = source.convert("RGBA")
+    margin = max(1, round(min(canvas.size) * 0.025))
+    width = max(1, min(320, round(canvas.width * 0.18), canvas.width - 2 * margin))
+    height = max(1, min(round(canvas.height * 0.22), canvas.height - 2 * margin))
+    mark.thumbnail((width, height), Image.Resampling.LANCZOS)
+    x = max(0, canvas.width - margin - mark.width)
+    y = min(margin, canvas.height - mark.height)
+    region = canvas.crop((x, y, x + mark.width, y + mark.height))
+    # Match the appearance of transparent photos on a light website background.
+    background = Image.new("RGBA", region.size, "white")
+    background.alpha_composite(region)
+    brightness = ImageStat.Stat(background.convert("L")).mean[0]
+    color = (255, 255, 255) if brightness < 145 else (25, 32, 27)
+    overlay = Image.new("RGBA", mark.size, color)
+    overlay.putalpha(mark.getchannel("A").point(lambda alpha: round(alpha * 0.38)))
+    canvas.alpha_composite(overlay, (x, y))
+    return canvas
 
 
 def _sanitized_copy(file_obj):
@@ -21,6 +46,7 @@ def _sanitized_copy(file_obj):
         source.load()
         image_format = source.format
         clean = ImageOps.exif_transpose(source)
+        clean = _watermarked_copy(clean)
         if image_format == "JPEG" and clean.mode not in ("RGB", "L"):
             clean = clean.convert("RGB")
 

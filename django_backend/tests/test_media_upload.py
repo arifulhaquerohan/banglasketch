@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase, override_settings
-from PIL import Image
+from PIL import Image, ImageChops
 from rest_framework.test import APIRequestFactory, force_authenticate
 from apps.authentication.models import AdminUser
 from apps.core.views import AdminUploadView, AdminCloudinarySignView
@@ -11,6 +11,38 @@ from apps.core.views import AdminUploadView, AdminCloudinarySignView
 
 @override_settings(CLOUDINARY_CLOUD_NAME="test", CLOUDINARY_API_KEY="test", CLOUDINARY_API_SECRET="test")
 class MediaUploadTests(SimpleTestCase):
+    @patch("apps.core.services.media_upload.cloudinary.uploader.upload")
+    def test_watermark_is_saved_in_top_right_on_light_and_dark_photos(self, upload):
+        upload.return_value = {"secure_url": "https://example.com/photo.png", "public_id": "photo"}
+        for color in ("white", "black"):
+            with self.subTest(color=color):
+                original = Image.new("RGB", (1000, 700), color)
+                data = BytesIO()
+                original.save(data, "PNG")
+                response = self.request(SimpleUploadedFile("photo.png", data.getvalue(), content_type="image/png"))
+                self.assertEqual(response.status_code, 200)
+                with Image.open(upload.call_args.args[0]) as stored:
+                    self.assertEqual(stored.size, original.size)
+                    difference = ImageChops.difference(stored.convert("RGB"), original)
+                    bounds = difference.getbbox()
+                    self.assertIsNotNone(bounds)
+                    left, top, right, bottom = bounds
+                    self.assertGreaterEqual(left, 800)
+                    self.assertGreater(top, 0)
+                    self.assertLess(right, 1000)
+                    self.assertLess(bottom, 175)
+                    # Branding is translucent, never a solid black/white stamp.
+                    self.assertLess(max(hi for lo, hi in difference.getextrema()), 110)
+
+    def test_watermark_preserves_transparency_and_handles_small_images(self):
+        from apps.core.services.media_upload import _watermarked_copy
+        for size in ((1, 1), (2, 2), (20, 1000), (1000, 20), (1000, 700)):
+            with self.subTest(size=size):
+                result = _watermarked_copy(Image.new("RGBA", size))
+                self.assertEqual(result.size, size)
+                self.assertEqual(result.mode, "RGBA")
+                self.assertLessEqual(result.getchannel("A").getextrema()[1], 97)
+
     def request(self, file=None, role="editor", folder="projects"):
         request = APIRequestFactory().post("/api/admin/upload", {
             "file": file or self.image(), "folder": folder,

@@ -1,9 +1,20 @@
+import type { Metadata } from "next";
 import { ContactTabs } from "../../components/ContactTabs";
 import { AnimateOnScroll } from "../../components/AnimateOnScroll";
 import { ArchitecturalDivider } from "../../components/ServiceIcons";
 import { CONTACT, SOCIAL } from "../../lib/constants";
 import { FiPhone, FiMail, FiMapPin, FiFacebook, FiInstagram, FiYoutube, FiCheckCircle } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
+
+export const metadata: Metadata = {
+  title: "Contact Us • Bangla Sketch Architectural Studio",
+  description: "Get in touch with Bangla Sketch for residential and commercial interior architectural consultations and site visit bookings in Dhaka.",
+  openGraph: {
+    title: "Contact Bangla Sketch • Architectural Studio Dhaka",
+    description: "Begin your architectural journey with Bangla Sketch. Book site visits and consultation.",
+    images: [{ url: "/logo-512.png", width: 512, height: 512 }],
+  },
+};
 
 export default function ContactPage() {
   return (

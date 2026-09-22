@@ -13,6 +13,19 @@ module.exports = {
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "Content-Security-Policy", value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'" },
       ],
+    }, {
+      source: "/portal/:path*",
+      headers: [
+        { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        { key: "Referrer-Policy", value: "no-referrer" },
+        { key: "Cache-Control", value: "private, no-store" },
+      ],
+    }, {
+      source: "/admin/:path*",
+      headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+    }, {
+      source: "/api/v1/portal/:path*",
+      headers: [{ key: "Cache-Control", value: "private, no-store" }],
     }];
   },
   images: {

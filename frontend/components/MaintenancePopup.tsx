@@ -198,7 +198,7 @@ export function MaintenancePopup() {
             <div className="absolute inset-0 rounded-full bg-[#586348] blur-xl opacity-30 animate-pulse" />
             <div className="relative w-32 h-32 mx-auto rounded-full shadow-2xl p-3 bg-[#383E38] border border-[#586348]/40 flex items-center justify-center">
               <Image
-                src="/logo-icon.svg"
+                src="/brand-icon.png"
                 alt="Bangla Sketch Logo"
                 width={128}
                 height={128}
@@ -308,7 +308,7 @@ export function MaintenancePopup() {
             </button>
           )}
           <div className="relative flex items-center gap-3.5 pr-10">
-            <Image src="/logo-icon.svg" alt="Bangla Sketch" width={56} height={56} className="h-14 w-14 shrink-0 object-contain" />
+            <Image src="/brand-icon.png" alt="Bangla Sketch" width={56} height={56} className="h-14 w-14 shrink-0 object-contain" />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ivory-light">Bangla Sketch</p>
               <p className="mt-1.5 text-xs text-gold">Thoughtful spaces. Beautiful living.</p>

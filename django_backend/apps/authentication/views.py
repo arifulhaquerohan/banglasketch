@@ -374,43 +374,33 @@ class AdminVerifyResetOTPView(APIView):
         target_email = reset_entry.email or email
         user = AdminUser.objects.filter(email=target_email, active=True).first()
 
-        # If a new password is provided (complete reset step)
-        if new_password:
+        if not new_password:
+            return Response({"success": False, "error": "New password is required to reset your account."}, status=400)
+
+        try:
+            validate_password(new_password)
+        except DjangoValidationError as e:
+            return Response({"success": False, "error": " ".join(e.messages)}, status=400)
+
+        if user:
+            user.set_password(new_password)
+            user.token_version += 1
+            user.save(update_fields=["password_hash", "token_version", "updated_at"])
+
             try:
-                validate_password(new_password)
-            except DjangoValidationError as e:
-                return Response({"success": False, "error": " ".join(e.messages)}, status=400)
+                AdminCredential.objects.update_or_create(
+                    id=1,
+                    defaults={"password_hash": user.password_hash, "version": user.token_version}
+                )
+            except Exception as e:
+                logger.error(f"Failed to update admin credentials: {e}")
 
-            if user:
-                user.set_password(new_password)
-                user.token_version += 1
-                user.save(update_fields=["password_hash", "token_version", "updated_at"])
-
-                try:
-                    AdminCredential.objects.update_or_create(
-                        id=1,
-                        defaults={"password_hash": user.password_hash, "version": user.token_version}
-                    )
-                except Exception as e:
-                    logger.error(f"Failed to update admin credentials: {e}")
-
-            reset_entry.used = True
-            reset_entry.save(update_fields=["used"])
-
-            return Response({
-                "success": True,
-                "message": "Master password has been reset successfully.",
-            })
-
-        # If only verifying the OTP code (two-step flow)
-        reset_token = secrets.token_hex(32)
         reset_entry.used = True
         reset_entry.save(update_fields=["used"])
 
         return Response({
             "success": True,
-            "resetToken": reset_token,
-            "email": target_email,
+            "message": "Master password has been reset successfully.",
         })
 
 

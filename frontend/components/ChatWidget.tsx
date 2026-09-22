@@ -1343,7 +1343,7 @@ export function ChatWidget() {
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="relative shrink-0">
                     <Image
-                      src="/logo-icon.svg"
+                      src="/brand-icon.png"
                       alt="Bangla Sketch logo"
                       width={38}
                       height={38}
@@ -1719,7 +1719,7 @@ export function ChatWidget() {
                         {!isUser && (
                           <div className="flex items-center gap-1.5 mb-1 px-1">
                             <Image
-                              src="/logo-icon.svg"
+                              src="/brand-icon.png"
                               alt=""
                               width={18}
                               height={18}
@@ -1844,7 +1844,7 @@ export function ChatWidget() {
                   {isSending && (
                     <div className="flex items-start gap-2 animate-fade-in">
                       <Image
-                        src="/logo-icon.svg"
+                        src="/brand-icon.png"
                         alt=""
                         width={18}
                         height={18}

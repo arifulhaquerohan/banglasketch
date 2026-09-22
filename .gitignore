@@ -180,21 +180,14 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+# Python virtual environments & build artifacts
 .venv/
 */.venv/
 venv/
 ENV/
 env/
+django_backend/lib/
+django_backend/lib64/
+parts/
 *.sqlite3
 *.db

@@ -178,7 +178,8 @@ export function TestimonialsWithProof() {
 
                       <Link
                         href={`/portfolio/${story.projectSlug}`}
-                        className="text-xs font-semibold text-[#A45138] hover:underline flex items-center gap-1"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-xs font-semibold text-[#A45138] hover:underline flex items-center gap-1 focus:outline-none focus:ring-1 focus:ring-[#A45138] rounded-sm"
                       >
                         Space <FiArrowRight size={11} />
                       </Link>

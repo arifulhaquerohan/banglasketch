@@ -32,8 +32,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
     const res = await fetch(`${getBackendUrl()}/api/admin/${subpath}${search}`, {
       headers: { ...proxyHeaders(req), Authorization: `Bearer ${token}` },
       cache: "no-store",
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(subpath.startsWith("invoices") ? 90000 : 10000),
     });
+    if (res.ok && /^invoices\/[a-f0-9-]+\/pdf$/.test(subpath) && res.headers.get("content-type")?.includes("application/pdf")) {
+      return new NextResponse(res.body, { status: res.status, headers: {
+        "Content-Type": "application/pdf", "Cache-Control": "private, no-store",
+        "Content-Disposition": res.headers.get("content-disposition") || "inline",
+        "X-Content-Type-Options": "nosniff",
+      } });
+    }
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
   } catch (err: unknown) {
@@ -60,7 +67,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(subpath.startsWith("invoices") ? 90000 : 10000),
     });
     const data = await res.json();
     if (res.ok) invalidateContent(subpath);
@@ -89,7 +96,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ path
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(subpath.startsWith("invoices") ? 90000 : 10000),
     });
     const data = await res.json();
     if (res.ok) invalidateContent(subpath);
@@ -118,7 +125,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pa
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(subpath.startsWith("invoices") ? 90000 : 10000),
     });
     const data = await res.json();
     if (res.ok) invalidateContent(subpath);
@@ -141,7 +148,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ p
     const res = await fetch(`${getBackendUrl()}/api/admin/${subpath}`, {
       method: "DELETE",
       headers: { ...proxyHeaders(req), Authorization: `Bearer ${token}` },
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(subpath.startsWith("invoices") ? 90000 : 10000),
     });
     const data = await res.json();
     if (res.ok) invalidateContent(subpath);

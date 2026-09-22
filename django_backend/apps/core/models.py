@@ -107,3 +107,31 @@ class RateLimitCounter(models.Model):
 
     def __str__(self):
         return f"{self.key}: {self.hits} hits"
+
+
+class Invoice(models.Model):
+    """Editable invoice record; each successful save has an immutable PDF revision."""
+    id = models.UUIDField(primary_key=True, editable=False)
+    number = models.CharField(max_length=80, unique=True)
+    payload = models.JSONField(default=dict)
+    revision = models.PositiveIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "invoices"
+        ordering = ["-updated_at"]
+
+
+class InvoiceRevision(models.Model):
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="revisions")
+    revision = models.PositiveIntegerField()
+    payload = models.JSONField()
+    fingerprint = models.CharField(max_length=64)
+    cloudinary_public_id = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    actor = models.ForeignKey(AdminUser, on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        db_table = "invoice_revisions"
+        constraints = [models.UniqueConstraint(fields=["invoice", "revision"], name="unique_invoice_revision")]

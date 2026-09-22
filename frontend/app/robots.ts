@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin/", "/api/"],
+      disallow: ["/admin", "/api/", "/portal/"],
     },
     sitemap: "https://banglasketch.com/sitemap.xml",
     host: "https://banglasketch.com",

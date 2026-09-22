@@ -1,4 +1,5 @@
 from django.urls import path, re_path
+from .invoice_views import AdminInvoicesView, AdminInvoiceDetailView, AdminInvoicePDFView
 from .views import (
     HealthCheckView,
     HealthLiveView,
@@ -20,6 +21,9 @@ core_public_urlpatterns = [
 ]
 
 core_admin_urlpatterns = [
+    re_path(r"^invoices/?$", AdminInvoicesView.as_view(), name="admin_invoices"),
+    path("invoices/<uuid:invoice_id>/pdf", AdminInvoicePDFView.as_view(), name="admin_invoice_pdf"),
+    path("invoices/<uuid:invoice_id>", AdminInvoiceDetailView.as_view(), name="admin_invoice_detail"),
     re_path(r"^(?:dashboard-)?stats/?$", AdminDashboardStatsView.as_view(), name="admin_dashboard_stats"),
     re_path(r"^settings(?:/(?P<key>[\w.-]+))?/?$", AdminSettingsView.as_view(), name="admin_settings"),
     re_path(r"^audit(?:-logs)?/?$", AdminAuditLogsView.as_view(), name="admin_audit_logs"),

@@ -29,6 +29,7 @@ const NAV = [
   { href: "/admin", label: "Dashboard", icon: FiHome, exact: true },
   { href: "/admin/enquiries", label: "Client Pipeline", icon: FiUsers },
   { href: "/admin/client-projects", label: "Client Projects", icon: FiBriefcase },
+  { href: "/admin/invoices", label: "Invoices", icon: FiFileText },
   { href: "/admin/site-visits", label: "Site Visits", icon: FiCalendar },
   { href: "/admin/projects", label: "Portfolio Showcase", icon: FiImage },
   { href: "/admin/blog", label: "Blog Posts", icon: FiFileText },
@@ -86,7 +87,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
         <div className="text-center mb-8">
           <div className="relative inline-block mb-4">
             <div className="relative w-28 h-28 mx-auto rounded-3xl shadow-sm bg-white p-3 border border-admin-border flex items-center justify-center">
-              <Image src="/logo-icon.svg" alt="bangla sketch" width={96} height={96} className="w-full h-full object-contain p-2" priority unoptimized />
+              <Image src="/brand-icon.png" alt="bangla sketch" width={96} height={96} className="w-full h-full object-contain p-2" priority unoptimized />
             </div>
             <p className="text-[11px] tracking-[0.25em] text-admin-primary uppercase font-semibold mt-3">
               Architectural Studio
@@ -201,10 +202,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     let active = true;
     async function verify() {
+      setChecking(true);
       try {
         const res = await fetch("/api/admin/session", { cache: "no-store" });
         if (!active) return;
-        if (res.ok) setLocked(false);
+        setLocked(!res.ok);
       } catch {
         // Leave locked on network error
       } finally {
@@ -215,7 +217,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => {
       active = false;
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -263,7 +265,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-admin-ink border-b border-admin-elevated px-4 py-3 flex items-center justify-between shadow-md pt-[max(0.75rem,env(safe-area-inset-top))]">
         <Link href="/admin" className="flex items-center gap-2.5">
           <div className="relative w-8 h-8 rounded-full bg-admin-elevated p-1 flex items-center justify-center">
-            <Image src="/logo-icon.svg" alt="Logo" width={32} height={32} className="w-full h-full object-contain" unoptimized />
+            <Image src="/brand-icon.png" alt="Logo" width={32} height={32} className="w-full h-full object-contain" unoptimized />
           </div>
           <div>
             <div className="text-sm font-semibold text-admin-surface tracking-wide">Bangla Sketch</div>
@@ -291,7 +293,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-5 border-b border-admin-elevated flex items-center justify-between">
           <Link href="/admin" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3">
             <div className="relative w-10 h-10 rounded-full bg-admin-elevated p-1 shadow-sm border border-white/10 flex items-center justify-center">
-              <Image src="/logo-icon.svg" alt="Banglasketch" width={40} height={40} className="w-full h-full object-contain" unoptimized />
+              <Image src="/brand-icon.png" alt="Banglasketch" width={40} height={40} className="w-full h-full object-contain" unoptimized />
             </div>
             <div>
               <div className="font-serif font-bold text-admin-surface text-base leading-tight">Bangla Sketch</div>

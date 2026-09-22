@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SERVICES, SAMPLE_PROJECTS, SAMPLE_TESTIMONIALS } from "../../../lib/constants";
@@ -10,6 +11,21 @@ import { FiArrowRight } from "react-icons/fi";
 
 export function generateStaticParams() {
   return SERVICES.map((s) => ({ category: s.id }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
+  const { category } = await params;
+  const service = SERVICES.find((s) => s.id === category);
+  if (!service) return { title: "Service • Bangla Sketch" };
+  return {
+    title: `${service.name} • Bangla Sketch Architectural Studio`,
+    description: service.fullDescription || service.description,
+    openGraph: {
+      title: `${service.name} • Bangla Sketch`,
+      description: service.description,
+      images: [{ url: service.image, width: 1200, height: 630 }],
+    },
+  };
 }
 
 export default async function ServiceDetailPage({ params }: { params: Promise<{ category: string }> }) {

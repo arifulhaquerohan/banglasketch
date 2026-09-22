@@ -142,6 +142,9 @@ export function CloudinaryUpload({ value, onChange, folder = "general", label = 
         }}
       />
       {error && <p className="text-xs text-red-600 mt-2 font-medium">{error}</p>}
+      <p className="mt-2 text-[11px] text-admin-subtle">
+        New photos automatically include a subtle, transparent Bangla Sketch watermark in the top-right corner.
+      </p>
       {storageInfo && !error && (
         <div role="status" className="mt-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px] leading-relaxed text-emerald-800">
           <span className="font-semibold">Saved securely.</span>{" "}

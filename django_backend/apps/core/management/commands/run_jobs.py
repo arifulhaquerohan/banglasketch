@@ -3,7 +3,7 @@ import signal
 import datetime
 import logging
 from django.core.management.base import BaseCommand
-from django.db import connection
+from django.db import connection, transaction
 from django.db.models import F
 from django.utils import timezone
 from apps.blog.models import BlogPost
@@ -11,6 +11,7 @@ from apps.authentication.models import AdminPasswordReset
 from apps.leads.models import ContactEmailJob
 from apps.core.models import BackgroundJob
 from apps.core.services.media_cleanup import delete_media_from_cloudinary
+from apps.core.services.invoice_cleanup import reconcile_invoice_upload
 
 logger = logging.getLogger("scheduled_jobs")
 
@@ -109,35 +110,46 @@ class Command(BaseCommand):
             )
 
     def process_background_jobs(self):
-        jobs = BackgroundJob.objects.filter(
-            status__in=["pending", "failed"],
-            attempts__lt=F("max_attempts")
-        ).order_by("available_at")[:10]
-
-        for job in jobs:
-            job.status = "running"
-            job.locked_at = timezone.now()
-            job.save(update_fields=["status", "locked_at"])
-
-            try:
-                if job.kind == "media_cleanup":
-                    public_id = job.payload.get("public_id")
-                    if public_id:
-                        success = delete_media_from_cloudinary(public_id)
-                        if success:
-                            job.status = "completed"
-                            job.completed_at = timezone.now()
-                        else:
-                            raise Exception("Failed to delete from Cloudinary")
-                    else:
-                        raise Exception("Missing public_id in payload")
+        now = timezone.now()
+        # A terminated worker must not strand cleanup jobs forever.
+        BackgroundJob.objects.filter(status="running", locked_at__lt=now - datetime.timedelta(minutes=10)).update(
+            status="failed", locked_at=None, available_at=now)
+        for _ in range(10):
+            with transaction.atomic():
+                jobs = BackgroundJob.objects.filter(
+                    status__in=["pending", "failed"], available_at__lte=timezone.now(),
+                    attempts__lt=F("max_attempts"),
+                ).order_by("available_at", "id")
+                if connection.features.has_select_for_update_skip_locked:
+                    jobs = jobs.select_for_update(skip_locked=True)
                 else:
-                    raise Exception(f"Unknown job kind: {job.kind}")
-
-            except Exception as e:
+                    jobs = jobs.select_for_update()
+                job = jobs.first()
+                if not job:
+                    break
+                # Conditional claim also protects backends without row locks.
+                claimed = BackgroundJob.objects.filter(pk=job.pk, status=job.status).update(
+                    status="running", locked_at=timezone.now(), attempts=F("attempts") + 1)
+                if not claimed:
+                    continue
+                job.attempts += 1
+            try:
+                public_id = job.payload.get("public_id")
+                if job.kind == "invoice_upload_cleanup":
+                    reconcile_invoice_upload(public_id)
+                elif job.kind == "media_cleanup":
+                    if not public_id or not delete_media_from_cloudinary(public_id):
+                        raise RuntimeError("Failed to delete media from Cloudinary")
+                else:
+                    raise ValueError("Unknown background job kind")
+                job.status = "completed"
+                job.completed_at = timezone.now()
+                job.last_error = None
+            except Exception:
                 job.status = "failed"
-                job.last_error = str(e)
-                job.attempts = job.attempts + 1
+                job.last_error = "Background cleanup failed; will retry."
+                job.available_at = timezone.now() + datetime.timedelta(seconds=min(3600, 60 * 2 ** job.attempts))
+                logger.exception("Background cleanup job failed: %s", job.pk)
             finally:
                 job.locked_at = None
-                job.save()
+                job.save(update_fields=["status", "completed_at", "last_error", "available_at", "locked_at"])

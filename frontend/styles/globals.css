@@ -760,3 +760,24 @@ select.input option {
 .article-content a { color: #893E28; }
 .article-content code { color: #344B33; background: #E8EEE5; }
 .article-content img { max-width: 100%; height: auto; }
+
+/* Supplied brand artwork, including its original wordmark and Bengali tagline. */
+.brand-logo-image {
+  display: block;
+  width: auto;
+  height: 74px;
+  object-fit: contain;
+  opacity: 0.88;
+}
+.brand-logo-footer {
+  padding: 0;
+}
+.brand-logo-footer .brand-logo-image {
+  width: 200px;
+  height: auto;
+  filter: brightness(0) invert(1);
+  opacity: 0.82;
+}
+@media (max-width: 767px) {
+  .site-header .brand-logo-image { height: 64px; max-width: 100%; }
+}

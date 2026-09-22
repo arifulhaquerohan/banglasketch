@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { adminReturnPath } from "@/lib/admin-return-path";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -17,7 +18,7 @@ function LoginForm() {
   const [resetModalOpen, setResetModalOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get("from") || "/admin";
+  const from = adminReturnPath(searchParams.get("from"));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,7 +171,7 @@ export default function AdminLoginPage() {
           <div className="relative inline-block mb-4">
             <div className="relative w-28 h-28 mx-auto rounded-full shadow-md bg-admin-tint p-2 border border-admin-border">
               <Image
-                src="/logo-icon.svg"
+                src="/brand-icon.png"
                 alt="Bangla Sketch Logo"
                 width={112}
                 height={112}
