@@ -19,6 +19,8 @@
 # Allow example/template files so team & CI can configure environments
 !.env.example
 !*/.env.example
+!.env*.example
+!*/.env*.example
 !.env.test.example
 !*/.env.test.example
 

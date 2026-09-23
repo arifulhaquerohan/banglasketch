@@ -1,0 +1,192 @@
+services:
+  # ----------------------------------------------------------------------------
+  # 1. PostgreSQL Relational Database
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: banglasketch_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-banglasketch_db}
+      POSTGRES_USER: ${POSTGRES_USER:-banglasketch_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-banglasketch_secure_pass_2026}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-banglasketch_user} -d ${POSTGRES_DB:-banglasketch_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - banglasketch_internal
+
+  # ----------------------------------------------------------------------------
+  # 2. Redis Cache & Message Broker
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: banglasketch_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - banglasketch_internal
+
+  # ----------------------------------------------------------------------------
+  # 3. Django REST API Backend (Gunicorn Application Server)
+  # ----------------------------------------------------------------------------
+  django_api:
+    build:
+      context: ./django_backend
+      dockerfile: Dockerfile
+    container_name: banglasketch_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-banglasketch_user}:${POSTGRES_PASSWORD:-banglasketch_secure_pass_2026}@postgres:5432/${POSTGRES_DB:-banglasketch_db}
+      DB_SSL_MODE: disable
+      RUN_MIGRATIONS: "true"
+      AUTO_SETUP_ADMIN: ${AUTO_SETUP_ADMIN:-false}
+    volumes:
+      - django_static:/app/staticfiles
+      - django_media:/app/uploads
+    ports:
+      - "${DJANGO_PORT:-5000}:5000"
+    networks:
+      - banglasketch_internal
+      - banglasketch_edge
+
+  # ----------------------------------------------------------------------------
+  # 4. Django Scheduled Background Tasks Runner (Publishing & Cleanup)
+  # ----------------------------------------------------------------------------
+  django_scheduler:
+    build:
+      context: ./django_backend
+      dockerfile: Dockerfile
+    container_name: banglasketch_scheduler
+    restart: unless-stopped
+    depends_on:
+      django_api:
+        condition: service_started
+    env_file:
+      - .env.docker
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-banglasketch_user}:${POSTGRES_PASSWORD:-banglasketch_secure_pass_2026}@postgres:5432/${POSTGRES_DB:-banglasketch_db}
+      DB_SSL_MODE: disable
+      RUN_MIGRATIONS: "false"
+    command: ["python", "manage.py", "run_jobs", "--interval", "60"]
+    networks:
+      - banglasketch_internal
+
+  # ----------------------------------------------------------------------------
+  # 5. Django Async Email Queue Worker (SMTP Deliveries)
+  # ----------------------------------------------------------------------------
+  django_email_worker:
+    build:
+      context: ./django_backend
+      dockerfile: Dockerfile
+    container_name: banglasketch_email_worker
+    restart: unless-stopped
+    depends_on:
+      django_api:
+        condition: service_started
+    env_file:
+      - .env.docker
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-banglasketch_user}:${POSTGRES_PASSWORD:-banglasketch_secure_pass_2026}@postgres:5432/${POSTGRES_DB:-banglasketch_db}
+      DB_SSL_MODE: disable
+      RUN_MIGRATIONS: "false"
+    command: ["python", "manage.py", "run_email_worker", "--interval", "15"]
+    networks:
+      - banglasketch_internal
+
+  # ----------------------------------------------------------------------------
+  # 6. Next.js 15 Standalone Frontend
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://django_api:5000}
+    container_name: banglasketch_frontend
+    restart: unless-stopped
+    depends_on:
+      django_api:
+        condition: service_started
+    env_file:
+      - .env.docker
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    networks:
+      - banglasketch_edge
+
+  # ----------------------------------------------------------------------------
+  # 7. Nginx Edge Reverse Proxy & Rate Limiter
+  # ----------------------------------------------------------------------------
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: banglasketch_nginx
+    restart: unless-stopped
+    depends_on:
+      frontend:
+        condition: service_started
+      django_api:
+        condition: service_started
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - django_static:/var/www/staticfiles:ro
+      - certbot_webroot:/var/www/certbot:ro
+      - letsencrypt_certs:/etc/letsencrypt:ro
+    networks:
+      - banglasketch_edge
+
+# ------------------------------------------------------------------------------
+# Named Storage Volumes
+# ------------------------------------------------------------------------------
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  django_static:
+    driver: local
+  django_media:
+    driver: local
+  certbot_webroot:
+    driver: local
+  letsencrypt_certs:
+    driver: local
+
+# ------------------------------------------------------------------------------
+# Isolated Bridge Networks
+# ------------------------------------------------------------------------------
+networks:
+  banglasketch_internal:
+    driver: bridge
+  banglasketch_edge:
+    driver: bridge
