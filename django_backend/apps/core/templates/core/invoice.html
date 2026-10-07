@@ -1,26 +1,220 @@
 <!doctype html><html><head><meta charset="utf-8"><title>Invoice {{ v.number }}</title><style>
 @font-face { font-family: Manrope; src: url('{{ manrope }}'); }
 @font-face { font-family: Bengali; src: url('{{ bengali }}'); }
-@page { size: A4; margin: 15mm 16mm 18mm; @bottom-left { content: '{{ v.number }} · Bangla Sketch'; font: 8pt Manrope; color: #7b8177; } @bottom-right { content: 'Page ' counter(page) ' of ' counter(pages); font: 8pt Manrope; color: #7b8177; } }
-* { box-sizing: border-box; } body { font: 9pt/1.6 Manrope,Bengali,sans-serif; color:#252b25; margin:0; }
-p { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; } h1,h2 { margin:0; } h2 { font-size:8pt; text-transform:uppercase; letter-spacing:1.2px; color:#6e7d61; margin-bottom:8px; }
-.brand { display:flex; align-items:center; gap:14px; padding-bottom:16px; border-bottom:2px solid #829070; }
-.logo { width:98px; height:79px; object-fit:contain; flex-shrink:0; } .brand-name { flex:1; } .brand-name strong { font-size:19pt; font-weight:800; letter-spacing:-.8px; } .tagline { font-size:7pt; letter-spacing:1.4px; color:#72796c; margin-top:3px; text-transform:uppercase; }
-.contact { width:230px; font-size:7.5pt; color:#596151; } .contact p:first-child { margin-bottom:5px; }
-.title { display:flex; align-items:center; justify-content:space-between; margin:20px 0; } h1 { font-size:36pt; font-weight:500; letter-spacing:-1.5px; line-height:1.2; } .number { margin-top:6px; font-size:9pt; color:#6e7d61; }
-.dates { border-left:2px solid #d7dece; padding-left:20px; width:230px; } .dates p { display:flex; justify-content:space-between; font-size:8pt; margin:5px 0; } .dates span { color:#707968; }
-.details { display:flex; gap:30px; margin-bottom:20px; } .details section { width:50%; border-top:1px solid #dce1d6; padding-top:12px; } .details strong { font-weight:700; }
-table { border-collapse:collapse; width:100%; table-layout:fixed; } thead { display:table-header-group; } th { background:#edf1e8; color:#4f6044; font-size:7pt; text-transform:uppercase; letter-spacing:.4px; padding:12px 10px; text-align:right; } td { padding:10px 10px; border-bottom:1px solid #e3e7dd; text-align:right; vertical-align:top; overflow-wrap:anywhere; } th:first-child,td:first-child { text-align:left; width:46%; } td:first-child { white-space:pre-wrap; } tr { break-inside:avoid; } .summary { display:flex; gap:30px; margin-top:18px; break-inside:avoid; } .notes { width:48%; color:#65705b; font-size:8pt; } .totals { flex:1; } .totals p { display:flex; justify-content:space-between; padding:3px 0; font-size:8pt; } .totals .due { background:#283527; color:white; border-radius:6px; margin-top:12px; padding:12px; font-weight:700; font-size:11pt; }
-.payment { display:flex; gap:28px; padding:18px 20px; background:#f4f6f0; border:1px solid #e3e8da; margin-top:18px; break-inside:avoid; } .payment section { width:50%; font-size:8pt; }
-.signatures { display:flex; justify-content:space-between; gap:45px; margin-top:20px; break-inside:avoid; } .signatures section { width:220px; } .signature-space { height:55px; display:flex; align-items:center; } .signature-space img { max-width:190px; max-height:50px; object-fit:contain; } .sign-line { border-top:1px solid #a3ae98; padding-top:8px; font-size:8pt; } .sign-line strong { display:block; } .sign-line span { color:#7b8177; font-size:7pt; }
-.thanks { border-top:1px solid #e1e5dc; padding-top:15px; margin-top:18px; font-size:8pt; color:#6c7662; text-align:center; break-inside:avoid; }
+@font-face { font-family: Serif; src: url('{{ serif }}'); }
+@font-face { font-family: SerifBn; src: url('{{ serif_bn }}'); }
+@page { size: A4; margin: 10mm 12mm 14mm;
+  @bottom-left  { content: '{{ v.number }}  ·  {{ v.company|default:"Bangla Sketch" }}'; font: 7pt Manrope,Bengali; color: #8a9182; }
+  @bottom-right { content: 'Page ' counter(page) ' of ' counter(pages); font: 7pt Manrope; color: #8a9182; }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font: 8.5pt/1.45 Manrope,Bengali,sans-serif; color: #1e261a; }
+p { white-space: pre-wrap; overflow-wrap: anywhere; }
+h1, h2, h3 { margin: 0; }
+
+/* ── Watermark (Center of page) ── */
+.watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 440px; height: 360px; opacity: 0.035; z-index: -1; pointer-events: none; }
+
+/* ── Header ── */
+.header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 2px solid #2d3a27; }
+.brand-group { display: flex; align-items: center; gap: 12px; }
+.logo { width: 62px; height: 50px; object-fit: contain; flex-shrink: 0; }
+.brand-name { font: 800 16pt/1.1 Manrope,Bengali; letter-spacing: -0.5px; color: #1e261a; }
+.tagline { font: 600 6.5pt/1.3 Manrope; text-transform: uppercase; letter-spacing: 1.5px; color: #6b7a5e; margin-top: 2px; }
+.company-info { text-align: right; font-size: 7pt; color: #4a5743; line-height: 1.4; }
+
+/* ── Invoice Title & Meta ── */
+.title-block { display: flex; justify-content: space-between; align-items: flex-end; margin: 14px 0 12px; }
+.title-left h1 { font: 400 34pt/0.95 Serif; letter-spacing: -1.5px; color: #1e261a; }
+.title-left .inv-number { font: 700 8.5pt Manrope; color: #5d6e52; margin-top: 3px; }
+.meta-grid { min-width: 250px; }
+.meta-row { display: flex; justify-content: space-between; gap: 16px; padding: 2.5px 0; font-size: 7.5pt; border-bottom: 1px solid #edf0e9; }
+.meta-row:last-child { border-bottom: none; }
+.meta-label { color: #6e7d61; font-weight: 500; }
+.meta-value { font-weight: 700; color: #1e261a; text-align: right; }
+
+/* ── Parties ── */
+.parties { display: flex; gap: 14px; margin-bottom: 12px; }
+.party { flex: 1; background: #f8faf5; border: 1px solid #e2e8dc; border-radius: 6px; padding: 10px 12px; }
+.party-label { font: 700 6.5pt/1 Manrope; text-transform: uppercase; letter-spacing: 1.2px; color: #7b8b6e; margin-bottom: 6px; }
+.party-name { font: 700 9.5pt/1.2 Manrope,Bengali; color: #1e261a; margin-bottom: 2px; }
+.party-company { font-size: 8pt; font-weight: 600; color: #3d4a35; margin-bottom: 2px; }
+.party-detail { font-size: 7.5pt; color: #4a5743; line-height: 1.35; white-space: pre-wrap; }
+
+/* ── Table ── */
+table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 10px; }
+thead { display: table-header-group; }
+th { background: #2d3a27; color: #f2f5ed; font: 700 6.5pt/1 Manrope; text-transform: uppercase; letter-spacing: 0.8px; padding: 7px 8px; text-align: right; }
+th:first-child { text-align: center; width: 24px; border-radius: 4px 0 0 0; }
+th:nth-child(2) { text-align: left; width: 48%; border-radius: 0; }
+th:last-child { border-radius: 0 4px 0 0; }
+td { padding: 7px 8px; text-align: right; vertical-align: top; font-size: 8pt; overflow-wrap: anywhere; color: #1e261a; line-height: 1.35; }
+td:first-child { text-align: center; color: #7b8b6e; font-size: 7.5pt; font-weight: 600; }
+td:nth-child(2) { text-align: left; white-space: pre-wrap; }
+tbody tr { border-bottom: 1px solid #e8ecdf; }
+tbody tr:nth-child(even) { background: #fbfcf9; }
+tbody tr:last-child { border-bottom: 1.5px solid #2d3a27; }
+tr { break-inside: avoid; }
+
+/* ── Summary Section ── */
+.summary-section { margin-top: 2px; break-inside: avoid; }
+.summary-flex { display: flex; gap: 18px; align-items: flex-start; }
+.notes-block { flex: 1; min-width: 0; }
+.notes-label { font: 700 6.5pt Manrope; text-transform: uppercase; letter-spacing: 1.2px; color: #7b8b6e; margin-bottom: 4px; }
+.notes-text { font-size: 7.5pt; color: #4f5e45; line-height: 1.45; }
+.totals-block { width: 215px; flex-shrink: 0; }
+.total-row { display: flex; justify-content: space-between; align-items: baseline; padding: 3px 0; font-size: 8pt; border-bottom: 1px solid #edf0e9; }
+.total-row:last-of-type { border-bottom: none; }
+.total-row .t-label { color: #5d6e52; }
+.total-row .t-value { font-weight: 600; font-family: Manrope; color: #1e261a; }
+.total-row.grand { border-top: 1.5px solid #2d3a27; border-bottom: none; padding: 4px 0 2px; margin-top: 3px; }
+.total-row.grand .t-label, .total-row.grand .t-value { font-size: 9.5pt; font-weight: 800; color: #1e261a; }
+.due-box { background: #2d3a27; color: #ffffff; border-radius: 5px; padding: 8px 12px; margin-top: 6px; display: flex; justify-content: space-between; align-items: center; }
+.due-box .due-label { font: 700 7pt Manrope; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.9; }
+.due-box .due-amount { font: 800 11.5pt Manrope; letter-spacing: -0.3px; }
+.credit-row { display: flex; justify-content: space-between; padding: 4px 10px; margin-top: 4px; background: #edf5e6; border-radius: 4px; font-size: 7.5pt; color: #3a6b2e; font-weight: 700; }
+
+/* ── Payment Block ── */
+.payment-block { margin-top: 10px; background: #f8faf5; border: 1px solid #e2e8dc; border-radius: 6px; padding: 10px 12px; break-inside: avoid; }
+.payment-block .pay-grid { display: flex; gap: 16px; }
+.payment-block section { flex: 1; min-width: 0; }
+.payment-block h2 { font: 700 6.5pt Manrope; text-transform: uppercase; letter-spacing: 1px; color: #7b8b6e; margin-bottom: 4px; break-after: avoid; }
+.payment-block p { font-size: 7.5pt; color: #3d4a35; line-height: 1.4; }
+
+/* ── Signatures ── */
+.signatures { display: flex; justify-content: space-between; gap: 30px; margin-top: 16px; break-inside: avoid; }
+.sig-box { width: 190px; }
+.sig-space { height: 42px; display: flex; align-items: flex-end; padding-bottom: 4px; }
+.sig-space img { max-width: 160px; max-height: 38px; object-fit: contain; }
+.sig-line { border-top: 1.2px solid #2d3a27; padding-top: 5px; }
+.sig-name { font: 700 8pt Manrope,Bengali; color: #1e261a; }
+.sig-title { font: 500 6.5pt Manrope; color: #7b8b6e; margin-top: 1px; }
+
+/* ── Footer ── */
+.footer { border-top: 1px solid #e0e5d8; padding-top: 8px; margin-top: 12px; text-align: center; break-inside: avoid; }
+.footer-thanks { font: italic 9.5pt/1.3 Serif,SerifBn; color: #4a5743; }
+.footer-sub { font: 500 6.5pt Manrope; color: #8a9182; margin-top: 2px; letter-spacing: 0.3px; }
+
+/* ── Overflow handling ── */
+.brand-group, .company-info, .party, .notes-block, .totals-block, .payment-block section { min-width: 0; overflow-wrap: anywhere; }
+h2 { break-after: avoid; }
+p { orphans: 2; widows: 2; }
 </style></head><body>
-<header class="brand"><img class="logo" src="{{ logo }}" alt="Bangla Sketch"><div class="brand-name"><strong>{{ v.company }}</strong><p class="tagline">Architecture & Interior Design</p></div><div class="contact"><p>{{ v.address }}</p><p>{{ v.phone }}<br>{{ v.email }}</p></div></header>
-<div class="title"><div><h1>Invoice</h1><p class="number"># {{ v.number }}</p></div><div class="dates"><p><span>Date issued</span><strong>{{ v.issued }}</strong></p><p><span>Payment due</span><strong>{{ v.due }}</strong></p><p><span>Currency</span><strong>BDT · Bangladeshi Taka</strong></p></div></div>
-<div class="details"><section><h2>Bill to</h2><strong>{{ v.client }}</strong>{% if v.clientCompany %}<p>{{ v.clientCompany }}</p>{% endif %}<p>{{ v.clientAddress }}</p><p>{{ v.clientPhone }}</p><p>{{ v.clientEmail }}</p></section><section><h2>Project details</h2><strong>{{ v.project|default:'Interior design services' }}</strong><p>{{ v.location }}</p></section></div>
-<table><thead><tr><th>Service description</th><th>Qty / Units</th><th>Rate · BDT</th><th>Amount · BDT</th></tr></thead><tbody>{% for item in rows %}<tr><td>{{ item.description }}</td><td>{{ item.quantity|floatformat:'-2' }}</td><td>{{ item.formatted_rate }}</td><td>{{ item.total }}</td></tr>{% endfor %}</tbody></table>
-<div class="summary"><section class="notes"><h2>Additional notes</h2><p>{{ v.notes|default:'Thank you for trusting us with your space.' }}</p></section><div class="totals"><p><span>Subtotal</span><span>{{ totals.subtotal }}</span></p>{% if v.discount %}<p><span>Discount ({{ v.discount }}%)</span><span>-{{ totals.discount }}</span></p>{% endif %}{% if v.tax %}<p><span>Tax ({{ v.tax }}%)</span><span>{{ totals.tax }}</span></p>{% endif %}<p><strong>Invoice total</strong><strong>{{ totals.total }}</strong></p><p><span>Amount paid</span><span>{{ totals.paid }}</span></p><p class="due"><span>Total due</span><span>BDT {{ totals.due }}</span></p>{% if has_credit %}<p><span>Credit balance</span><span>{{ totals.credit }}</span></p>{% endif %}</div></div>
-<div class="payment"><section><h2>Payment methods</h2><p>{{ v.payment|default:'Please contact us for payment details.' }}</p></section><section><h2>Payment terms</h2><p>{{ v.terms }}</p></section></div>
-{% if v.signatureEnabled or v.clientSignature %}<div class="signatures">{% if v.signatureEnabled %}<section><div class="signature-space">{% if v.signature %}<img src="{{ v.signature }}" alt="Authorized signature">{% endif %}</div><div class="sign-line"><strong>{{ v.signatory|default:v.company }}</strong><span>{{ v.signatoryTitle|default:'Authorized signatory' }}</span></div></section>{% endif %}{% if v.clientSignature %}<section><div class="signature-space"></div><div class="sign-line"><strong>Client acceptance</strong><span>Signature & date</span></div></section>{% endif %}</div>{% endif %}
-<p class="thanks">Thank you for choosing {{ v.company }}. Thoughtful spaces, made for you.</p>
+{% if watermark %}<img class="watermark" src="{{ watermark }}" alt="">{% endif %}
+
+<header class="header">
+  <div class="brand-group">
+    <img class="logo" src="{{ logo }}" alt="Bangla Sketch">
+    <div>
+      <div class="brand-name">{{ v.company }}</div>
+      <div class="tagline">Architecture · Interior · Landscape</div>
+    </div>
+  </div>
+  <div class="company-info">
+    <p>{{ v.address }}</p>
+    <p>{{ v.phone }}  ·  {{ v.email }}</p>
+  </div>
+</header>
+
+<div class="title-block">
+  <div class="title-left">
+    <h1>Invoice</h1>
+    <p class="inv-number"># {{ v.number }}</p>
+  </div>
+  <div class="meta-grid">
+    <div class="meta-row"><span class="meta-label">Date issued</span><span class="meta-value">{{ v.issued }}</span></div>
+    <div class="meta-row"><span class="meta-label">Payment due</span><span class="meta-value">{{ v.due }}</span></div>
+    <div class="meta-row"><span class="meta-label">Currency</span><span class="meta-value">BDT · Bangladeshi Taka</span></div>
+  </div>
+</div>
+
+<div class="parties">
+  <div class="party">
+    <div class="party-label">Bill to</div>
+    <div class="party-name">{{ v.client }}</div>
+    {% if v.clientCompany %}<div class="party-company">{{ v.clientCompany }}</div>{% endif %}
+    <div class="party-detail">{% if v.clientAddress %}{{ v.clientAddress }}<br>{% endif %}{% if v.clientPhone %}{{ v.clientPhone }}{% endif %}{% if v.clientPhone and v.clientEmail %}  ·  {% endif %}{% if v.clientEmail %}{{ v.clientEmail }}{% endif %}</div>
+  </div>
+  <div class="party">
+    <div class="party-label">Project details</div>
+    <div class="party-name">{{ v.project|default:'Interior design services' }}</div>
+    <div class="party-detail">{{ v.location }}</div>
+  </div>
+</div>
+
+<table>
+  <thead><tr>
+    <th>#</th>
+    <th>Service description</th>
+    <th>Qty</th>
+    <th>Rate · BDT</th>
+    <th>Amount · BDT</th>
+  </tr></thead>
+  <tbody>{% for item in rows %}<tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ item.description }}</td>
+    <td>{{ item.quantity|floatformat:'-2' }}</td>
+    <td>{{ item.formatted_rate }}</td>
+    <td>{{ item.total }}</td>
+  </tr>{% endfor %}</tbody>
+</table>
+
+<div class="summary-section">
+  <div class="summary-flex">
+    <div class="notes-block">
+      <div class="notes-label">Additional notes</div>
+      <p class="notes-text">{{ v.notes|default:'Thank you for trusting us with your space.' }}</p>
+    </div>
+    <div class="totals-block">
+      <div class="total-row"><span class="t-label">Subtotal</span><span class="t-value">{{ totals.subtotal }}</span></div>
+      {% if has_discount %}<div class="total-row"><span class="t-label">Discount ({{ v.discount }}%)</span><span class="t-value">−{{ totals.discount }}</span></div>{% endif %}
+      {% if has_tax %}<div class="total-row"><span class="t-label">Tax ({{ v.tax }}%)</span><span class="t-value">+{{ totals.tax }}</span></div>{% endif %}
+      <div class="total-row grand"><span class="t-label">Invoice total</span><span class="t-value">{{ totals.total }}</span></div>
+      <div class="total-row"><span class="t-label">Amount paid</span><span class="t-value">{{ totals.paid }}</span></div>
+      <div class="due-box"><span class="due-label">Total due</span><span class="due-amount">BDT {{ totals.due }}</span></div>
+      {% if has_credit %}<div class="credit-row"><span>Credit balance</span><span>BDT {{ totals.credit }}</span></div>{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="payment-block">
+  <div class="pay-grid">
+    <section>
+      <h2>Payment methods</h2>
+      <p>{{ v.payment|default:'Please contact us for payment details.' }}</p>
+    </section>
+    <section>
+      <h2>Payment terms</h2>
+      <p>{{ v.terms }}</p>
+    </section>
+  </div>
+</div>
+
+{% if v.signatureEnabled or v.clientSignature %}
+<div class="signatures">
+  {% if v.signatureEnabled %}
+  <div class="sig-box">
+    <div class="sig-space">{% if v.signature %}<img src="{{ v.signature }}" alt="Authorized signature">{% endif %}</div>
+    <div class="sig-line">
+      <div class="sig-name">{{ v.signatory|default:v.company }}</div>
+      <div class="sig-title">{{ v.signatoryTitle|default:'Authorized signatory' }}</div>
+    </div>
+  </div>
+  {% endif %}
+  {% if v.clientSignature %}
+  <div class="sig-box">
+    <div class="sig-space"></div>
+    <div class="sig-line">
+      <div class="sig-name">Client acceptance</div>
+      <div class="sig-title">Signature & date</div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="footer">
+  <p class="footer-thanks">Thank you for choosing {{ v.company }}. Thoughtful spaces, made for you.</p>
+  <p class="footer-sub">{{ v.company }} · Architecture · Interior · Landscape</p>
+</div>
 </body></html>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   FiTrash2,
   FiRotateCcw,
@@ -40,6 +40,16 @@ const TABS: { id: EntityType; label: string; table: string; icon: React.Componen
 
 export default function RecycleBinPage() {
   const [activeTab, setActiveTab] = useState<EntityType>("projects");
+  return <RecycleBinTab key={activeTab} activeTab={activeTab} setActiveTab={setActiveTab} />;
+}
+
+// A tab owns its requests and actions. Switching tabs unmounts that state so
+// a delayed response can never populate a different entity's recycle bin.
+function RecycleBinTab({ activeTab, setActiveTab }: {
+  activeTab: EntityType;
+  setActiveTab: (tab: EntityType) => void;
+}) {
+  const requestSequence = useRef(0);
   const [items, setItems] = useState<TrashItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState<string | number | null>(null);
@@ -48,9 +58,11 @@ export default function RecycleBinPage() {
   const currentTabConfig = TABS.find((t) => t.id === activeTab) || TABS[0];
 
   const loadTrash = useCallback(async () => {
+    const sequence = ++requestSequence.current;
     setLoading(true);
     setMessage(null);
     const result = await adminFetch<TrashItem[]>(`${activeTab}?trash=true`);
+    if (sequence !== requestSequence.current) return;
     if (result.success && Array.isArray(result.data)) {
       setItems(result.data);
     } else {
@@ -61,7 +73,8 @@ export default function RecycleBinPage() {
   }, [activeTab]);
 
   useEffect(() => {
-    loadTrash();
+    void loadTrash();
+    return () => { requestSequence.current += 1; };
   }, [loadTrash]);
 
   const handleRestore = async (item: TrashItem) => {
@@ -117,7 +130,7 @@ export default function RecycleBinPage() {
         </div>
         <button
           onClick={loadTrash}
-          disabled={loading}
+          disabled={loading || actionId !== null}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-admin-surface border border-admin-border hover:border-admin-primary text-xs font-semibold text-admin-ink transition-colors shadow-xs self-start sm:self-auto disabled:opacity-50"
         >
           <FiRefreshCw className={loading ? "animate-spin text-admin-primary" : "text-admin-primary"} size={14} /> Refresh
@@ -133,6 +146,7 @@ export default function RecycleBinPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
+              disabled={actionId !== null}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
                 isActive
                   ? "bg-admin-primary text-white shadow-xs"
@@ -225,7 +239,7 @@ export default function RecycleBinPage() {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => handleRestore(item)}
-                          disabled={isOperating}
+                          disabled={actionId !== null}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-emerald-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition-colors disabled:opacity-50"
                         >
                           <FiRotateCcw size={13} className={isOperating ? "animate-spin" : ""} />
@@ -233,7 +247,7 @@ export default function RecycleBinPage() {
                         </button>
                         <button
                           onClick={() => handlePermanentDelete(item)}
-                          disabled={isOperating}
+                          disabled={actionId !== null}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-red-200 text-red-800 bg-red-50 hover:bg-red-100 transition-colors disabled:opacity-50"
                         >
                           <FiTrash2 size={13} />

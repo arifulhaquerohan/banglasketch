@@ -1,6 +1,6 @@
 import time
 import datetime
-from django.db import connection
+from django.db import connection, transaction
 from django.db.models import Sum, Avg
 from django.utils import timezone
 from rest_framework.views import APIView
@@ -413,23 +413,27 @@ class AdminPermanentDeleteView(APIView):
         if not model:
             return Response({"success": False, "error": "Invalid entity"}, status=400)
 
-        item = model.objects.filter(id=id, deleted_at__isnull=False).first()
-        if not item:
-            return Response({"success": False, "error": "Deleted item not found"}, status=404)
-
-        AuditLog.objects.create(
-            actor=request.user if hasattr(request.user, "id") else None,
-            action="permanent_delete",
-            entity_type=entity,
-            entity_id=int(id),
-            before_data={"deleted": True},
-        )
-
         from .models import BackgroundJob
-        BackgroundJob.objects.create(
-            kind="permanent_delete",
-            payload={"entity": entity, "id": id},
-        )
+        # Preserve asset IDs before deleting their record, and commit cleanup
+        # jobs together with the deletion so a queue failure cannot lose them.
+        with transaction.atomic():
+            item = model.objects.select_for_update().filter(id=id, deleted_at__isnull=False).first()
+            if not item:
+                return Response({"success": False, "error": "Deleted item not found"}, status=404)
 
-        item.delete()
+            public_ids = getattr(item, "cloudinary_ids", [])
+            if not isinstance(public_ids, list):
+                public_ids = []
+            public_ids = [*public_ids, getattr(item, "cloudinary_id", None)]
+            public_ids = sorted({value for value in public_ids if isinstance(value, str) and value.strip()})
+            AuditLog.objects.create(
+                actor=request.user if hasattr(request.user, "id") else None,
+                action="permanent_delete",
+                entity_type=entity,
+                entity_id=int(id),
+                before_data={"deleted": True, "cloudinary_ids": public_ids},
+            )
+            for public_id in public_ids:
+                BackgroundJob.objects.create(kind="media_cleanup", payload={"public_id": public_id})
+            item.delete()
         return Response({"success": True, "message": "Item permanently deleted"})

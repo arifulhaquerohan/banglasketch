@@ -10,7 +10,7 @@ This guide explains step-by-step how to host the **Bangla Sketch** website and C
 
 * **Frontend:** Next.js 15 (React 19, Tailwind CSS) — runs on port `3000`
 * **Backend:** Node.js Express 4 API — runs on port `5000`
-* **Database:** PostgreSQL (Supabase or self-hosted)
+* **Database:** PostgreSQL (self-hosted or any managed provider)
 * **Storage:** Cloudinary (for images & media)
 * **Email:** Nodemailer SMTP (Gmail or custom domain SMTP)
 

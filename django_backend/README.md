@@ -122,13 +122,13 @@ python scripts/verify_backup.py
 ### Gunicorn
 Run via Gunicorn with 3 workers:
 ```bash
-gunicorn banglasketch_api.wsgi:application --bind 127.0.0.1:5000 --workers 3
+gunicorn config.wsgi:application --bind 127.0.0.1:5000 --workers 3
 ```
 
 ### PM2 Integration
 Run backend API and workers via PM2:
 ```bash
-pm2 start "django_backend/.venv/bin/gunicorn banglasketch_api.wsgi:application --bind 127.0.0.1:5000 --workers 3" --name banglasketch-api
+pm2 start "django_backend/.venv/bin/gunicorn config.wsgi:application --bind 127.0.0.1:5000 --workers 3" --name banglasketch-api
 pm2 start "django_backend/.venv/bin/python manage.py run_email_worker" --name banglasketch-email-worker
 pm2 start "django_backend/.venv/bin/python manage.py run_jobs" --name banglasketch-scheduler
 ```

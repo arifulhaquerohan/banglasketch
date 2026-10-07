@@ -8,7 +8,7 @@ This step-by-step guide explains how to host the **Bangla Sketch** platform (Nex
 
 * **Frontend:** Next.js 15 App Router (`frontend/`) — starts via `server.js` on your main domain (`yourdomain.com`).
 * **Backend:** Node.js Express API (`backend/`) — starts via `server.js` on your API subdomain (`api.yourdomain.com`) or subpath.
-* **Database:** PostgreSQL on Supabase (configured in `backend/.env`).
+* **Database:** PostgreSQL (configured in `backend/.env`).
 * **Image Media:** Cloudinary (already integrated and configured).
 * **Email / Notifications:** Gmail SMTP App Password (already configured in `backend/.env`).
 

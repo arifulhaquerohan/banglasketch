@@ -1,5 +1,11 @@
 from django.urls import path, re_path
-from .invoice_views import AdminInvoicesView, AdminInvoiceDetailView, AdminInvoicePDFView
+from .invoice_views import (
+    AdminInvoicesView,
+    AdminInvoiceDetailView,
+    AdminInvoicePDFView,
+    AdminInvoiceSendEmailView,
+    PublicInvoicePDFView,
+)
 from .views import (
     HealthCheckView,
     HealthLiveView,
@@ -18,11 +24,13 @@ core_public_urlpatterns = [
     re_path(r"^health/?$", HealthCheckView.as_view(), name="health_check"),
     re_path(r"^health/live/?$", HealthLiveView.as_view(), name="health_live"),
     re_path(r"^health/ready/?$", HealthReadyView.as_view(), name="health_ready"),
+    path("invoices/<uuid:invoice_id>/pdf", PublicInvoicePDFView.as_view(), name="public_invoice_pdf"),
 ]
 
 core_admin_urlpatterns = [
     re_path(r"^invoices/?$", AdminInvoicesView.as_view(), name="admin_invoices"),
     path("invoices/<uuid:invoice_id>/pdf", AdminInvoicePDFView.as_view(), name="admin_invoice_pdf"),
+    path("invoices/<uuid:invoice_id>/send-email", AdminInvoiceSendEmailView.as_view(), name="admin_invoice_send_email"),
     path("invoices/<uuid:invoice_id>", AdminInvoiceDetailView.as_view(), name="admin_invoice_detail"),
     re_path(r"^(?:dashboard-)?stats/?$", AdminDashboardStatsView.as_view(), name="admin_dashboard_stats"),
     re_path(r"^settings(?:/(?P<key>[\w.-]+))?/?$", AdminSettingsView.as_view(), name="admin_settings"),

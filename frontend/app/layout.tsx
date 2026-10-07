@@ -68,7 +68,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${instrumentSerif.variable} ${manrope.variable} ${notoSerifBengali.variable} ${notoSansBengali.variable} ${manrope.className}`}
     >
-      <body className="bg-ivory text-charcoal overflow-x-hidden min-h-screen selection:bg-olive-tint selection:text-olive-dark font-sans">
+      {/* Extensions such as Grammarly add body attributes before hydration. */}
+      <body
+        suppressHydrationWarning
+        className="bg-ivory text-charcoal overflow-x-hidden min-h-screen selection:bg-olive-tint selection:text-olive-dark font-sans"
+      >
         <SpaceCollectionProvider>
           <a
             href="#main-content"

@@ -106,3 +106,12 @@ test("login only redirects to local admin pages", () => {
     assert.equal(adminReturnPath(path), "/admin");
   }
 });
+
+test("recycle-bin tabs isolate requests and reject stale refresh results", () => {
+  const source = fs.readFileSync(require.resolve("../app/admin/trash/page.tsx"), "utf8");
+  assert.match(source, /<RecycleBinTab key=\{activeTab\}/);
+  assert.match(source, /const sequence = \+\+requestSequence\.current/);
+  assert.match(source, /if \(sequence !== requestSequence\.current\) return;\s*if \(result.success/);
+  assert.match(source, /return \(\) => \{ requestSequence\.current \+= 1; \}/);
+  assert.match(source, /onClick=\{\(\) => setActiveTab\(tab.id\)\}\s*disabled=\{actionId !== null\}/);
+});

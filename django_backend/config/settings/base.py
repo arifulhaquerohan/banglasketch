@@ -3,6 +3,7 @@ Django settings for banglasketch_api project.
 """
 
 import os
+import sys
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 from dotenv import load_dotenv
@@ -93,14 +94,16 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 # Database Configuration
-DATABASE_URL = os.getenv("DATABASE_URL")
+RUNNING_TESTS = "test" in sys.argv
+USE_EXTERNAL_TEST_DB = os.getenv("USE_EXTERNAL_TEST_DB") == "1"
+DATABASE_URL = os.getenv("DATABASE_URL") if not (RUNNING_TESTS and not USE_EXTERNAL_TEST_DB) else None
 if DATABASE_URL and urlparse(DATABASE_URL).scheme not in ("postgres", "postgresql"):
     raise ImproperlyConfigured("DATABASE_URL must use postgres:// or postgresql://")
 if DATABASE_URL and (DATABASE_URL.startswith("postgres://") or DATABASE_URL.startswith("postgresql://")):
     parsed = urlparse(DATABASE_URL)
     if not parsed.hostname or not parsed.path.lstrip("/"):
         raise ImproperlyConfigured("DATABASE_URL must include a host and database name")
-    # Handle Supabase/PostgreSQL SSL options from environment
+    # Handle PostgreSQL SSL options from environment
     ssl_mode = os.getenv("DB_SSL_MODE", "require")
     ssl_ca_file = os.getenv("DB_SSL_CA_FILE")
 

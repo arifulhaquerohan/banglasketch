@@ -169,3 +169,26 @@ class ClientProjectSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
+
+
+class ProposalDocumentInputSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+    url = serializers.URLField(max_length=2048)
+    type = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    size = serializers.IntegerField(min_value=0, required=False)
+
+    def validate_url(self, value):
+        if not value.lower().startswith(("https://", "http://")):
+            raise serializers.ValidationError("Document links must use HTTP or HTTPS.")
+        return value
+
+
+class ProposalVersionInputSerializer(serializers.Serializer):
+    scope_summary = serializers.CharField()
+    proposed_cost = serializers.DecimalField(max_digits=14, decimal_places=2, min_value=0)
+    timeline_days = serializers.IntegerField(min_value=0, max_value=2147483647, required=False, allow_null=True, default=None)
+    documents = ProposalDocumentInputSerializer(many=True, required=False, default=list)
+
+
+class ProposalInputSerializer(ProposalVersionInputSerializer):
+    title = serializers.CharField(max_length=255)

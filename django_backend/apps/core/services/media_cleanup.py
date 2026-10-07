@@ -17,9 +17,9 @@ def delete_media_from_cloudinary(public_id):
                 api_secret=settings.CLOUDINARY_API_SECRET,
                 secure=True,
             )
-        result = cloudinary.uploader.destroy(public_id)
+        result = cloudinary.uploader.destroy(public_id, timeout=15)
         logger.info(f"Cloudinary deletion result for {public_id}: {result}")
-        if result.get("result") == "ok":
+        if result.get("result") in ("ok", "not found"):
             return True
         else:
             logger.error(f"Failed to delete {public_id} from Cloudinary: {result}")

@@ -25,6 +25,8 @@ from .serializers import (
     ClientProjectSerializer,
     ProposalSerializer,
     ProposalVersionSerializer,
+    ProposalInputSerializer,
+    ProposalVersionInputSerializer,
     ChangeOrderSerializer,
 )
 
@@ -329,6 +331,9 @@ class PublicPortalProposalDecisionView(APIView):
             version = versions.order_by("-version").first()
             if version is None:
                 return Response({"success": False, "error": "Proposal version not found"}, status=404)
+
+        if version is not None and version.proposed_cost < 0:
+            return Response({"success": False, "error": "Proposal cost cannot be negative. Create a corrected version before approval."}, status=400)
 
         proposal.status = decision
         proposal.approval_notes = notes
@@ -1112,28 +1117,23 @@ class AdminProposalCreateView(APIView):
         if not cp:
             return Response({"success": False, "error": "Project not found"}, status=404)
 
-        title = (request.data.get("title") or "").strip()
-        scope_summary = (request.data.get("scope_summary") or "").strip()
-        proposed_cost = request.data.get("proposed_cost")
-        timeline_days = request.data.get("timeline_days")
-        documents = request.data.get("documents") or []
-
-        if not title or not scope_summary or proposed_cost is None:
-            return Response({"success": False, "error": "Title, scope summary, and proposed cost are required"}, status=400)
+        serializer = ProposalInputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
 
         with transaction.atomic():
             proposal = Proposal.objects.create(
                 project=cp,
-                title=title,
+                title=data["title"],
                 status="draft",
             )
             version = ProposalVersion.objects.create(
                 proposal=proposal,
                 version=1,
-                scope_summary=scope_summary,
-                proposed_cost=proposed_cost,
-                timeline_days=timeline_days or None,
-                documents=documents,
+                scope_summary=data["scope_summary"],
+                proposed_cost=data["proposed_cost"],
+                timeline_days=data["timeline_days"],
+                documents=data["documents"],
                 actor=request.user if hasattr(request.user, "id") else None,
             )
 
@@ -1161,17 +1161,13 @@ class AdminProposalVersionCreateView(APIView):
     permission_classes = [IsAdminUserAuthenticated, require_role("editor")]
 
     def post(self, request, id):
-        proposal = Proposal.objects.filter(pk=id).first()
+        proposal = Proposal.objects.filter(pk=id, project__deleted_at__isnull=True).first()
         if not proposal:
             return Response({"success": False, "error": "Proposal not found"}, status=404)
 
-        scope_summary = (request.data.get("scope_summary") or "").strip()
-        proposed_cost = request.data.get("proposed_cost")
-        timeline_days = request.data.get("timeline_days")
-        documents = request.data.get("documents") or []
-
-        if not scope_summary or proposed_cost is None:
-            return Response({"success": False, "error": "Scope summary and proposed cost are required"}, status=400)
+        serializer = ProposalVersionInputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
 
         with transaction.atomic():
             max_v = ProposalVersion.objects.filter(proposal=proposal).order_by("-version").first()
@@ -1180,10 +1176,10 @@ class AdminProposalVersionCreateView(APIView):
             version = ProposalVersion.objects.create(
                 proposal=proposal,
                 version=next_version,
-                scope_summary=scope_summary,
-                proposed_cost=proposed_cost,
-                timeline_days=timeline_days or None,
-                documents=documents,
+                scope_summary=data["scope_summary"],
+                proposed_cost=data["proposed_cost"],
+                timeline_days=data["timeline_days"],
+                documents=data["documents"],
                 actor=request.user if hasattr(request.user, "id") else None,
             )
             proposal.updated_at = timezone.now()
@@ -1235,6 +1231,9 @@ class AdminProposalApproveView(APIView):
 
             if not version:
                 return Response({"success": False, "error": "Specified proposal version not found"}, status=404)
+
+            if version.proposed_cost < 0:
+                return Response({"success": False, "error": "Proposal cost cannot be negative. Create a corrected version before approval."}, status=400)
 
             # Lock and re-fetch the proposal to prevent race conditions
             proposal = Proposal.objects.select_for_update().get(pk=proposal.pk)

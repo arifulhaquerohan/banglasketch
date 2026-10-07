@@ -28,6 +28,9 @@ class InvoiceTests(TestCase):
         self.admin = AdminUser.objects.create(email="invoice-test@example.com", role="admin", active=True)
         self.client.force_authenticate(self.admin)
         self.data = sample_invoice()
+        retrieval = patch("apps.core.invoice_views.requests.get", return_value=Mock(content=b"%PDF-archive", raise_for_status=lambda: None))
+        retrieval.start()
+        self.addCleanup(retrieval.stop)
 
     def save(self):
         return self.client.post("/api/admin/invoices", self.data, format="json")
@@ -110,6 +113,65 @@ class InvoiceTests(TestCase):
             self.assertIn(self.client.get("/api/admin/invoices").status_code, (401,403))
             self.assertIn(self.save().status_code, (401,403))
             self.assertIn(self.client.get(f'/api/admin/invoices/{self.data["id"]}/pdf').status_code, (401,403))
+            self.assertIn(self.client.post(f'/api/admin/invoices/{self.data["id"]}/send-email', {}).status_code, (401,403))
+
+    @patch("apps.core.invoice_views.cloudinary.uploader.upload")
+    @patch("apps.core.invoice_views.render_invoice_pdf", return_value=b"%PDF-public-view")
+    def test_public_invoice_pdf_retrieval(self, render, upload):
+        upload.return_value = {"public_id":"banglasketch/invoices/test/public.pdf"}
+        self.save()
+        anon_client = APIClient()
+        response = anon_client.get(f'/api/invoices/{self.data["id"]}/pdf')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["content-type"], "application/pdf")
+        self.assertEqual(response.headers["Cache-Control"], "private, no-store")
+        self.assertIn(f"BanglaSketch-Invoice-{self.data['number']}.pdf", response.headers["content-disposition"])
+        # Non-existent invoice returns 404
+        self.assertEqual(anon_client.get(f'/api/invoices/{uuid4()}/pdf').status_code, 404)
+
+    @patch("apps.core.invoice_views.cloudinary.uploader.upload")
+    @patch("apps.core.invoice_views.render_invoice_pdf", return_value=b"%PDF-email-attachment")
+    def test_admin_invoice_send_email_success_and_validation(self, render, upload):
+        from django.core import mail
+        from apps.core.models import AuditLog
+        upload.return_value = {"public_id":"banglasketch/invoices/test/email.pdf"}
+        self.save()
+
+        # Missing email when neither payload nor request provides one
+        res = self.client.post(f'/api/admin/invoices/{self.data["id"]}/send-email', {}, format="json")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("Please provide a valid client email", res.data["error"])
+
+        # Invalid email format
+        res = self.client.post(f'/api/admin/invoices/{self.data["id"]}/send-email', {"recipient_email": "invalid-email"}, format="json")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("Invalid email", res.data["error"])
+
+        # Success with custom note and recipient
+        mail.outbox.clear()
+        res = self.client.post(
+            f'/api/admin/invoices/{self.data["id"]}/send-email',
+            {"recipient_email": "client@example.com", "custom_notes": "Please transfer via bKash or Bank."},
+            format="json"
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(res.data["success"])
+        self.assertIn("successfully emailed to client@example.com", res.data["message"])
+
+        # Check delivered mail outbox
+        self.assertEqual(len(mail.outbox), 1)
+        sent_msg = mail.outbox[0]
+        self.assertIn(self.data["number"], sent_msg.subject)
+        self.assertEqual(sent_msg.to, ["client@example.com"])
+        self.assertIn("Please transfer via bKash or Bank.", sent_msg.body)
+        self.assertEqual(len(sent_msg.attachments), 1)
+        self.assertEqual(sent_msg.attachments[0][0], f"Invoice-{self.data['number']}.pdf")
+        self.assertEqual(sent_msg.attachments[0][2], "application/pdf")
+
+        # Verify AuditLog entry
+        audit = AuditLog.objects.filter(entity_type="invoice", entity_id=self.data["id"], action="invoice_email_sent").first()
+        self.assertIsNotNone(audit)
+        self.assertEqual(audit.after_data["recipient"], "client@example.com")
 
     def test_pdf_renderer_with_unicode_and_long_table(self):
         data = {**self.data, "client":"রহমান", "notes":"<script>alert('escaped')</script>"}
@@ -173,3 +235,23 @@ class InvoiceTests(TestCase):
         self.assertGreater(job.available_at, timezone.now())
         command.process_background_jobs()
         self.assertEqual(destroy.call_count, 1)
+
+    def test_pdf_hides_decimal_string_zero_adjustments(self):
+        data = {**self.data, "discount": "0.00", "tax": "0.00"}
+        with patch("apps.core.services.invoice_pdf.render_to_string", return_value="<p>Invoice</p>") as template:
+            render_invoice_pdf(data)
+        context = template.call_args.args[1]
+        self.assertFalse(context["has_discount"])
+        self.assertFalse(context["has_tax"])
+
+    def test_email_validation_and_provider_errors(self):
+        Invoice.objects.create(id=self.data["id"], number=self.data["number"], payload=self.data)
+        url = f'/api/admin/invoices/{self.data["id"]}/send-email'
+        self.assertEqual(self.client.post(url, ["bad"], format="json").status_code, 400)
+        self.assertEqual(self.client.post(url, {"custom_notes": "x" * 5001}, format="json").status_code, 400)
+        with patch("apps.core.invoice_views.get_invoice_pdf_content", return_value=b"%PDF-test"), patch(
+            "apps.core.invoice_views.EmailMultiAlternatives.send", side_effect=RuntimeError("private-provider-secret")
+        ):
+            response = self.client.post(url, {"recipient_email": "client@example.com"}, format="json")
+        self.assertEqual(response.status_code, 502)
+        self.assertNotIn("private-provider-secret", str(response.data))

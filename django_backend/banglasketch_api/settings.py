@@ -105,7 +105,7 @@ if DATABASE_URL and (DATABASE_URL.startswith("postgres://") or DATABASE_URL.star
     parsed = urlparse(DATABASE_URL)
     if not parsed.hostname or not parsed.path.lstrip("/"):
         raise ImproperlyConfigured("DATABASE_URL must include a host and database name")
-    # Handle Supabase/PostgreSQL SSL options from environment
+    # Handle PostgreSQL SSL options from environment
     ssl_mode = os.getenv("DB_SSL_MODE", "require")
     ssl_ca_file = os.getenv("DB_SSL_CA_FILE")
 
@@ -121,9 +121,6 @@ if DATABASE_URL and (DATABASE_URL.startswith("postgres://") or DATABASE_URL.star
             # Log warning or raise error if verification is requested but CA file is missing
             pass
 
-    is_pooler = "pooler.supabase.com" in (parsed.hostname or "") or parsed.port == 6543
-    default_conn_max_age = 0 if is_pooler else 60
-
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -132,8 +129,7 @@ if DATABASE_URL and (DATABASE_URL.startswith("postgres://") or DATABASE_URL.star
             "PASSWORD": unquote(parsed.password or ""),
             "HOST": parsed.hostname or "localhost",
             "PORT": parsed.port or 5432,
-            "CONN_MAX_AGE": int(os.getenv("CONN_MAX_AGE", default_conn_max_age)),
-            "DISABLE_SERVER_SIDE_CURSORS": is_pooler,
+            "CONN_MAX_AGE": int(os.getenv("CONN_MAX_AGE", 60)),
             "OPTIONS": {
                 "sslmode": ssl_mode,
                 **ssl_options,

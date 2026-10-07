@@ -2,6 +2,8 @@
 
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
+import { normalizeProposalDocuments } from "@/lib/proposal-documents";
+import { CONTACT } from "@/lib/constants";
 import {
   FiCheckCircle,
   FiClock,
@@ -401,9 +403,9 @@ export default function ClientPortalPage({
                                       {ver.scope_summary}
                                     </p>
 
-                                    {ver.documents && ver.documents.length > 0 && (
+                                    {normalizeProposalDocuments(ver.documents).length > 0 && (
                                       <div className="flex flex-wrap gap-2 pt-1">
-                                        {ver.documents.map((doc, idx) => (
+                                        {normalizeProposalDocuments(ver.documents).map((doc, idx) => (
                                           <a
                                             key={idx}
                                             href={doc.url}
@@ -486,13 +488,13 @@ export default function ClientPortalPage({
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs font-semibold text-[#586348]">
             <a
-              href="tel:+8801700000000"
+              href={`tel:${CONTACT.phone.replace(/[^+\d]/g, "")}`}
               className="px-4 py-2 bg-[#F7F4EE] border border-[#DED5C7] rounded-xl hover:bg-[#EBE4D8] transition"
             >
               Call Us Directly
             </a>
             <a
-              href="mailto:info@banglasketch.com"
+              href={`mailto:${CONTACT.email}`}
               className="px-4 py-2 bg-[#586348] text-white rounded-xl hover:bg-[#444D37] transition"
             >
               Email Project Team
