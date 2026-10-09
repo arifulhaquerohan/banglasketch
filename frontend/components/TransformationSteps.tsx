@@ -1,246 +1,86 @@
 "use client";
 
-import React, { useState } from "react";
-import { FiCheckCircle, FiFileText, FiLayers, FiShield, FiSliders, FiTool } from "react-icons/fi";
+import Link from "next/link";
+import { useState } from "react";
+import { FiArrowRight, FiMinus, FiPlus } from "react-icons/fi";
 
-interface PhaseStep {
-  step: string;
-  title: string;
-  subtitle: string;
-  timeline: string;
-  description: string;
-  deliverable: string;
-  deliverableDetails: string[];
-  icon: React.ReactNode;
-}
-
-const PHASES: PhaseStep[] = [
+const PHASES = [
   {
     step: "01",
-    title: "Consultation & Site Visit",
-    subtitle: "Understanding How You Live",
-    timeline: "Week 01 – 02",
-    description:
-      "We visit your home in Dhaka, measure the space, study the natural light, and discuss how you actually use each room day to day.",
-    deliverable: "Spatial Audit Document & Mood Intent Matrix",
-    deliverableDetails: [
-      "Precise laser site dimensional survey",
-      "Sunlight angle & cross-ventilation analysis",
-      "Lifestyle habit & storage inventory worksheet",
-    ],
-    icon: <FiFileText className="text-[#A45138]" size={20} />,
+    title: "First, we listen.",
+    label: "Consultation & site visit",
+    description: "We get to know your everyday routines, your ideas, and your space. A site visit helps us understand the light, layout, and possibilities.",
+    deliverable: "Your design brief, site measurements, and initial direction.",
   },
   {
     step: "02",
-    title: "Layout Plan & 3D Design",
-    subtitle: "Seeing Your Space Before Building",
-    timeline: "Week 03 – 04",
-    description:
-      "We produce detailed 2D floor plans and photorealistic 3D views. You see the room proportions, cabinetry, and lighting before any construction begins.",
-    deliverable: "Photorealistic 3D Renders & CAD Layout Blueprints",
-    deliverableDetails: [
-      "High-resolution 3D walkthroughs for each room",
-      "Dimensioned 2D floor plans & furniture clearances",
-      "Reflected ceiling plans & HVAC plenum layouts",
-    ],
-    icon: <FiLayers className="text-[#727A61]" size={20} />,
+    title: "See the possibilities.",
+    label: "Layout & 3D design",
+    description: "Floor plans and 3D views bring your ideas into focus. Together, we refine the arrangement, furniture, and lighting before building begins.",
+    deliverable: "Floor plans and 3D visualisations of your future space.",
   },
   {
     step: "03",
-    title: "Material Selection & Final Budget",
-    subtitle: "Touching Samples & Agreeing the Numbers",
-    timeline: "Week 05 – 06",
-    description:
-      "We invite you to our studio to touch authentic marble slabs, natural teak veneers, textured linens, and aged brass samples. Zero ambiguous selections.",
-    deliverable: "Physical Swatch Board & Transparent Itemized BOQ",
-    deliverableDetails: [
-      "Tangible sample board for woods, stones & hardware",
-      "100% itemized bill of quantities with fixed pricing",
-      "Sanitary fixture & architectural lighting schedule",
-    ],
-    icon: <FiSliders className="text-[#A45138]" size={20} />,
+    title: "Make it feel like you.",
+    label: "Materials & budget",
+    description: "Explore textures, finishes, and material samples with us. We agree on the details and an itemised budget so you can move forward with confidence.",
+    deliverable: "Your material selections and an itemised project budget.",
   },
   {
     step: "04",
-    title: "Construction & Site Supervision",
-    subtitle: "Built Exactly as Designed",
-    timeline: "Week 07 – 14",
-    description:
-      "Our dedicated full-time site architects oversee master carpenters, marble masons, and certified electricians. Every joint and shadowline is verified against drawings.",
-    deliverable: "Weekly Milestone Verification & Quality Logs",
-    deliverableDetails: [
-      "On-site resident engineer supervision daily",
-      "Weekly photo & 360° video progress reports",
-      "Pre-installation MEP acoustic pressure testing",
-    ],
-    icon: <FiTool className="text-[#727A61]" size={20} />,
+    title: "Watch it come together.",
+    label: "Build & supervision",
+    description: "Our team coordinates the craftspeople and installation, checks the work against the design, and keeps you informed as your space takes shape.",
+    deliverable: "Coordinated site supervision and regular progress updates.",
   },
   {
     step: "05",
-    title: "Handover & Warranty",
-    subtitle: "Moving into Your New Space",
-    timeline: "Week 15",
-    description:
-      "Deep architectural cleaning, lighting scene calibration, custom soft furnishings placement, and formal handover of your completed sanctuary.",
-    deliverable: "10-Year Craftsmanship Warranty & Care Manual",
-    deliverableDetails: [
-      "Formal certificate of 10-year structural warranty",
-      "Architectural Living Manual with material maintenance tips",
-      "Complimentary 6-month and 12-month post-handover tune-up",
-    ],
-    icon: <FiShield className="text-[#A45138]" size={20} />,
+    title: "Welcome home.",
+    label: "Finishing & handover",
+    description: "We take care of the finishing touches, walk through your completed space with you, and explain how to care for its materials and fittings.",
+    deliverable: "Your finished space, final walkthrough, and care guidance.",
   },
 ];
 
 export function TransformationSteps() {
-  const [activeStep, setActiveStep] = useState<string>("01");
+  const [activeStep, setActiveStep] = useState<string | null>("01");
 
   return (
-    <section className="section bg-[#FAF7F2] border-b border-[#DDD5C8] relative">
-      <div className="container">
-        {/* Header */}
-        <div className="max-w-3xl mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF7F2] border border-[#DDD5C8] text-[11px] font-semibold tracking-widest uppercase text-[#727A61] mb-3">
-            <span className="w-2 h-2 rounded-full bg-[#A45138]" />
-            <span>Our Process</span>
-          </div>
-
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#242622] tracking-tight leading-[1.15]">
-            How It Works
-          </h2>
-
-          <p className="text-base sm:text-lg text-[#5A6057] mt-3 leading-relaxed">
-            Five clear steps from first conversation to finished home. At each stage you receive a concrete deliverable — so you always know exactly where your project stands.
-          </p>
+    <section id="process" aria-labelledby="process-heading" className="scroll-mt-24 border-b border-[#DDD5C8] bg-[#FAF7F2] py-16 sm:py-20 lg:py-24">
+      <div className="container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
+        <div>
+          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-[#6A705D]">The way we work</p>
+          <h2 id="process-heading" className="max-w-sm font-serif text-4xl font-normal leading-[1.1] sm:text-5xl lg:text-[56px]">Good design.<br /><span className="italic text-[#727A61]">A clear process.</span></h2>
+          <p className="mt-6 max-w-sm text-base leading-7 text-[#5A6057]">From our first conversation to the day you move in, we make each step considered, collaborative, and easy to understand.</p>
+          <Link href="/contact" className="mt-7 inline-flex min-h-11 items-center gap-5 border-b border-[#A45138]/50 text-sm font-medium text-[#A45138] transition-colors hover:text-[#893E28]">Start a conversation <FiArrowRight aria-hidden="true" /></Link>
         </div>
 
-        {/* Desktop Fine Animated Line Timeline */}
-        <div className="relative">
-          {/* Continuous Fine Architectural Axis Rule */}
-          <div className="hidden lg:block absolute top-[44px] left-8 right-8 h-[1.5px] bg-[#DDD5C8] z-0">
-            {/* Animated accent gradient runner */}
-            <div className="h-full bg-[#727A61]/60 w-full" />
-          </div>
-
-          {/* 5 Phase Column Cards */}
-          <div className="grid lg:grid-cols-5 gap-6 relative z-10">
-            {PHASES.map((phase) => {
-              const isActive = activeStep === phase.step;
-              return (
-                <div
-                  key={phase.step}
-                  onClick={() => setActiveStep(phase.step)}
-                  className={`cursor-pointer rounded-xl p-5 sm:p-6 transition-all duration-300 border flex flex-col justify-between ${
-                    isActive
-                      ? "bg-[#F4F0E8] border-[#A45138] ring-1 ring-[#A45138] shadow-lg translate-y-[-4px]"
-                      : "bg-[#FAF7F2] border-[#DDD5C8] hover:border-[#727A61] hover:bg-[#FAF7F2]/90"
-                  }`}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setActiveStep(phase.step);
-                    }
-                  }}
-                >
-                  <div>
-                    {/* Top Step Pill & Timeline */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div
-                        className={`w-9 h-9 rounded-full flex items-center justify-center font-mono font-bold text-xs border transition-colors ${
-                          isActive
-                            ? "bg-[#A45138] text-white border-[#A45138]"
-                            : "bg-[#FAF7F2] text-[#242622] border-[#DDD5C8]"
-                        }`}
-                      >
-                        {phase.step}
-                      </div>
-                      <span className="text-[10px] font-mono text-[#727A61] uppercase tracking-wider">
-                        {phase.timeline}
-                      </span>
-                    </div>
-
-                    <h3 className="font-serif text-lg font-semibold text-[#242622] mb-1.5 leading-snug">
-                      {phase.title}
-                    </h3>
-                    <p className="text-xs text-[#727A61] font-medium mb-3">
-                      {phase.subtitle}
-                    </p>
-                    <p className="text-xs text-[#5A6057] leading-relaxed mb-4 line-clamp-3">
-                      {phase.description}
-                    </p>
-                  </div>
-
-                  {/* Concrete Deliverable Badge */}
-                  <div className="pt-4 border-t border-[#DDD5C8]/80">
-                    <span className="architectural-tag text-[#A45138] block text-[9px] mb-1">
-                      Deliverable
+        <div className="border-t border-[#D4CEC2]">
+          {PHASES.map((phase) => {
+            const isActive = activeStep === phase.step;
+            return (
+              <div key={phase.step} className="border-b border-[#D4CEC2]">
+                <h3>
+                  <button id={`process-button-${phase.step}`} type="button" aria-expanded={isActive} aria-controls={`process-panel-${phase.step}`} onClick={() => setActiveStep(isActive ? null : phase.step)} className="group flex w-full items-center gap-4 py-5 text-left sm:gap-6 sm:py-6">
+                    <span className={`font-sans text-xs font-medium ${isActive ? "text-[#A45138]" : "text-[#6A705D]"}`}>{phase.step}</span>
+                    <span className="flex-1">
+                      <span className={`block font-serif text-2xl font-normal transition-colors sm:text-[28px] ${isActive ? "text-[#A45138]" : "text-[#242622] group-hover:text-[#A45138]"}`}>{phase.title}</span>
+                      <span className="mt-1 block font-sans text-xs font-normal tracking-wide text-[#64695F]">{phase.label}</span>
                     </span>
-                    <div className="text-xs font-semibold text-[#242622] leading-snug flex items-start gap-1.5">
-                      <FiCheckCircle className="text-[#727A61] shrink-0 mt-0.5" size={13} />
-                      <span>{phase.deliverable}</span>
-                    </div>
+                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-colors ${isActive ? "border-[#A45138] bg-[#A45138] text-white" : "border-[#CCC8BB] text-[#5A6057] group-hover:border-[#A45138]"}`}>{isActive ? <FiMinus aria-hidden="true" size={15} /> : <FiPlus aria-hidden="true" size={15} />}</span>
+                  </button>
+                </h3>
+                <div id={`process-panel-${phase.step}`} role="region" aria-labelledby={`process-button-${phase.step}`} hidden={!isActive} className="pb-6 pl-8 pr-4 sm:pl-10 sm:pr-12">
+                  <p className="max-w-lg text-base leading-7 text-[#5A6057]">{phase.description}</p>
+                  <div className="mt-4 border-l-2 border-[#B5BBA5] pl-4">
+                    <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.14em] text-[#6A705D]">What you receive</span>
+                    <p className="text-xs leading-6 text-[#41473D]">{phase.deliverable}</p>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Detailed Expanded Inspector for Active Phase */}
-        {(() => {
-          const selected = PHASES.find((p) => p.step === activeStep) || PHASES[0];
-          return (
-            <div className="mt-10 p-6 sm:p-8 rounded-2xl bg-[#F4F0E8] border border-[#DDD5C8] shadow-sm animate-fade-in">
-              <div className="grid md:grid-cols-12 gap-6 items-center">
-                <div className="md:col-span-8 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="architectural-tag text-[#A45138]">Phase {selected.step} Milestone Deep-Dive</span>
-                    <span className="text-[#DDD5C8]">•</span>
-                    <span className="text-xs font-mono text-[#727A61]">{selected.timeline}</span>
-                  </div>
-                  <h4 className="font-serif text-2xl font-semibold text-[#242622]">
-                    {selected.title}: What Homeowners Receive
-                  </h4>
-                  <p className="text-sm text-[#5A6057] leading-relaxed">
-                    {selected.description}
-                  </p>
-                  <div className="pt-2 grid sm:grid-cols-3 gap-3">
-                    {selected.deliverableDetails.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3 rounded-lg bg-[#FAF7F2] border border-[#DDD5C8] text-xs text-[#242622] flex items-center gap-2"
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#A45138] shrink-0" />
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="md:col-span-4 p-5 rounded-xl bg-[#242622] text-[#FAF7F2] space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                      {selected.icon}
-                    </div>
-                    <div>
-                      <span className="architectural-tag text-[#DDD5C8] text-[9px] block">
-                        Official Deliverable
-                      </span>
-                      <h5 className="font-serif text-sm font-semibold text-white">
-                        {selected.deliverable}
-                      </h5>
-                    </div>
-                  </div>
-                  <p className="text-xs text-[#DDD5C8]/80 leading-relaxed border-t border-white/10 pt-2">
-                    All deliverables are transferred into your digital studio dossier and backed by our turnkey guarantee.
-                  </p>
                 </div>
               </div>
-            </div>
-          );
-        })()}
+            );
+          })}
+        </div>
       </div>
     </section>
   );

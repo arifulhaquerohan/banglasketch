@@ -1,5 +1,6 @@
 from django.urls import re_path
 from .views import (
+    AdminClientPortalRenewView,
     PublicPortalView,
     PublicPortalProposalDecisionView,
     PublicPortalChangeOrderDecisionView,
@@ -47,6 +48,7 @@ client_handling_admin_urlpatterns = [
     re_path(r"^enquiries/(?P<id>\d+)/convert-to-project/?$", AdminEnquiryConvertToProjectView.as_view(), name="admin_enquiry_convert_to_project"),
 
     # Clients
+    re_path(r"^clients/(?P<pk>\d+)/portal-link/?$", AdminClientPortalRenewView.as_view(), name="admin_client_portal_renew"),
     re_path(r"^clients/?$", AdminClientListCreateView.as_view(), name="admin_clients_list_create"),
     re_path(r"^clients/(?P<pk>\d+)/?$", AdminClientDetailUpdateDeleteView.as_view(), name="admin_client_detail_update_delete"),
 

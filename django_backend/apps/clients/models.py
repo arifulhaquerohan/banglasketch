@@ -1,5 +1,11 @@
 from django.db import models
 from apps.authentication.models import AdminUser
+from django.utils import timezone
+from datetime import timedelta
+
+
+def portal_expiry():
+    return timezone.now() + timedelta(days=30)
 
 class Client(models.Model):
     name = models.CharField(max_length=255)
@@ -8,6 +14,7 @@ class Client(models.Model):
     alternate_phone = models.CharField(max_length=50, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     portal_token = models.CharField(max_length=64, unique=True, blank=True, null=True)
+    portal_token_expires_at = models.DateTimeField(default=portal_expiry)
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

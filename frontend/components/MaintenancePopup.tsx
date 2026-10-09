@@ -7,6 +7,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import { FiArrowUpRight, FiArrowRight, FiClock, FiMail, FiPhone, FiTool, FiX } from "react-icons/fi";
 import { DEFAULT_MAINTENANCE_CONFIG, MaintenanceConfig } from "../lib/maintenance.types";
+import { readBrowserStorage, writeBrowserStorage } from "../lib/browser-storage";
 
 export function MaintenancePopup() {
   const pathname = usePathname();
@@ -23,7 +24,7 @@ export function MaintenancePopup() {
     setMounted(true);
 
     // Check if dismissed in this session
-    const isDismissed = typeof window !== "undefined" ? sessionStorage.getItem("bs_maintenance_dismissed") === "true" : false;
+    const isDismissed = readBrowserStorage("sessionStorage", "bs_maintenance_dismissed") === "true";
     setDismissed(isDismissed);
 
     // Fetch live maintenance config
@@ -45,9 +46,7 @@ export function MaintenancePopup() {
 
   const handleDismiss = () => {
     setDismissed(true);
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("bs_maintenance_dismissed", "true");
-    }
+    writeBrowserStorage("sessionStorage", "bs_maintenance_dismissed", "true");
   };
 
   useEffect(() => {

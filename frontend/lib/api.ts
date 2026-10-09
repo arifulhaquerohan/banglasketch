@@ -13,6 +13,11 @@ export interface Project {
   description: string;
   category: ServiceCategory;
   location?: string;
+  scope?: string;
+  materials?: string;
+  timeline?: string;
+  design_challenge?: string;
+  design_solution?: string;
   area?: string;
   style?: string;
   year?: string;
@@ -103,10 +108,10 @@ function normalizeProject(raw: any): Project {
     ...raw,
     featured_image: img,
     coverImage: img,
-    location: raw.location || (raw.client_location ? raw.client_location : "Dhaka, Bangladesh"),
-    area: raw.area || (raw.space_size ? raw.space_size : "Bespoke Residence"),
-    style: raw.style || "Quiet Luxury",
-    year: raw.year || (raw.date_completed ? new Date(raw.date_completed).getFullYear().toString() : "2026"),
+    location: raw.location || raw.client_location || "",
+    area: raw.area || raw.space_size || "",
+    style: raw.style || "",
+    year: raw.year || (raw.date_completed ? raw.date_completed.slice(0, 4) : ""),
     beforeImage: raw.before_image || raw.beforeImage,
     afterImage: raw.after_image || raw.afterImage,
     gallery: normalizeStringArray(raw.gallery),
@@ -298,13 +303,14 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
   return match ? normalizeBlogPost(match) : null;
 }
 
-export async function getTestimonials(featured?: boolean): Promise<Testimonial[]> {
+export async function getTestimonials(featured?: boolean, allowSamples = true): Promise<Testimonial[]> {
   try {
     return (await fetchCollection("testimonials", new URLSearchParams(featured ? { featured: "true" } : {}))).map(normalizeTestimonial);
   } catch {
     // Fallback
   }
 
+  if (!allowSamples) return [];
   let fallback = SAMPLE_TESTIMONIALS.map(normalizeTestimonial);
   if (featured) fallback = fallback.filter((t) => t.featured);
   return fallback;

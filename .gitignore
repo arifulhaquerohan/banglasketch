@@ -94,10 +94,13 @@ tmp/
 # ------------------------------------------------------------------------------
 *.sqlite
 *.sqlite3
+*.sqlite3*
 *.db
 *.dump
 *.dump.enc
 *.enc
+output/
+plans/
 backend/backups/
 django_backend/backups/
 *.sql.gz

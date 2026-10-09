@@ -14,6 +14,7 @@ export interface ClientProject {
   agreed_budget: number | string;
   target_completion_date?: string;
   portal_token?: string;
+  portal_token_expires_at?: string;
   pending_change_orders_count?: number | undefined;
   created_at: string;
 }

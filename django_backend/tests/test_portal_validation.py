@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 from apps.clients.models import Client, ClientProject, Proposal, ProposalVersion, ChangeOrder
+from datetime import timedelta
+from apps.authentication.models import AdminUser
 
 
 class PortalDecisionValidationTests(TestCase):
@@ -50,3 +52,32 @@ class PortalDecisionValidationTests(TestCase):
         for url in [self.proposal_url, self.change_url]:
             self.assertEqual(self.api.post(url, {"decision": "approved", "version": 1}, format="json").status_code, 200)
             self.assertEqual(self.api.post(url, {"decision": "rejected"}, format="json").status_code, 409)
+
+    def test_expired_link_cannot_read_or_modify_client_data(self):
+        self.owner.portal_token_expires_at = timezone.now() - timedelta(seconds=1)
+        self.owner.save()
+        self.assertEqual(self.api.get(f"/api/portal/{self.owner.portal_token}/").status_code, 404)
+        for url in [self.proposal_url, self.change_url]:
+            self.assertEqual(self.api.post(url, {"decision": "approved"}, format="json").status_code, 401)
+        self.proposal.refresh_from_db()
+        self.change.refresh_from_db()
+        self.assertEqual(self.proposal.status, "sent")
+        self.assertEqual(self.change.status, "pending_approval")
+
+    def test_link_rotation_requires_editor_and_revokes_old_link(self):
+        url = f"/api/admin/clients/{self.owner.id}/portal-link/"
+        self.assertIn(self.api.post(url).status_code, [401, 403])
+        user = AdminUser.objects.create(email="portal-editor@example.com", role="viewer", active=True)
+        self.api.force_authenticate(user=user)
+        self.assertEqual(self.api.post(url).status_code, 403)
+        user.role = "editor"
+        user.save()
+        old_token = self.owner.portal_token
+        response = self.api.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.owner.refresh_from_db()
+        self.assertNotEqual(old_token, self.owner.portal_token)
+        self.assertGreater(self.owner.portal_token_expires_at, timezone.now() + timedelta(days=29))
+        self.api.force_authenticate(user=None)
+        self.assertEqual(self.api.get(f"/api/portal/{old_token}/").status_code, 404)
+        self.assertEqual(self.api.get(f"/api/portal/{self.owner.portal_token}/").status_code, 200)

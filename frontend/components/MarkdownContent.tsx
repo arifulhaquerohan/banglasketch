@@ -1,10 +1,11 @@
+import { isSafePublicHref } from "../lib/safe-url";
+
 interface MarkdownContentProps {
   content: string;
 }
 
 function isSafeContentUrl(url: string, image = false) {
-  if (/^https?:\/\//i.test(url) || /^\/(?!\/)/.test(url)) return true;
-  return !image && (/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(url) || /^tel:\+?[0-9().\-\s]+$/i.test(url));
+  return isSafePublicHref(url) && (!image || !/^(mailto|tel):/i.test(url));
 }
 
 function inlineMarkdown(text: string) {

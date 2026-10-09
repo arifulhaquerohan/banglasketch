@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -60,7 +61,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <div className="pt-24 bg-[#F5F2EB]">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleJsonLd) }} />
+      <script suppressHydrationWarning nonce={(await headers()).get("x-nonce") ?? undefined} type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleJsonLd) }} />
 
       {/* Hero */}
       <section className="relative h-[50vh] min-h-[420px] max-h-[580px] overflow-hidden">

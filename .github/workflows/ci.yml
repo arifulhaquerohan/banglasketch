@@ -89,7 +89,7 @@ jobs:
       - name: Run Backend Test Suite
         run: |
           cd django_backend
-          python manage.py test --keepdb --verbosity=2 tests.test_api tests.test_auth_security tests.test_chatbot tests.test_client_handling tests.test_database_integrity tests.test_email_jobs tests.test_invoices tests.test_media_upload
+          python manage.py test --keepdb --verbosity=2 tests
 
   # --------------------------------------------------------------------------
   # Next.js Frontend CI

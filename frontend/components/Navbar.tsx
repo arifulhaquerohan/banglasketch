@@ -14,6 +14,12 @@ const NAV_ITEMS = [
   { href: "/about", label: "Studio" },
   { href: "/blog", label: "Journal" },
 ];
+const MOBILE_NAV_ITEMS = [
+  { href: "/portfolio", label: "Portfolio" },
+  { href: "/services", label: "Services" },
+  { href: "/about", label: "Studio" },
+  { href: "/contact", label: "Contact" },
+];
 const PLANNING_LINKS = [
   { href: "/design-brief", label: "Create a design brief", description: "Tell us what home means to you." },
   { href: "/cost-estimator", label: "Estimate your budget", description: "Find a starting point for your project." },
@@ -85,7 +91,7 @@ export function Navbar() {
   const closeNavigation = () => { setOpen(false); setServicesOpen(false); };
 
   return (
-    <header ref={headerRef} className={`site-header ${scrolled || open ? "site-header-raised" : ""}`}>
+    <header ref={headerRef} className={`site-header ${scrolled || open ? "site-header-raised" : ""} ${open ? "site-header-menu-open" : ""}`}>
       <div className="site-header-inner">
         <BrandLogo />
         <nav aria-label="Main navigation" className="hidden lg:block">
@@ -140,19 +146,20 @@ export function Navbar() {
       </div>
       {open && (
         <nav id="mobile-navigation" aria-label="Mobile navigation" className="site-mobile-navigation lg:hidden">
-          <div className="mb-4 flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.18em] text-olive-dark"><span>Explore the studio</span><span>Dhaka, Bangladesh</span></div>
+          <div className="site-mobile-menu-intro"><span>Explore the studio</span><span>Dhaka, Bangladesh</span></div>
           <ul className="divide-y divide-limestone/70">
-            {[{ href: "/", label: "Home" }, ...NAV_ITEMS].map(item => (
-              <li key={item.href}><Link href={item.href} onClick={closeNavigation} aria-current={isActive(item.href) ? "page" : undefined} className={`flex items-center justify-between py-4 font-serif text-[27px] ${isActive(item.href) ? "text-clay" : "text-charcoal"}`}>
+            {[{ href: "/", label: "Home" }, ...MOBILE_NAV_ITEMS].map(item => (
+              <li key={item.href}><Link href={item.href} onClick={closeNavigation} aria-current={isActive(item.href) ? "page" : undefined} className={`site-mobile-menu-link ${isActive(item.href) ? "text-clay" : "text-charcoal"}`}>
                 {item.label}<FiArrowUpRight size={19} className="text-olive" />
               </Link></li>
             ))}
           </ul>
-          <div className="my-5 grid grid-cols-2 gap-3">
+          <div className="my-4 grid grid-cols-1 min-[360px]:grid-cols-2 gap-3">
             {PLANNING_LINKS.map(link => <Link key={link.href} href={link.href} onClick={closeNavigation} className="flex min-h-16 items-center justify-between gap-2 rounded-lg border border-limestone bg-ivory-light p-3 text-sm text-charcoal">{link.label}<FiArrowUpRight size={18} className="shrink-0 text-olive" /></Link>)}
           </div>
           <Link href="/contact" onClick={closeNavigation} className="site-consultation-button flex w-full">Book a consultation <FiArrowUpRight size={18} /></Link>
-          <a href={`tel:${CONTACT.phone}`} className="mt-4 flex min-h-11 items-center justify-center gap-2 text-sm text-charcoal-muted"><FiPhone size={14} />{CONTACT.phone}</a>
+          <Link href="/blog" onClick={closeNavigation} className="mt-3 flex min-h-11 items-center justify-center gap-2 text-sm text-olive-dark">Read the journal <FiArrowUpRight size={15} /></Link>
+          <a href={`tel:${CONTACT.phone}`} onClick={closeNavigation} className="mt-3 flex min-h-11 items-center justify-center gap-2 text-sm text-charcoal-muted"><FiPhone size={14} />{CONTACT.phone}</a>
         </nav>
       )}
     </header>

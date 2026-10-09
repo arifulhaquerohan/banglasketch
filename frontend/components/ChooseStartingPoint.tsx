@@ -2,358 +2,135 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
-import { FiArrowRight, FiCheckCircle, FiClock, FiCompass, FiMaximize } from "react-icons/fi";
+import { useState } from "react";
+import type { Project } from "../lib/api";
+import { FiArrowRight, FiBookmark, FiCheck } from "react-icons/fi";
 import { useSpaceCollection } from "./SpaceCollectionContext";
 
-interface EntryPointOption {
-  id: "entire-home" | "one-room" | "renovation";
-  title: string;
-  subtitle: string;
-  tagline: string;
-  image: string;
-  typicalArea: string;
-  duration: string;
-  deliverables: string[];
-  recommendedBudget: string;
-  description: string;
-  featuredProjects: {
-    title: string;
-    location: string;
-    slug: string;
-    image: string;
-    scope: string;
-  }[];
-}
-
-const ENTRY_POINTS: EntryPointOption[] = [
+const ENTRY_POINTS = [
   {
     id: "entire-home",
-    title: "An Entire Home",
-    subtitle: "Complete Interior Design",
-    tagline: "Full design and build — from bare apartment to finished home.",
+    title: "An entire home",
+    subtitle: "Considered, room by room",
+    heading: "A home that feels entirely yours.",
     image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80",
-    typicalArea: "2,400 – 6,500 sq.ft",
-    duration: "90 – 120 Days",
-    recommendedBudget: "Tier 1 Bespoke Turnkey",
+    imageAlt: "Warm contemporary living room with natural materials and sculptural furniture",
+    typicalArea: "2,400–6,500 sq.ft",
+    duration: "90–120 days",
     description:
-      "A complete interior design project covering every room, hallway, and storage unit in your home. We handle the floor plan, 3D design, material selection, and construction supervision.",
-    deliverables: [
-      "Master layout plan & 3D virtual walkthroughs",
-      "Full MEP, smart lighting & acoustic schedule",
-      "Custom kitchen, bedroom joinery & vanity suites",
-      "Dedicated resident site engineer & 10-year warranty",
-    ],
-    featuredProjects: [
-      {
-        title: "Gulshan Penthouse Residence",
-        location: "Gulshan II, Dhaka",
-        slug: "open-living-space",
-        image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&q=80",
-        scope: "4,200 sq.ft • 4 Bedrooms",
-      },
-      {
-        title: "Baridhara Contemporary Haven",
-        location: "Baridhara DOHS",
-        slug: "luxury-bedroom-sanctuary",
-        image: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=80",
-        scope: "3,100 sq.ft • Turnkey",
-      },
-    ],
+      "From the first floor plan to the finishing touches, we bring every room together around the way you live.",
+    deliverables: ["Space planning & 3D design", "Materials, lighting & custom furniture", "Construction & site supervision"],
   },
   {
     id: "one-room",
-    title: "One Room",
-    subtitle: "Single Room Design",
-    tagline: "Focused design for your kitchen, bedroom, or living room.",
+    title: "One special room",
+    subtitle: "Small scope, meaningful change",
+    heading: "Make your favourite room even better.",
     image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=80",
-    typicalArea: "250 – 800 sq.ft",
-    duration: "25 – 45 Days",
-    recommendedBudget: "Targeted High-Impact",
+    imageAlt: "Bright kitchen with thoughtfully arranged cabinetry and a central island",
+    typicalArea: "250–800 sq.ft",
+    duration: "25–45 days",
     description:
-      "Transform one room without disrupting the rest of your home. We specialise in kitchens, master bedrooms, living rooms, and bathrooms — designed for how you actually use them.",
-    deliverables: [
-      "Precise spatial ergonomics & cabinetry blueprint",
-      "Integrated appliance & architectural lighting plan",
-      "Premium hardware, natural quartz/stone & veneers",
-      "Fast-track artisan carpentry with minimal site dust",
-    ],
-    featuredProjects: [
-      {
-        title: "Minimalist Teak Culinary Studio",
-        location: "Banani, Dhaka",
-        slug: "modern-kitchen-renovation",
-        image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
-        scope: "Chef’s Kitchen & Breakfast Bar",
-      },
-      {
-        title: "Serene Master Bedroom Suite",
-        location: "Dhanmondi, Dhaka",
-        slug: "luxury-bedroom-sanctuary",
-        image: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=80",
-        scope: "Bedroom & Walk-in Wardrobe",
-      },
-    ],
+      "A kitchen made for gathering. A bedroom made for slowing down. Thoughtful design, focused on the room that matters to you.",
+    deliverables: ["Room layout & 3D visualisation", "Custom cabinetry & material selection", "Lighting, installation & finishing"],
   },
   {
     id: "renovation",
-    title: "A Renovation",
-    subtitle: "Renovation & Remodelling",
-    tagline: "Modernise an existing home — open up layouts, update finishes, fix what doesn’t work.",
+    title: "A fresh beginning",
+    subtitle: "Renovation & remodelling",
+    heading: "Familiar spaces. New possibilities.",
     image: "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=1200&q=80",
-    typicalArea: "1,500 – 4,000 sq.ft",
-    duration: "60 – 90 Days",
-    recommendedBudget: "Full Architectural Remodel",
+    imageAlt: "Renovated living space with a warm neutral palette and natural light",
+    typicalArea: "1,500–4,000 sq.ft",
+    duration: "60–90 days",
     description:
-      "Renovate an older apartment or home in Dhaka. We remove partition walls, update plumbing and wiring, and install modern finishes — giving your space a fresh start.",
-    deliverables: [
-      "Structural feasibility & partition wall modifications",
-      "Electrical & plumbing system modernization",
-      "Acoustic ceiling drops & hidden air-conditioning",
-      "Flawless surface restorations and marble floor polish",
-    ],
-    featuredProjects: [
-      {
-        title: "Dhanmondi 1990s Apartment Remodel",
-        location: "Dhanmondi Rd 7A",
-        slug: "open-living-space",
-        image: "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800&q=80",
-        scope: "Full Wall Demolition & Open Plan",
-      },
-      {
-        title: "Gulshan Classic Spa Bathroom Remodel",
-        location: "Gulshan I",
-        slug: "boutique-bathroom-design",
-        image: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80",
-        scope: "Italian Marble & Concealed Plumbing",
-      },
-    ],
+      "Open up the layout, rethink the finishes, and make an existing home work beautifully for its next chapter.",
+    deliverables: ["Existing-space review & layout redesign", "Plumbing, electrical & finish updates", "Coordinated renovation & site supervision"],
   },
-];
+] as const;
 
-export function ChooseStartingPoint() {
-  const [selectedId, setSelectedId] = useState<"entire-home" | "one-room" | "renovation">("entire-home");
+export function ChooseStartingPoint({ projects = [] }: { projects?: Project[] }) {
+  const [selectedId, setSelectedId] = useState<string>("entire-home");
   const { toggleItem, hasItem } = useSpaceCollection();
+  const current = ENTRY_POINTS.find((option) => option.id === selectedId) || ENTRY_POINTS[0];
 
-  const current = ENTRY_POINTS.find((p) => p.id === selectedId) || ENTRY_POINTS[0];
+  const featuredProjects = projects.filter((project) =>
+    selectedId !== "one-room" || ["kitchen", "bedroom", "bathroom"].includes(project.category)
+  ).slice(0, 2);
 
   return (
-    <section className="section bg-[#F4F0E8] relative">
+    <section id="services" aria-labelledby="services-heading" className="scroll-mt-24 bg-[#EEEAE1] py-16 sm:py-20 lg:py-24">
       <div className="container">
-        {/* Section Header */}
-        <div className="max-w-2xl mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF7F2] border border-[#DDD5C8] text-[11px] font-semibold tracking-widest uppercase text-[#727A61] mb-3">
-            <span className="w-2 h-2 rounded-full bg-[#A45138]" />
-            <span>Our Services</span>
+        <div className="mb-9 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-[#6A705D]">Designed around you</p>
+            <h2 id="services-heading" className="font-serif text-4xl font-normal leading-[1.1] sm:text-5xl lg:text-[56px]">Every space has a starting point.</h2>
           </div>
-
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#242622] tracking-tight leading-[1.15]">
-            What We Design
-          </h2>
-
-          <p className="text-base sm:text-lg text-[#5A6057] mt-3 leading-relaxed">
-            Whole-home interiors, individual rooms, or renovations of existing spaces. Select your scope to see our process and related work.
-          </p>
+          <p className="max-w-xs text-base leading-7 text-[#5A6057]">A whole home or a single room. Find the right way to begin.</p>
         </div>
 
-        {/* 3 Entry Point Cards */}
-        <div className="grid md:grid-cols-3 gap-5 lg:gap-7">
-          {ENTRY_POINTS.map((item) => {
-            const isSelected = item.id === selectedId;
+        <div className="mb-7 grid grid-cols-3 border-b border-[#CDC8BA]" aria-label="Choose your project scope">
+          {ENTRY_POINTS.map((option, index) => {
+            const selected = option.id === selectedId;
             return (
-              <div
-                key={item.id}
-                onClick={() => setSelectedId(item.id)}
-                className={`group cursor-pointer text-left transition-all duration-300 relative rounded-xl overflow-hidden border ${
-                  isSelected
-                    ? "border-[#A45138] ring-2 ring-[#A45138]/20 bg-[#FAF7F2] shadow-xl translate-y-[-4px]"
-                    : "border-[#DDD5C8] bg-[#FAF7F2]/60 hover:bg-[#FAF7F2] hover:border-[#727A61] shadow-sm"
-                }`}
-                role="button"
-                tabIndex={0}
-                aria-pressed={isSelected}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setSelectedId(item.id);
-                  }
-                }}
+              <button
+                key={option.id}
+                type="button"
+                aria-pressed={selected}
+                aria-controls="service-details"
+                onClick={() => setSelectedId(option.id)}
+                className={`relative flex min-h-[84px] items-start gap-3 px-2 py-5 text-left transition-colors sm:px-5 ${selected ? "text-[#242622]" : "text-[#64695F] hover:bg-[#FAF7F2]/60"}`}
               >
-                {/* Photo Thumbnail */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-[#DDD5C8]">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className={`object-cover transition-transform duration-700 ease-out ${
-                      isSelected ? "scale-105" : "group-hover:scale-103 opacity-90"
-                    }`}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#242622]/70 via-transparent to-transparent" />
-
-                  {/* Active Indicator Chip */}
-                  <div className="absolute top-3 left-3 z-10">
-                    <span
-                      className={`architectural-tag px-2.5 py-1 rounded text-[10px] ${
-                        isSelected
-                          ? "bg-[#A45138] text-white"
-                          : "bg-[#242622]/80 text-[#FAF7F2] backdrop-blur-md"
-                      }`}
-                    >
-                      {item.subtitle}
-                    </span>
-                  </div>
-
-                  {/* Selection Radio Dot */}
-                  <div className="absolute top-3 right-3 z-10 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center bg-[#242622]/60 backdrop-blur-sm">
-                    {isSelected && <span className="w-3 h-3 rounded-full bg-[#A45138]" />}
-                  </div>
-
-                  <div className="absolute bottom-3 left-4 right-4 text-white">
-                    <h3 className="font-serif text-xl sm:text-2xl font-semibold leading-tight">
-                      {item.title}
-                    </h3>
-                  </div>
-                </div>
-
-                {/* Card Summary */}
-                <div className="p-5 sm:p-6 space-y-3">
-                  <p className="text-xs sm:text-sm text-[#5A6057] leading-relaxed">
-                    {item.tagline}
-                  </p>
-
-                  <div className="pt-3 border-t border-[#DDD5C8]/70 flex items-center justify-between text-xs text-[#727A61] font-medium">
-                    <span className="flex items-center gap-1.5">
-                      <FiClock size={13} /> {item.duration}
-                    </span>
-                    <span className="flex items-center gap-1.5 font-mono">
-                      <FiMaximize size={13} /> {item.typicalArea}
-                    </span>
-                  </div>
-                </div>
-              </div>
+                <span className={`hidden pt-1 text-xs sm:block ${selected ? "text-[#A45138]" : "text-[#64695F]"}`}>0{index + 1}</span>
+                <span>
+                  <span className="block font-serif text-lg sm:text-2xl">{option.title}</span>
+                  <span className="mt-1 hidden text-xs text-[#64695F] md:block">{option.subtitle}</span>
+                </span>
+                {selected && <span className="absolute inset-x-0 -bottom-px h-[2px] bg-[#A45138]" />}
+              </button>
             );
           })}
         </div>
 
-        {/* Revealed Detailed Panel for Selected Starting Point */}
-        <div className="mt-10 rounded-2xl bg-[#FAF7F2] border border-[#DDD5C8] p-6 sm:p-10 shadow-lg animate-fade-in">
-          <div className="grid lg:grid-cols-12 gap-8 items-start">
-            {/* Left Scope & Deliverables */}
-            <div className="lg:col-span-7 space-y-6">
-              <div>
-                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#A45138] mb-1">
-                  <span>Scope Blueprint</span>
-                  <span>•</span>
-                  <span>{current.subtitle}</span>
-                </div>
-                <h4 className="font-serif text-2xl sm:text-3xl font-semibold text-[#242622]">
-                  How We Approach: {current.title}
-                </h4>
-                <p className="text-sm sm:text-base text-[#5A6057] leading-relaxed mt-2">
-                  {current.description}
-                </p>
-              </div>
+        <div id="service-details" className="grid overflow-hidden bg-[#FAF7F2] lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="relative min-h-[290px] sm:min-h-[380px] lg:min-h-[520px]">
+            <Image src={current.image} alt={current.imageAlt} fill sizes="(max-width: 1023px) 100vw, 48vw" className="object-cover" />
+            <div className="absolute inset-x-0 bottom-0 flex flex-wrap gap-x-7 gap-y-3 bg-gradient-to-t from-[#242622]/85 to-transparent px-6 pb-6 pt-20 text-[#FAF7F2] sm:px-8">
+              <div><span className="mb-1 block text-xs uppercase tracking-[0.16em] text-white/75">Typical area</span><span className="text-sm">{current.typicalArea}</span></div>
+              <div><span className="mb-1 block text-xs uppercase tracking-[0.16em] text-white/75">Estimated timeline</span><span className="text-sm">{current.duration}</span></div>
+            </div>
+          </div>
 
-              {/* Concrete Deliverables */}
-              <div>
-                <h5 className="architectural-tag text-[#727A61] mb-3">Concrete Deliverables</h5>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {current.deliverables.map((deliv, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-2.5 p-3 rounded-lg bg-[#F4F0E8] border border-[#DDD5C8]/70 text-xs text-[#242622]"
-                    >
-                      <FiCheckCircle className="text-[#727A61] shrink-0 mt-0.5" size={15} />
-                      <span className="leading-snug">{deliv}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* CTA Row */}
-              <div className="pt-4 flex flex-wrap items-center gap-3">
-                <Link
-                  href={`/design-brief?scope=${current.id}`}
-                  className="btn btn-clay text-sm px-6 py-3"
-                >
-                  <FiCompass size={15} />
-                  <span>Plan My {current.title}</span>
-                </Link>
-                <Link
-                  href="/contact"
-                  className="btn btn-secondary text-sm px-6 py-3"
-                >
-                  <span>Book Studio Consultation</span>
-                </Link>
-              </div>
+          <div className="flex flex-col justify-center p-6 sm:p-9 lg:p-10 xl:p-12">
+            <h3 className="max-w-md font-serif text-3xl font-normal leading-[1.15] sm:text-4xl">{current.heading}</h3>
+            <p className="mt-4 max-w-md text-base leading-7 text-[#5A6057]">{current.description}</p>
+            <ul className="my-6 space-y-3">
+              {current.deliverables.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-[#41473D]"><FiCheck aria-hidden="true" className="mt-0.5 shrink-0 text-[#727A61]" size={16} />{item}</li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Link href={`/design-brief?scope=${current.id}`} className="inline-flex min-h-12 items-center justify-center gap-4 bg-[#A45138] px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-[#893E28]">Plan your space <FiArrowRight aria-hidden="true" /></Link>
+              <Link href="/contact" className="inline-flex min-h-11 items-center border-b border-[#B6B7AA] text-sm text-[#41473D] transition-colors hover:text-[#A45138]">Let’s talk first</Link>
             </div>
 
-            {/* Right Matching Case Studies */}
-            <div className="lg:col-span-5 space-y-4">
-              <div className="flex items-center justify-between">
-                <h5 className="architectural-tag text-[#727A61]">Matching Completed Work</h5>
-                <Link
-                  href="/portfolio"
-                  className="text-xs text-[#A45138] hover:underline font-semibold flex items-center gap-1"
-                >
-                  View all <FiArrowRight size={12} />
-                </Link>
+            {featuredProjects.length > 0 && <div className="mt-8 border-t border-[#DDD5C8] pt-5">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#6A705D]">Spaces to explore</p>
+                <Link href="/portfolio" className="inline-flex min-h-8 items-center gap-1 text-xs text-[#6A705D] hover:text-[#A45138]">View all <FiArrowRight aria-hidden="true" size={13} /></Link>
               </div>
-
-              <div className="space-y-3">
-                {current.featuredProjects.map((p) => (
-                  <div
-                    key={p.slug}
-                    className="p-3.5 rounded-xl bg-[#F4F0E8] border border-[#DDD5C8] flex items-center gap-4 hover:border-[#727A61] transition-all group"
-                  >
-                    <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-[#DDD5C8]">
-                      <Image
-                        src={p.image}
-                        alt={p.title}
-                        fill
-                        sizes="80px"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[10px] font-mono text-[#727A61] block mb-0.5">
-                        {p.scope}
-                      </span>
-                      <h6 className="font-serif text-base font-semibold text-[#242622] group-hover:text-[#A45138] transition-colors truncate">
-                        {p.title}
-                      </h6>
-                      <p className="text-xs text-[#5A6057]">{p.location}</p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <Link
-                          href={`/portfolio/${p.slug}`}
-                          className="text-xs text-[#242622] font-semibold underline underline-offset-2 hover:text-[#A45138]"
-                        >
-                          Explore Space
-                        </Link>
-                        <span className="text-neutral-300">•</span>
-                        <button
-                          onClick={() =>
-                            toggleItem({
-                              id: `entry-${p.slug}`,
-                              type: "project",
-                              title: p.title,
-                              subtitle: p.location,
-                              image: p.image,
-                              notes: p.scope,
-                            })
-                          }
-                          className="text-xs text-[#727A61] hover:text-[#A45138] font-medium"
-                        >
-                          {hasItem(`entry-${p.slug}`) ? "✓ Saved" : "+ Save"}
-                        </button>
-                      </div>
-                    </div>
+              {featuredProjects.map((project) => {
+                const saved = hasItem(`entry-${project.slug}`);
+                return (
+                  <div key={project.slug} className="flex items-center justify-between gap-3">
+                    <Link href={`/portfolio/${project.slug}`} className="py-2 text-xs leading-5 text-[#41473D] transition-colors hover:text-[#A45138]">{project.title}</Link>
+                    <button type="button" aria-label={`${saved ? "Remove" : "Save"} ${project.title}${saved ? " from" : " to"} your collection`} aria-pressed={saved} onClick={() => toggleItem({ id: `entry-${project.slug}`, type: "project", title: project.title, subtitle: project.location, image: project.featured_image || project.coverImage, notes: project.area })} className={`flex h-10 w-10 shrink-0 items-center justify-center transition-colors hover:bg-[#EEEAE1] ${saved ? "text-[#A45138]" : "text-[#6A705D]"}`}>
+                      {saved ? <FiCheck aria-hidden="true" size={15} /> : <FiBookmark aria-hidden="true" size={15} />}
+                    </button>
                   </div>
-                ))}
-              </div>
-            </div>
+                );
+              })}
+            </div>}
           </div>
         </div>
       </div>

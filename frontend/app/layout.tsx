@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { headers } from "next/headers";
 import { ChatWidget } from "../components/ChatWidget";
 import { FloatingWhatsApp } from "../components/FloatingWhatsApp";
 import { Footer } from "../components/Footer";
@@ -9,6 +10,9 @@ import { MobileStickyBar } from "../components/MobileStickyBar";
 import { SpaceCollectionProvider } from "../components/SpaceCollectionContext";
 import { SpaceCollectionDrawer } from "../components/SpaceCollectionDrawer";
 import "../styles/globals.css";
+
+// Every document needs a fresh CSP nonce, including generated detail routes.
+export const dynamic = "force-dynamic";
 
 const instrumentSerif = localFont({
   src: "./fonts/instrument-serif.ttf",
@@ -38,6 +42,13 @@ const notoSansBengali = localFont({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#FAF7F2",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://banglasketch.com"),
   title: "From Space to Sanctuary • বাংলা স্কেচ Bangla Sketch — Architectural Studio",
@@ -62,7 +73,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <html
       lang="en"
@@ -81,6 +93,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Skip to main content
           </a>
           <script
+            // Browsers hide the nonce attribute after parsing; keep the CSP nonce
+            // and suppress only this expected script-attribute hydration mismatch.
+            suppressHydrationWarning
+            nonce={nonce}
             type="application/ld+json"
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({

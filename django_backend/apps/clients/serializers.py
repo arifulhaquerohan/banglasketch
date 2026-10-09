@@ -20,11 +20,12 @@ class ClientSerializer(serializers.ModelSerializer):
             "alternate_phone",
             "address",
             "portal_token",
+            "portal_token_expires_at",
             "notes",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "portal_token", "created_at", "updated_at"]
+        read_only_fields = ["id", "portal_token", "portal_token_expires_at", "created_at", "updated_at"]
 
 
 class EnquiryFollowUpSerializer(serializers.ModelSerializer):

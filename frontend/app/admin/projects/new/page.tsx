@@ -6,7 +6,7 @@ import Link from "next/link";
 import { FiSave, FiArrowLeft } from "react-icons/fi";
 import { CloudinaryUpload } from "../../../../components/admin/CloudinaryUpload";
 import { GalleryUpload } from "../../../../components/admin/GalleryUpload";
-import { RichTextEditor } from "../../../../components/admin/RichTextEditor";
+import { ProjectCaseStudyFields, EMPTY_CASE_STUDY } from "../../../../components/admin/ProjectCaseStudyFields";
 import { adminFetch } from "../../../../lib/api";
 
 export default function NewProjectPage() {
@@ -14,16 +14,15 @@ export default function NewProjectPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
+    ...EMPTY_CASE_STUDY,
     title: "",
     slug: "",
     category: "kitchen",
     description: "",
-    content: "",
     image: "",
     gallery: [] as string[],
-    location: "",
     client: "",
-    year: new Date().getFullYear().toString(),
+    dateCompleted: "",
     status: "draft",
     featured: false,
   });
@@ -43,13 +42,23 @@ export default function NewProjectPage() {
         title: form.title.trim(),
         slug,
         category: form.category,
-        description: form.description.trim() || form.content.trim() || "Project details coming soon.",
+        description: form.description.trim(),
         featured_image: form.image || null,
         client_name: form.client.trim() || null,
-        date_completed: `${form.year || new Date().getFullYear()}-01-01`,
+        date_completed: form.dateCompleted || null,
         featured: form.featured,
         published: form.status === "published",
         gallery: form.gallery,
+        location: form.location.trim(),
+        area: form.area.trim(),
+        style: form.style.trim(),
+        scope: form.scope.trim(),
+        materials: form.materials.trim(),
+        timeline: form.timeline.trim(),
+        before_image: form.before_image || null, after_image: form.after_image || null, client_testimonial: form.client_testimonial.trim(),
+        design_challenge: form.design_challenge.trim(),
+        design_solution: form.design_solution.trim(),
+
       }),
     });
     setSaving(false);
@@ -127,14 +136,9 @@ export default function NewProjectPage() {
                 className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 transition-all resize-none shadow-2xs leading-relaxed"
               />
             </div>
-            <RichTextEditor
-              value={form.content}
-              onChange={(content) => setForm({ ...form, content })}
-              label="Detailed Project Story"
-              placeholder="Describe the architectural design choices, materials used, lighting, textures..."
-            />
           </div>
 
+          <ProjectCaseStudyFields value={form} onChange={patch => setForm(current => ({ ...current, ...patch }))} />
           <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
             <h3 className="font-serif text-lg font-bold text-admin-ink">Gallery Media</h3>
             <p className="text-xs text-admin-muted">Additional perspectives, render angles, and layout sketches.</p>
@@ -177,18 +181,6 @@ export default function NewProjectPage() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
-                Location
-              </label>
-              <input
-                type="text"
-                value={form.location}
-                onChange={(e) => setForm({ ...form, location: e.target.value })}
-                placeholder="e.g. Gulshan-2, Dhaka"
-                className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink placeholder:text-admin-subtle focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 shadow-2xs"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
                 Client / Studio Partner
               </label>
               <input
@@ -201,12 +193,12 @@ export default function NewProjectPage() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-admin-primary uppercase tracking-wider mb-1.5">
-                Completion Year
+                Completion date (optional)
               </label>
               <input
-                type="number"
-                value={form.year}
-                onChange={(e) => setForm({ ...form, year: e.target.value })}
+                type="date"
+                value={form.dateCompleted}
+                onChange={(e) => setForm({ ...form, dateCompleted: e.target.value })}
                 className="w-full bg-white border border-admin-border rounded-xl px-4 py-2.5 text-xs text-admin-ink focus:border-admin-primary focus:outline-none focus:ring-2 focus:ring-admin-primary/20 shadow-2xs"
               />
             </div>

@@ -1,6 +1,7 @@
 import secrets
 import datetime
 from django.utils import timezone
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Q
 from rest_framework.views import APIView
@@ -9,6 +10,7 @@ from rest_framework.permissions import AllowAny
 from apps.authentication.auth import IsAdminUserAuthenticated, require_role
 from apps.authentication.models import AdminUser
 from apps.core.models import AuditLog
+from apps.core.services.rate_limit import PostgresRateLimiter
 from .models import (
     Client,
     Enquiry,
@@ -17,6 +19,7 @@ from .models import (
     Proposal,
     ProposalVersion,
     ChangeOrder,
+    portal_expiry,
 )
 from .serializers import (
     ClientSerializer,
@@ -82,6 +85,11 @@ class PublicEnquiryCreateView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
+        ip = forwarded.split(",")[0].strip() if forwarded else request.META.get("REMOTE_ADDR", "unknown")
+        allowed, _, _ = PostgresRateLimiter("public_enquiry", 15 * 60 * 1000, 100 if settings.DEBUG else 10).check_and_increment(ip)
+        if not allowed:
+            return Response({"success": False, "error": "Too many enquiries. Please try again in 15 minutes."}, status=429)
         data = request.data
         website = data.get("website")
         started_at = data.get("started_at")
@@ -186,7 +194,10 @@ class PublicPortalView(APIView):
         if not token or len(token) < 16:
             return Response({"success": False, "error": "Invalid portal token"}, status=400)
 
-        client = Client.objects.filter(portal_token=token, deleted_at__isnull=True).first()
+        client = Client.objects.filter(
+            portal_token=token, deleted_at__isnull=True,
+            portal_token_expires_at__gt=timezone.now(),
+        ).first()
         if not client:
             return Response({"success": False, "error": "Client portal not found or access link has expired"}, status=404)
 
@@ -296,7 +307,10 @@ class PublicPortalProposalDecisionView(APIView):
 
     @transaction.atomic
     def post(self, request, token, proposal_id):
-        client = Client.objects.filter(portal_token=token, deleted_at__isnull=True).first()
+        client = Client.objects.filter(
+            portal_token=token, deleted_at__isnull=True,
+            portal_token_expires_at__gt=timezone.now(),
+        ).first()
         if not client:
             return Response({"success": False, "error": "Unauthorized or invalid portal token"}, status=401)
 
@@ -355,7 +369,10 @@ class PublicPortalChangeOrderDecisionView(APIView):
 
     @transaction.atomic
     def post(self, request, token, change_order_id):
-        client = Client.objects.filter(portal_token=token, deleted_at__isnull=True).first()
+        client = Client.objects.filter(
+            portal_token=token, deleted_at__isnull=True,
+            portal_token_expires_at__gt=timezone.now(),
+        ).first()
         if not client:
             return Response({"success": False, "error": "Unauthorized or invalid portal token"}, status=401)
 
@@ -1036,6 +1053,7 @@ class AdminClientProjectDetailUpdateDeleteView(APIView):
             "client_phone": cp.client.phone if cp.client else None,
             "client_email": cp.client.email if cp.client else None,
             "portal_token": cp.client.portal_token if cp.client else None,
+            "portal_token_expires_at": format_dt(cp.client.portal_token_expires_at) if cp.client else None,
             "enquiry_id": cp.enquiry_id,
             "title": cp.title,
             "stage": cp.stage,
@@ -1323,3 +1341,18 @@ class AdminChangeOrderDecisionView(APIView):
             "data": ChangeOrderSerializer(co).data,
             "message": f"Change order #{id} has been marked as {status_val}.",
         })
+
+
+class AdminClientPortalRenewView(APIView):
+    permission_classes = [IsAdminUserAuthenticated, require_role("editor")]
+
+    def post(self, request, pk):
+        with transaction.atomic():
+            client = Client.objects.select_for_update().filter(pk=pk, deleted_at__isnull=True).first()
+            if not client:
+                return Response({"success": False, "error": "Not found"}, status=404)
+            client.portal_token = secrets.token_hex(24)
+            client.portal_token_expires_at = portal_expiry()
+            client.save(update_fields=["portal_token", "portal_token_expires_at", "updated_at"])
+        return Response({"success": True, "data": ClientSerializer(client).data},
+                        headers={"Cache-Control": "private, no-store"})

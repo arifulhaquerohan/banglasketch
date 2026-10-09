@@ -46,7 +46,7 @@ class PublicProjectListView(APIView):
         if cursor:
             qs = qs.filter(id__lt=cursor)
         offset = 0 if cursor else (page - 1) * limit
-        fields = ("id", "title", "slug", "description", "category", "featured_image", "date_completed", "featured")
+        fields = ("id", "title", "slug", "description", "category", "featured_image", "date_completed", "featured", "location", "area", "style", "scope", "materials", "timeline")
         try:
             rows = list(qs.order_by("-id").values(*fields)[offset:offset + limit + 1])
         except DatabaseError:

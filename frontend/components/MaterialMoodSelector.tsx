@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-import { FiBookmark, FiCheck } from "react-icons/fi";
+import { FiArrowUpRight, FiBookmark, FiCheck } from "react-icons/fi";
 import { useSpaceCollection } from "./SpaceCollectionContext";
 
 interface SwatchItem {
@@ -12,7 +12,6 @@ interface SwatchItem {
   role: string;
   hex: string;
   finish: string;
-  origin: string;
 }
 
 interface PaletteMood {
@@ -22,406 +21,221 @@ interface PaletteMood {
   headline: string;
   description: string;
   heroImage: string;
-  detailImage: string;
+  imageAlt: string;
   swatches: SwatchItem[];
-  matchingProjectSlug: string;
-  matchingProjectTitle: string;
 }
 
 const PALETTES: PaletteMood[] = [
   {
     id: "warm-minimal",
     name: "Warm Minimal",
-    subtitle: "Air, Limestone & Teak",
-    headline: "Grounded in raw earthen warmth and meditative daylight.",
+    subtitle: "Soft light. Natural warmth.",
+    headline: "A little less. A little warmer.",
     description:
-      "A quiet, sun-drenched palette that eliminates sensory noise. Honed limestone anchors the flooring, while bleached native teak and sheer Belgian linens invite gentle, diffused tropical light.",
+      "Light stone, warm timber and soft linen. An easy, sunlit palette for spaces that feel calm from the moment you step inside.",
     heroImage: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=85",
-    detailImage: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&q=85",
-    matchingProjectSlug: "open-living-space",
-    matchingProjectTitle: "Gulshan Courtyard Pavilion",
+    imageAlt: "Bright living room with warm neutral furnishings and natural textures",
     swatches: [
-      {
-        id: "wm-limestone",
-        name: "Honed Roman Limestone",
-        role: "Primary Flooring & Plinths",
-        hex: "#DDD5C8",
-        finish: "Honed Matte 5%",
-        origin: "Italy / Cut in Dhaka",
-      },
-      {
-        id: "wm-teak",
-        name: "Bleached Chittagong Teak",
-        role: "Architectural Millwork",
-        hex: "#C5A880",
-        finish: "Natural Wax PU",
-        origin: "Hill Tracts, Bangladesh",
-      },
-      {
-        id: "wm-linen",
-        name: "Unbleached Belgian Linen",
-        role: "Sheer Drapes & Upholstery",
-        hex: "#EAE3D5",
-        finish: "Textured Natural Weave",
-        origin: "Flanders, Belgium",
-      },
-      {
-        id: "wm-brass",
-        name: "Satin Brushed Brass",
-        role: "Shadowlines & Hardware",
-        hex: "#C8A86B",
-        finish: "Brushed Unlacquered",
-        origin: "Artisan Turned",
-      },
-      {
-        id: "wm-travertine",
-        name: "Navona Travertine",
-        role: "Island & Coffee Plinths",
-        hex: "#E2D9C8",
-        finish: "Filled & Cross-Cut Honed",
-        origin: "Tivoli, Italy",
-      },
+      { id: "wm-limestone", name: "Limestone", role: "Floors & surfaces", hex: "#DDD5C8", finish: "Soft, honed stone" },
+      { id: "wm-teak", name: "Warm teak", role: "Cabinetry & furniture", hex: "#C5A880", finish: "Natural timber grain" },
+      { id: "wm-linen", name: "Soft linen", role: "Curtains & upholstery", hex: "#EAE3D5", finish: "An airy, textured weave" },
+      { id: "wm-brass", name: "Brushed brass", role: "Handles & lighting", hex: "#C8A86B", finish: "A muted metallic accent" },
+      { id: "wm-travertine", name: "Travertine", role: "Tables & feature surfaces", hex: "#E2D9C8", finish: "Quiet, natural variation" },
     ],
   },
   {
     id: "natural-modern",
     name: "Natural Modern",
-    subtitle: "Smoked Oak, Glass & Raw Concrete",
-    headline: "Graphic architectural discipline meets tactile Bangladeshi textures.",
+    subtitle: "Clean lines. Earthy textures.",
+    headline: "Rooted in nature. Made for today.",
     description:
-      "Balancing crisp European joinery with authentic tactile grounding. Smoked quarter-cut oak creates deep rhythm against fluted glass partitions, balanced by hand-woven jute rugs and structural steel.",
+      "Deep timber, cool mineral tones and a touch of jute. For a home with clean lines, inviting textures and room to breathe.",
     heroImage: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1600&q=85",
-    detailImage: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=85",
-    matchingProjectSlug: "modern-kitchen-renovation",
-    matchingProjectTitle: "Banani Culinary Studio",
+    imageAlt: "Contemporary living space with sculptural furniture and natural materials",
     swatches: [
-      {
-        id: "nm-oak",
-        name: "Smoked Quarter-Cut Oak",
-        role: "Full-Height Wall Paneling",
-        hex: "#4B3E35",
-        finish: "Deep Wire-Brushed Matte",
-        origin: "Sustainably Sourced European Oak",
-      },
-      {
-        id: "nm-glass",
-        name: "Fluted Architectural Glass",
-        role: "Acoustic Partition Screens",
-        hex: "#98A39C",
-        finish: "12mm Tempered Reeded",
-        origin: "Saint-Gobain",
-      },
-      {
-        id: "nm-concrete",
-        name: "Micro-Topping Concrete",
-        role: "Accent Walls & Floating Desks",
-        hex: "#9E9A92",
-        finish: "Hand-Troweled Mineral Seal",
-        origin: "Custom Studio Blend",
-      },
-      {
-        id: "nm-jute",
-        name: "Bengali Golden Jute",
-        role: "Tactile Area Rugs & Screens",
-        hex: "#A89276",
-        finish: "Braided Flat-Weave",
-        origin: "Faridpur, Bangladesh",
-      },
-      {
-        id: "nm-steel",
-        name: "Blackened Structural Carbon",
-        role: "Framing & Door Portals",
-        hex: "#242622",
-        finish: "Powder Coated Sand-Tex",
-        origin: "Precision Laser Cut",
-      },
+      { id: "nm-oak", name: "Smoked oak", role: "Wall panels & cabinetry", hex: "#4B3E35", finish: "Rich, visible timber grain" },
+      { id: "nm-glass", name: "Reeded glass", role: "Screens & partitions", hex: "#98A39C", finish: "Light with a little privacy" },
+      { id: "nm-concrete", name: "Soft concrete", role: "Walls & work surfaces", hex: "#9E9A92", finish: "A smooth mineral texture" },
+      { id: "nm-jute", name: "Natural jute", role: "Rugs & woven accents", hex: "#A89276", finish: "Tactile, golden fibres" },
+      { id: "nm-steel", name: "Blackened steel", role: "Frames & small details", hex: "#242622", finish: "A crisp, matte accent" },
     ],
   },
   {
     id: "quiet-classic",
     name: "Quiet Classic",
-    subtitle: "Burled Walnut, Carrara & Aged Bronze",
-    headline: "Timeless salon dignity reimagined for contemporary life.",
+    subtitle: "Rich materials. Lasting character.",
+    headline: "Familiar comforts, beautifully refined.",
     description:
-      "A rich, layered tactile experience celebrating heritage craftsmanship. Bookmatched Carrara marble countertops glow against deep walnut millwork, tactile bouclé upholstery, and patinated bronze fixtures.",
+      "Walnut, pale marble and olive accents. A layered palette that brings a sense of character and comfort to everyday living.",
     heroImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=85",
-    detailImage: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=85",
-    matchingProjectSlug: "luxury-bedroom-sanctuary",
-    matchingProjectTitle: "Baridhara Penthouse Sanctuary",
+    imageAlt: "Light-filled home with warm wood details and a connection to the garden",
     swatches: [
-      {
-        id: "qc-walnut",
-        name: "Burled American Walnut",
-        role: "Bespoke Cabinetry & Library",
-        hex: "#3E2D23",
-        finish: "Hand-Rubbed Danish Oil",
-        origin: "North American Walnut",
-      },
-      {
-        id: "qc-marble",
-        name: "Carrara Statuario Marble",
-        role: "Countertops & Fireplace Surround",
-        hex: "#F0EDE6",
-        finish: "Bookmatched Leathered Finish",
-        origin: "Carrara, Italy",
-      },
-      {
-        id: "qc-boucle",
-        name: "Tactile Bouclé Wool",
-        role: "Armchairs & Headboard Plinths",
-        hex: "#E4DFD5",
-        finish: "High-Pile Loop Texture",
-        origin: "Danish Textile Mill",
-      },
-      {
-        id: "qc-bronze",
-        name: "Aged Patinated Bronze",
-        role: "Door Latches & Lighting Trim",
-        hex: "#5E5243",
-        finish: "Hand-Oxidized Living Finish",
-        origin: "Cast Bronze Atelier",
-      },
-      {
-        id: "qc-olive",
-        name: "Muted Olive Mohair Velvet",
-        role: "Accent Cushions & Drapes",
-        hex: "#575E4A",
-        finish: "Deep Luster Matte Velvet",
-        origin: "Custom Dye",
-      },
+      { id: "qc-walnut", name: "Deep walnut", role: "Cabinetry & shelving", hex: "#3E2D23", finish: "Rich, warm timber" },
+      { id: "qc-marble", name: "Pale marble", role: "Counters & feature surfaces", hex: "#F0EDE6", finish: "Delicate natural veining" },
+      { id: "qc-boucle", name: "Cream bouclé", role: "Armchairs & headboards", hex: "#E4DFD5", finish: "A soft, looped texture" },
+      { id: "qc-bronze", name: "Aged bronze", role: "Lighting & hardware", hex: "#5E5243", finish: "A warm, muted patina" },
+      { id: "qc-olive", name: "Olive velvet", role: "Cushions & curtains", hex: "#575E4A", finish: "Soft colour with gentle depth" },
     ],
   },
 ];
 
 export function MaterialMoodSelector() {
   const [activePaletteId, setActivePaletteId] = useState<PaletteMood["id"]>("warm-minimal");
-  const [selectedSwatch, setSelectedSwatch] = useState<SwatchItem | null>(null);
-  const { toggleItem, hasItem, addItem } = useSpaceCollection();
+  const [selectedSwatchId, setSelectedSwatchId] = useState<string | null>(null);
+  const { toggleItem, hasItem, addItem, removeItem } = useSpaceCollection();
 
-  const current = PALETTES.find((p) => p.id === activePaletteId) || PALETTES[0];
-  const activeSwatch = selectedSwatch || current.swatches[0];
+  const current = PALETTES.find((palette) => palette.id === activePaletteId) || PALETTES[0];
+  const activeSwatch = current.swatches.find((swatch) => swatch.id === selectedSwatchId) || current.swatches[0];
+  const isPaletteSaved = current.swatches.every((swatch) => hasItem(swatch.id));
+  const isSwatchSaved = hasItem(activeSwatch.id);
 
-  const handleSaveWholePalette = () => {
-    current.swatches.forEach((s) => {
-      addItem({
-        id: s.id,
-        type: "material",
-        title: s.name,
-        subtitle: `${current.name} • ${s.role}`,
-        hex: s.hex,
-        notes: `${s.finish} | ${s.origin}`,
-      });
+  const collectionItem = (swatch: SwatchItem) => ({
+    id: swatch.id,
+    type: "material" as const,
+    title: swatch.name,
+    subtitle: `${current.name} • ${swatch.role}`,
+    hex: swatch.hex,
+    notes: `${swatch.finish}. Material palette inspiration.`,
+  });
+
+  const togglePalette = () => {
+    current.swatches.forEach((swatch) => {
+      if (isPaletteSaved) removeItem(swatch.id);
+      else addItem(collectionItem(swatch));
     });
   };
 
   return (
-    <section className="section bg-[#F4F0E8] relative">
+    <section id="materials" aria-labelledby="material-mood-heading" className="scroll-mt-24 bg-[#F4F0E8] py-20 sm:py-24 lg:py-28">
       <div className="container">
-        {/* Section Header */}
-        <div className="max-w-3xl mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF7F2] border border-[#DDD5C8] text-[11px] font-semibold tracking-widest uppercase text-[#727A61] mb-3">
-            <span className="w-2 h-2 rounded-full bg-[#727A61]" />
-            <span>Tactile Materiality</span>
+        <div className="mb-9 flex flex-col justify-between gap-6 md:flex-row md:items-end lg:mb-11">
+          <div>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#727A61]">
+              Find your feeling
+            </p>
+            <h2 id="material-mood-heading" className="font-serif text-4xl font-normal leading-[1.1] tracking-tight text-[#242622] sm:text-5xl lg:text-6xl">
+              Every space starts<br className="hidden sm:block" /> with a feeling.
+            </h2>
           </div>
-
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#242622] tracking-tight leading-[1.15]">
-            Discover Your Material Mood
-          </h2>
-
-          <p className="text-base sm:text-lg text-[#5A6057] mt-3 leading-relaxed">
-            Interiors are felt as much as seen. Select a curated material palette below to experience how hand-selected stones, native timbers, and architectural metals establish the emotional temperature of your home.
+          <p className="max-w-sm text-base leading-7 text-[#5A6057] md:pb-1">
+            Explore three directions. Pick the colours and textures you love, and save them to your collection.
           </p>
         </div>
 
-        {/* 3 Palette Switcher Tabs */}
-        <div className="flex flex-wrap gap-2 sm:gap-3 p-1.5 rounded-xl bg-[#FAF7F2] border border-[#DDD5C8] max-w-2xl mb-10">
-          {PALETTES.map((palette) => {
+        <div role="group" aria-label="Choose a material mood" className="mb-7 flex flex-wrap gap-2">
+          {PALETTES.map((palette, index) => {
             const isActive = palette.id === activePaletteId;
             return (
               <button
                 key={palette.id}
+                type="button"
+                aria-pressed={isActive}
+                aria-controls="material-mood-content"
                 onClick={() => {
                   setActivePaletteId(palette.id);
-                  setSelectedSwatch(null);
+                  setSelectedSwatchId(null);
                 }}
-                className={`flex-1 min-w-[140px] px-4 py-3 rounded-lg text-left transition-all duration-300 ${
+                className={`inline-flex min-h-11 items-center gap-3 rounded-full border px-4 py-3 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#575E4A] sm:px-5 sm:text-sm ${
                   isActive
-                    ? "bg-[#242622] text-[#FAF7F2] shadow-md"
-                    : "text-[#5A6057] hover:text-[#242622] hover:bg-[#EAE3D5]"
+                    ? "border-[#575E4A] bg-[#575E4A] text-white"
+                    : "border-[#D4D0C5] bg-transparent text-[#5A6057] hover:border-[#575E4A] hover:bg-[#EAE3D5]"
                 }`}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-serif text-base font-semibold">{palette.name}</span>
-                  <div className="flex -space-x-1">
-                    {palette.swatches.slice(0, 3).map((sw) => (
-                      <span
-                        key={sw.id}
-                        className="w-2.5 h-2.5 rounded-full border border-black/20"
-                        style={{ backgroundColor: sw.hex }}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div
-                  className={`text-[10px] tracking-wider uppercase truncate ${
-                    isActive ? "text-[#DDD5C8]" : "text-[#727A61]"
-                  }`}
-                >
-                  {palette.subtitle}
-                </div>
+                <span aria-hidden="true" className={isActive ? "text-white/65" : "text-[#727A61]"}>0{index + 1}</span>
+                {palette.name}
               </button>
             );
           })}
         </div>
 
-        {/* Main Interactive Grid */}
-        <div className="grid lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Mood Photography with Crossfade */}
-          <div className="lg:col-span-7 space-y-4">
-            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-[#DDD5C8] bg-[#DDD5C8] shadow-lg group">
-              <Image
-                key={current.heroImage}
-                src={current.heroImage}
-                alt={`${current.name} interior style`}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 60vw"
-                className="object-cover transition-all duration-700 animate-fade-in"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#242622]/70 via-transparent to-transparent pointer-events-none" />
-
-              <div className="absolute bottom-4 left-5 right-5 text-white z-10 flex items-end justify-between">
-                <div>
-                  <span className="architectural-tag text-[#DDD5C8] block text-[10px]">
-                    Aesthetic Mood • {current.name}
-                  </span>
-                  <h4 className="font-serif text-xl sm:text-2xl font-medium mt-0.5">
-                    {current.headline}
-                  </h4>
-                </div>
-                <Link
-                  href={`/portfolio/${current.matchingProjectSlug}`}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/20 backdrop-blur-md text-white text-xs font-semibold hover:bg-white/30 transition-colors"
-                >
-                  <span>See Case Study</span>
-                  <span>→</span>
-                </Link>
-              </div>
-            </div>
-
-            {/* Mood Statement & Narrative */}
-            <div className="p-6 rounded-xl bg-[#FAF7F2] border border-[#DDD5C8] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="max-w-xl">
-                <p className="text-xs sm:text-sm text-[#5A6057] leading-relaxed">
-                  {current.description}
-                </p>
-              </div>
-              <button
-                onClick={handleSaveWholePalette}
-                className="btn btn-clay text-xs px-4 py-2.5 shrink-0 flex items-center gap-1.5 shadow-sm"
-              >
-                <FiBookmark size={13} />
-                <span>Save Mood to Collection</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Right Column: Tactile Swatches & Inspection */}
-          <div className="lg:col-span-5 space-y-5">
-            <div className="flex items-center justify-between pb-2 border-b border-[#DDD5C8]">
-              <span className="architectural-tag text-[#727A61]">Material Curation Board</span>
-              <span className="text-[11px] font-mono text-[#5A6057]">5 Key Specifications</span>
-            </div>
-
-            {/* Swatch List */}
-            <div className="space-y-2.5">
-              {current.swatches.map((swatch) => {
-                const isFocused = activeSwatch.id === swatch.id;
-                const isSaved = hasItem(swatch.id);
-                return (
-                  <div
-                    key={swatch.id}
-                    onClick={() => setSelectedSwatch(swatch)}
-                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
-                      isFocused
-                        ? "bg-[#FAF7F2] border-[#A45138] ring-1 ring-[#A45138] shadow-md"
-                        : "bg-[#FAF7F2]/70 border-[#DDD5C8] hover:bg-[#FAF7F2] hover:border-[#727A61]"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      {/* Physical Swatch Pill */}
-                      <span
-                        className="w-8 h-8 rounded-lg border border-black/15 shadow-inner shrink-0"
-                        style={{ backgroundColor: swatch.hex }}
-                      />
-                      <div className="min-w-0">
-                        <div className="font-serif text-sm font-semibold text-[#242622] truncate">
-                          {swatch.name}
-                        </div>
-                        <div className="text-[11px] text-[#727A61] truncate">{swatch.role}</div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-[10px] font-mono text-[#5A6057] hidden sm:inline">
-                        {swatch.hex}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleItem({
-                            id: swatch.id,
-                            type: "material",
-                            title: swatch.name,
-                            subtitle: `${current.name} • ${swatch.role}`,
-                            hex: swatch.hex,
-                            notes: `${swatch.finish} | ${swatch.origin}`,
-                          });
-                        }}
-                        className={`p-2 rounded-lg transition-colors ${
-                          isSaved
-                            ? "bg-[#A45138] text-white"
-                            : "text-[#5A6057] hover:text-[#A45138] hover:bg-[#EAE3D5]"
-                        }`}
-                        title={isSaved ? "Saved to collection" : "Save this material swatch"}
-                      >
-                        {isSaved ? <FiCheck size={14} /> : <FiBookmark size={14} />}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Active Swatch Specimen Card */}
-            <div className="p-4 rounded-xl bg-[#242622] text-[#FAF7F2] space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="architectural-tag text-[#DDD5C8]">Material Spec Sheet</span>
-                <span
-                  className="w-3 h-3 rounded-full border border-white/20"
-                  style={{ backgroundColor: activeSwatch.hex }}
-                />
-              </div>
-
+        <div id="material-mood-content" className="grid overflow-hidden rounded-2xl border border-[#DDD5C8] lg:grid-cols-[1.2fr_1fr]">
+          <figure className="relative min-h-[340px] bg-[#DDD5C8] sm:min-h-[430px] lg:min-h-[570px]">
+            <Image
+              src={current.heroImage}
+              alt={current.imageAlt}
+              fill
+              sizes="(max-width: 1023px) 100vw, 55vw"
+              className="object-cover"
+            />
+            <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+            <figcaption className="absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-4 p-6 text-white sm:p-8">
               <div>
-                <h5 className="font-serif text-lg font-medium text-white">{activeSwatch.name}</h5>
-                <p className="text-xs text-[#DDD5C8] font-mono mt-0.5">ROLE: {activeSwatch.role}</p>
+                <span className="block text-xs uppercase tracking-[0.18em] text-white/80">The mood</span>
+                <span className="mt-1 block font-serif text-3xl">{current.name}</span>
+              </div>
+              <span className="text-xs leading-5 text-white/85">Stock photography<br />Mood inspiration</span>
+            </figcaption>
+          </figure>
+
+          <div className="flex flex-col bg-[#EEF0E9] p-6 sm:p-9 lg:p-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#575E4A]">{current.subtitle}</p>
+            <h3 className="mt-4 max-w-sm font-serif text-3xl font-normal leading-[1.15] text-[#242622] sm:text-4xl">
+              {current.headline}
+            </h3>
+            <p className="mt-4 text-base leading-7 text-[#5A6057]">{current.description}</p>
+
+            <div className="mt-8">
+              <div className="mb-3 flex items-center justify-between gap-3 text-xs uppercase tracking-[0.12em] text-[#5A6057]">
+                <span>Touch of texture</span>
+                <span>Select a swatch</span>
+              </div>
+              <div role="group" aria-label={`${current.name} material swatches`} className="grid grid-cols-5 gap-2 sm:gap-3">
+                {current.swatches.map((swatch) => {
+                  const isSelected = activeSwatch.id === swatch.id;
+                  return (
+                    <button
+                      key={swatch.id}
+                      type="button"
+                      aria-label={`${swatch.name}${hasItem(swatch.id) ? ", saved to collection" : ""}`}
+                      aria-pressed={isSelected}
+                      aria-controls="selected-material-detail"
+                      onClick={() => setSelectedSwatchId(swatch.id)}
+                      title={swatch.name}
+                      className={`relative h-16 rounded-lg border border-black/10 transition-shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#575E4A] sm:h-[72px] ${
+                        isSelected ? "ring-1 ring-[#575E4A] ring-offset-[3px] ring-offset-[#EEF0E9]" : "hover:ring-1 hover:ring-[#9EA58F] hover:ring-offset-2 hover:ring-offset-[#EEF0E9]"
+                      }`}
+                      style={{ backgroundColor: swatch.hex }}
+                    >
+                      {isSelected && <FiCheck aria-hidden="true" className="absolute bottom-2 right-2 rounded-full bg-[#FAF7F2] p-1 text-[#242622]" size={22} />}
+                    </button>
+                  );
+                })}
               </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/10 text-xs">
-                <div>
-                  <span className="text-[#727A61] text-[10px] uppercase tracking-wider block">
-                    Surface Finish
-                  </span>
-                  <span className="text-white font-medium">{activeSwatch.finish}</span>
+              <div id="selected-material-detail" className="mt-5 flex min-h-[76px] items-start justify-between gap-3 border-b border-[#D0D6C7] pb-5">
+                <div aria-live="polite" aria-atomic="true">
+                  <p className="text-sm font-semibold text-[#242622]">{activeSwatch.name}</p>
+                  <p className="mt-1 text-xs leading-5 text-[#5A6057]">{activeSwatch.role} · {activeSwatch.finish}</p>
                 </div>
-                <div>
-                  <span className="text-[#727A61] text-[10px] uppercase tracking-wider block">
-                    Origin & Fabrication
-                  </span>
-                  <span className="text-white font-medium">{activeSwatch.origin}</span>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleItem(collectionItem(activeSwatch))}
+                  aria-pressed={isSwatchSaved}
+                  aria-label={`${isSwatchSaved ? "Remove" : "Save"} ${activeSwatch.name} ${isSwatchSaved ? "from" : "to"} collection`}
+                  title={isSwatchSaved ? "Remove material from collection" : "Save this material"}
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#575E4A] ${
+                    isSwatchSaved ? "border-[#575E4A] bg-[#575E4A] text-white" : "border-[#C9CDBF] text-[#575E4A] hover:bg-white/60"
+                  }`}
+                >
+                  {isSwatchSaved ? <FiCheck aria-hidden="true" size={17} /> : <FiBookmark aria-hidden="true" size={17} />}
+                </button>
               </div>
+            </div>
+
+            <div className="mt-auto pt-6">
+              <button
+                type="button"
+                onClick={togglePalette}
+                aria-pressed={isPaletteSaved}
+                aria-label={`${isPaletteSaved ? "Remove" : "Save"} ${current.name} palette ${isPaletteSaved ? "from" : "to"} collection`}
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-full bg-[#575E4A] px-5 py-3.5 text-xs font-semibold text-white transition-colors hover:bg-[#414837] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#575E4A]"
+              >
+                {isPaletteSaved ? <FiCheck aria-hidden="true" size={16} /> : <FiBookmark aria-hidden="true" size={16} />}
+                {isPaletteSaved ? "Palette saved to your collection" : "Save this palette"}
+              </button>
+              <Link href="/design-brief" className="mt-4 flex min-h-11 items-center justify-center gap-2 text-xs font-medium text-[#575E4A] underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#575E4A]">
+                Make it part of your design brief <FiArrowUpRight aria-hidden="true" size={15} />
+              </Link>
             </div>
           </div>
         </div>

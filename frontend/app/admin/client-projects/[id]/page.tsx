@@ -26,6 +26,7 @@ export default function ClientProjectDetailPage() {
   const [changeOrders, setChangeOrders] = useState<ChangeOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [renewingPortal, setRenewingPortal] = useState(false);
 
   // New Proposal Modal
   const [showNewProposal, setShowNewProposal] = useState(false);
@@ -246,6 +247,11 @@ export default function ClientProjectDetailPage() {
               <p className="text-[11px] text-[#788278] mb-2">
                 Share this secure link with the client for their private portal.
               </p>
+              {project.portal_token_expires_at && (
+                <p className="mb-3 text-xs text-admin-muted">
+                  Expires {new Date(project.portal_token_expires_at).toLocaleDateString()}.
+                </p>
+              )}
               <div className="flex items-center gap-2">
                 <code className="flex-1 bg-white border border-admin-border rounded-lg px-3 py-2 text-[11px] text-admin-muted break-all">
                   {typeof window !== "undefined" && window.location.origin}/portal/{project.portal_token}
@@ -257,6 +263,31 @@ export default function ClientProjectDetailPage() {
                   Copy
                 </button>
               </div>
+              <button
+                disabled={renewingPortal}
+                onClick={async () => {
+                  setRenewingPortal(true);
+                  try {
+                    const result = await adminFetch<{ portal_token: string; portal_token_expires_at: string }>(
+                      `clients/${project.client_id}/portal-link`, { method: "POST" },
+                    );
+                    if (result.success && result.data) {
+                      setProject({ ...project, portal_token: result.data.portal_token,
+                        portal_token_expires_at: result.data.portal_token_expires_at });
+                    } else {
+                      setError(result.error || "Could not replace portal link.");
+                    }
+                  } catch {
+                    setError("Could not replace portal link. Please try again.");
+                  } finally {
+                    setRenewingPortal(false);
+                  }
+                }}
+                className="mt-3 min-h-11 text-xs font-semibold text-admin-primary disabled:opacity-50"
+              >
+                {renewingPortal ? "Replacing link…" : "Replace link · valid for 30 days"}
+              </button>
+              <p className="text-xs text-admin-muted">Replacing the link immediately disables the previous one.</p>
             </div>
           )}
         </div>

@@ -1,5 +1,8 @@
 "use client";
 
+import { writeBrowserStorage } from "../lib/browser-storage";
+import { isSafePublicHref } from "../lib/safe-url";
+
 import { useState, useEffect, useRef, useTransition } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -196,12 +199,7 @@ function playChime(type: "send" | "receive" | "pop") {
 
 // --- Inline Rich Text Parser ---
 function isSafeChatHref(href: string) {
-  return (
-    /^https?:\/\//i.test(href) ||
-    /^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(href) ||
-    /^tel:\+?[0-9().\-\s]+$/i.test(href) ||
-    /^\/(?!\/)[a-zA-Z0-9/_%.-]*$/.test(href)
-  );
+  return isSafePublicHref(href);
 }
 
 function renderLinkedText(text: string, tone: "assistant" | "user") {
@@ -1030,15 +1028,16 @@ export function ChatWidget() {
   const toggleSound = () => {
     const next = !soundEnabled;
     setSoundEnabled(next);
-    localStorage.setItem(SOUND_KEY, String(next));
+    writeBrowserStorage("localStorage", SOUND_KEY, String(next));
     if (next) playChime("pop");
   };
 
   const chooseVoiceStyle = (style: VoiceStyle) => {
     setVoiceStyle(style);
-    localStorage.setItem(VOICE_STYLE_KEY, style);
+    writeBrowserStorage("localStorage", VOICE_STYLE_KEY, style);
     setShowVoiceMenu(false);
 
+    if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) return;
     window.speechSynthesis.cancel();
     const preview = new SpeechSynthesisUtterance(
       language === "bn" ? "স্বাগতম। আপনার সুন্দর ঘরের পরিকল্পনা নিয়ে কথা বলি।" : "Welcome. Let's create a beautiful space together."

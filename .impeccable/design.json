@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-09T00:00:00.000Z",
+  "title": "Design System: Bangla Sketch (বাংলা স্কেচ)",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Burnt Clay (Terracotta)",
+        "canonical": "#A45138",
+        "tonalRamp": ["#421A10", "#632717", "#893E28", "#A45138", "#B8654D", "#D28B76", "#E8BDB0", "#F8ECE9"]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Studio Olive",
+        "canonical": "#727A61",
+        "tonalRamp": ["#25291E", "#3D4332", "#575E4A", "#727A61", "#8C9678", "#AAB398", "#CCD3BE", "#EEF1EA"]
+      },
+      "accent-gold": {
+        "role": "tertiary",
+        "displayName": "Architectural Gold",
+        "canonical": "#C5A059",
+        "tonalRamp": ["#463412", "#6C501C", "#936D28", "#C5A059", "#D7B573", "#E8CE8A", "#F4E3B8", "#FAF3DF"]
+      },
+      "neutral-canvas": {
+        "role": "neutral",
+        "displayName": "Warm Ivory Light",
+        "canonical": "#FAF7F2",
+        "tonalRamp": ["#242622", "#5A6057", "#8C948C", "#C8BDB0", "#DDD5C8", "#EAE3D5", "#F4F0E8", "#FAF7F2"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display (Serif)",
+        "purpose": "Hero headlines and main editorial statement titles."
+      },
+      "headline": {
+        "displayName": "Headline (Serif)",
+        "purpose": "Major section headings and project titles."
+      },
+      "body": {
+        "displayName": "Body (Sans)",
+        "purpose": "General editorial copy, project narratives, and form labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-rest",
+        "value": "0 2px 12px rgba(36, 40, 36, 0.03)",
+        "purpose": "Resting shadow for portfolio and journal cards."
+      },
+      {
+        "name": "card-hover",
+        "value": "0 14px 32px rgba(36, 40, 36, 0.07)",
+        "purpose": "Elevated lift state on mouse hover."
+      },
+      {
+        "name": "cta-glow",
+        "value": "0 4px 14px rgba(164, 81, 56, 0.2)",
+        "purpose": "Soft warm halo for primary Burnt Clay CTAs."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-architectural",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Default fluid easing for cards, buttons, and drawer transitions."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1440px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Consultation Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary call-to-action button for consultations and urgent leads.",
+      "html": "<button class=\"ds-btn-primary\">Book a Consultation <span style=\"margin-left:8px;\">↗</span></button>",
+      "css": ".ds-btn-primary { background: #A45138; color: #FFFFFF; padding: 12px 24px; font-family: var(--font-manrope, sans-serif); font-size: 14px; font-weight: 600; border-radius: 4px; border: 1px solid #A45138; box-shadow: 0 4px 14px rgba(164,81,56,0.2); cursor: pointer; transition: background 0.2s cubic-bezier(0.16,1,0.3,1), transform 0.2s cubic-bezier(0.16,1,0.3,1); display: inline-flex; align-items: center; justify-content: center; } .ds-btn-primary:hover { background: #893E28; transform: translateY(-2px); box-shadow: 0 8px 22px rgba(164,81,56,0.3); }"
+    },
+    {
+      "name": "Studio Charcoal Action Button",
+      "kind": "button",
+      "refersTo": "button-charcoal",
+      "description": "Bold editorial button for main navigation and primary surface interactions.",
+      "html": "<button class=\"ds-btn-charcoal\">Explore Portfolio <span style=\"margin-left:16px;\">→</span></button>",
+      "css": ".ds-btn-charcoal { background: #242622; color: #FAF7F2; padding: 15px 22px; font-family: var(--font-manrope, sans-serif); font-size: 12px; font-weight: 600; border-radius: 4px; border: 1px solid #242622; cursor: pointer; transition: background 0.2s ease, transform 0.2s ease; display: inline-flex; align-items: center; justify-content: space-between; } .ds-btn-charcoal:hover { background: #575E4A; border-color: #575E4A; transform: translateY(-1px); }"
+    },
+    {
+      "name": "Architectural Category Chip",
+      "kind": "chip",
+      "refersTo": "badge-olive",
+      "description": "Tag badge for space categories and architectural disciplines.",
+      "html": "<span class=\"ds-chip-olive\">Residential Interior</span>",
+      "css": ".ds-chip-olive { display: inline-flex; align-items: center; padding: 4px 12px; background: #EEF1EA; color: #575E4A; border: 1px solid #DDD5C8; border-radius: 9999px; font-family: var(--font-manrope, sans-serif); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }"
+    },
+    {
+      "name": "Architectural Input Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Standard form input for booking and design brief workflows.",
+      "html": "<input type=\"text\" class=\"ds-input-field\" placeholder=\"e.g. Gulshan 2, Apartment (3,200 sqft)\" />",
+      "css": ".ds-input-field { width: 100%; padding: 14px 18px; border-radius: 8px; border: 1.5px solid #DDD5C8; background: #FAF7F2; color: #242622; font-family: var(--font-manrope, sans-serif); font-size: 15px; transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; outline: none; } .ds-input-field:focus { border-color: #727A61; background-color: #FFFFFF; box-shadow: 0 0 0 3px rgba(88,99,72,0.15); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Warm Architectural Sanctuary",
+    "overview": "Bangla Sketch's visual system evokes the quiet luxury of a master architect's atelier in Dhaka. It rejects sterile, clinical minimalism and synthetic neon palettes in favor of organic tactile warmth: hand-laid limestone, sunlit ivory plaster, natural earthen terracotta clay, and weathered studio olive. The atmosphere is calm, contemplative, and editorial—treating every home interior as a work of fine art and enduring physical craftsmanship.",
+    "keyCharacteristics": [
+      "Warm Plaster Canvas (Ivory #FAF7F2 / #F4F0E8)",
+      "Earthen Materiality (Terracotta #A45138, Olive #727A61, Limestone #DDD5C8)",
+      "Editorial Typographic Harmony (Instrument Serif & Manrope + Noto Serif/Sans Bengali)",
+      "Hairline Architectural Precision (1px structural framing over noisy shadows)"
+    ],
+    "rules": [
+      {
+        "name": "The Rarity of Clay Rule",
+        "body": "Burnt Clay (#A45138) is reserved exclusively for primary calls to action, saved counts, and active focus points. It should occupy <=5% of visual screen surface to maintain its urgent, premium pull.",
+        "section": "colors"
+      },
+      {
+        "name": "The Organic Paper Rule",
+        "body": "Never use pure digital white (#FFFFFF) for background expanses on the public website. Always use Warm Ivory (#FAF7F2 / #F4F0E8) to preserve tactile organic warmth.",
+        "section": "colors"
+      },
+      {
+        "name": "The Typographic Balance Rule",
+        "body": "All headlines must have text-wrap: balance and body paragraphs text-wrap: pretty to ensure zero orphaned words across responsive viewport widths.",
+        "section": "typography"
+      },
+      {
+        "name": "The Bilingual Parity Rule",
+        "body": "When rendering Bengali text, line heights expand automatically (line-height: 1.8 for body, 1.45 for headings) to accommodate conjunct character ascenders and descenders without clipping.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hairline Framing Rule",
+        "body": "Every elevated container must pair its elevation with a subtle 1px border (border: 1px solid var(--color-limestone)), ensuring crisp edge definition even in high-glare lighting environments.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use var(--color-ivory-light) (#FAF7F2) and var(--color-ivory) (#F4F0E8) for page and container backgrounds.",
+      "Do pair Instrument Serif / Noto Serif Bengali for headlines with Manrope / Noto Sans Bengali for body copy.",
+      "Do wrap headlines in text-wrap: balance and body copy in text-wrap: pretty.",
+      "Do keep interactive hover transitions between 180ms and 220ms with custom cubic-bezier easing (cubic-bezier(0.16, 1, 0.3, 1)).",
+      "Do provide explicit touch targets of at least 44px height for all mobile interactive controls."
+    ],
+    "donts": [
+      "Don't use pure black (#000000) or pure white (#FFFFFF) as large surface backgrounds.",
+      "Don't use aggressive, saturated neon colors or generic cold grays (#6B7280).",
+      "Don't use heavy, blurry drop shadows without a bounding 1px architectural hairline border.",
+      "Don't crowd headlines—always ensure generous top and bottom breathing room (minimum 3rem padding).",
+      "Don't disable focus indicators—always preserve the 2px Studio Olive outline with 3px offset for keyboard accessibility."
+    ]
+  }
+}

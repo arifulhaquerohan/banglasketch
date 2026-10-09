@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -49,9 +50,14 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const rawFeaturedImage =
     project.featured_image || project.coverImage || "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&q=85";
   const featuredImage = getOptimizedCloudinaryUrl(rawFeaturedImage, { width: 1920, quality: "auto:good" });
+  const isInspiration = rawFeaturedImage.includes("images.unsplash.com");
   const gallery = (project.gallery || []).map((img) =>
     getOptimizedCloudinaryUrl(img, { width: 1200, quality: "auto:good" })
   );
+  const projectFacts = [
+    ["Location", project.location], ["Size", project.area], ["Design style", project.style],
+    ["Timeline", project.timeline], ["Completed", project.year],
+  ].filter(([, value]) => Boolean(value));
 
   const projectJsonLd = {
     "@context": "https://schema.org",
@@ -64,7 +70,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="pt-24 bg-[#F4F0E8]">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(projectJsonLd) }} />
+      <script suppressHydrationWarning nonce={(await headers()).get("x-nonce") ?? undefined} type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(projectJsonLd) }} />
 
       {/* Hero: Large architectural photo with warm charcoal scrim */}
       <section className="relative h-[60vh] min-h-[460px] max-h-[660px] overflow-hidden">
@@ -80,24 +86,17 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         <div className="absolute bottom-0 left-0 right-0 container py-10 z-10">
           <AnimateOnScroll>
             <div className="flex flex-wrap items-center gap-2 mb-3">
+              {isInspiration && <span className="rounded-full bg-ivory-light px-3 py-1 text-xs font-semibold text-charcoal">Design inspiration</span>}
               <span className="px-3 py-1 rounded-full bg-[#FAF7F2]/95 text-[#575E4A] text-xs font-semibold uppercase tracking-wider backdrop-blur-xs border border-[#DDD5C8]">
                 {project.category.replace("-", " ")}
               </span>
-              <span className="inline-flex items-center gap-1.5 text-xs text-[#EAE3D5] bg-[#242622]/70 backdrop-blur-xs px-3 py-1 rounded-full border border-white/10 font-medium">
-                <FiMapPin className="text-[#A45138]" /> {project.location || "Dhaka, Bangladesh"}
-              </span>
-              <span className="inline-flex items-center gap-1.5 text-xs text-[#EAE3D5] bg-[#242622]/70 backdrop-blur-xs px-3 py-1 rounded-full border border-white/10 font-medium">
-                <FiCalendar className="text-[#C5A059]" /> {project.year || "2026"}
-              </span>
+              {project.location && <span className="inline-flex items-center gap-1.5 text-xs text-[#EAE3D5] bg-[#242622]/70 px-3 py-1 rounded-full"><FiMapPin /> {project.location}</span>}
+              {project.year && <span className="inline-flex items-center gap-1.5 text-xs text-[#EAE3D5] bg-[#242622]/70 px-3 py-1 rounded-full"><FiCalendar /> {project.year}</span>}
             </div>
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-semibold text-white tracking-tight mb-2 leading-tight">
               {project.title}
             </h1>
-            <div className="flex items-center gap-3 text-xs sm:text-sm text-[#DDD5C8] font-mono">
-              <span>Area: {project.area || "Bespoke Residence"}</span>
-              <span>•</span>
-              <span>Style: {project.style || "Quiet Luxury"}</span>
-            </div>
+            {project.area && <p className="text-sm text-[#DDD5C8]">{project.area}</p>}
           </AnimateOnScroll>
         </div>
       </section>
@@ -105,6 +104,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       {/* Content Section */}
       <section className="section bg-[#FAF7F2] border-b border-[#DDD5C8]/70">
         <div className="container max-w-4xl">
+          {projectFacts.length > 0 && <dl className="mb-12 grid grid-cols-2 gap-6 border-b border-limestone pb-8 sm:grid-cols-3">
+            {projectFacts.map(([label, value]) => <div key={label}><dt className="mb-2 text-xs uppercase tracking-widest text-olive-dark">{label}</dt><dd className="text-base text-charcoal">{value}</dd></div>)}
+          </dl>}
           <AnimateOnScroll>
             <div className="space-y-4 mb-12">
               <span className="text-xs font-semibold uppercase tracking-widest text-[#727A61] font-mono">
@@ -113,6 +115,12 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               <p className="font-serif text-xl md:text-2xl text-[#242622] leading-relaxed">
                 {project.description}
               </p>
+            </div>
+
+            <div className="mb-12 grid gap-8 sm:grid-cols-2">
+              {[["The brief", project.design_challenge], ["Our design response", project.design_solution], ["Scope of work", project.scope], ["Materials & finishes", project.materials]].filter(([, text]) => Boolean(text)).map(([title, text]) => (
+                <section key={title} className="border-t border-limestone pt-6"><h2 className="mb-4 text-3xl font-normal">{title}</h2><p className="whitespace-pre-line text-base leading-8 text-charcoal-muted">{text}</p></section>
+              ))}
             </div>
 
             {/* Save to Collection & Specification Strip */}
@@ -155,7 +163,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                     before={project.before_image}
                     after={project.after_image}
                     beforeCaption="Original Site State"
-                    afterCaption="Bangla Sketch Handover"
+                    afterCaption="After"
                   />
                 </div>
               </div>
@@ -172,7 +180,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                       Craft & Materiality
                     </span>
                     <h3 className="font-serif text-2xl font-semibold text-[#242622] mt-1">
-                      Project Photography
+                      {isInspiration ? "Interior inspiration" : "Project photography"}
                     </h3>
                   </div>
                   <span className="text-xs text-[#727A61] font-medium hidden sm:inline">Click image to expand</span>
@@ -208,11 +216,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 Love This Architectural Direction?
               </h2>
               <p className="text-sm text-[#5A6057] max-w-lg mx-auto mb-6 leading-relaxed">
-                Connect with our lead architect to discuss spatial layouts, teak millwork, and turnkey execution in Dhaka.
+                Tell us what you like about this space. We’ll discuss the layout, materials, and scope that could work for your project.
               </p>
               <div className="flex flex-wrap gap-3 justify-center">
                 <Link href="/contact" className="btn btn-clay text-xs px-7 py-3.5 shadow-sm">
-                  <span>Book Free Studio Consultation</span>
+                  <span>Discuss your project</span>
                   <FiArrowRight size={14} />
                 </Link>
                 <Link href="/cost-estimator" className="btn btn-secondary text-xs px-7 py-3.5">

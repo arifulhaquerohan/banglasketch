@@ -1,5 +1,7 @@
 "use client";
 
+import { ProjectCaseStudyFields, EMPTY_CASE_STUDY, type CaseStudyFields } from "../../../../components/admin/ProjectCaseStudyFields";
+
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -9,13 +11,13 @@ import { GalleryUpload } from "../../../../components/admin/GalleryUpload";
 import { adminFetch, Project } from "../../../../lib/api";
 import VersionHistoryModal from "../../../../components/admin/VersionHistoryModal";
 
-interface ProjectFormState {
+interface ProjectFormState extends CaseStudyFields {
   title: string; slug: string; category: string; description: string; image: string;
   gallery: string[];
   client: string; dateCompleted: string; status: "draft" | "published"; featured: boolean;
 }
 
-const emptyForm: ProjectFormState = { title: "", slug: "", category: "kitchen", description: "", image: "", gallery: [], client: "", dateCompleted: "", status: "draft", featured: false };
+const emptyForm: ProjectFormState = { ...EMPTY_CASE_STUDY, title: "", slug: "", category: "kitchen", description: "", image: "", gallery: [], client: "", dateCompleted: "", status: "draft", featured: false };
 
 export default function EditProjectPage() {
   const params = useParams<{ id: string }>();
@@ -33,6 +35,16 @@ export default function EditProjectPage() {
     const project = result.data?.find((item) => String(item.id) === String(params.id));
     if (!project) setError(result.error || "Project not found.");
     else setForm({
+      before_image: project.before_image || "", after_image: project.after_image || "", client_testimonial: project.client_testimonial || "",
+      location: project.location || "",
+      area: project.area || "",
+      style: project.style || "",
+      scope: project.scope || "",
+      materials: project.materials || "",
+      timeline: project.timeline || "",
+      design_challenge: project.design_challenge || "",
+      design_solution: project.design_solution || "",
+
       title: project.title, slug: project.slug, category: project.category, description: project.description || "",
       image: project.featured_image || project.coverImage || "", gallery: Array.isArray(project.gallery) ? project.gallery : [], client: project.client_name || "",
       dateCompleted: project.date_completed ? project.date_completed.slice(0, 10) : "",
@@ -49,6 +61,16 @@ export default function EditProjectPage() {
       title: form.title.trim(), slug: form.slug.trim(), category: form.category, description: form.description.trim(),
       featured_image: form.image || null, client_name: form.client || null, date_completed: form.dateCompleted || null,
       gallery: form.gallery,
+      location: form.location.trim(),
+      area: form.area.trim(),
+      style: form.style.trim(),
+      scope: form.scope.trim(),
+      materials: form.materials.trim(),
+      timeline: form.timeline.trim(),
+      before_image: form.before_image || null, after_image: form.after_image || null, client_testimonial: form.client_testimonial.trim(),
+      design_challenge: form.design_challenge.trim(),
+      design_solution: form.design_solution.trim(),
+
       featured: form.featured, published: form.status === "published",
     }) });
     setSaving(false);
@@ -180,6 +202,7 @@ export default function EditProjectPage() {
           </div>
 
           <div className="bg-admin-surface border border-admin-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <ProjectCaseStudyFields value={form} onChange={patch => setForm(current => ({ ...current, ...patch }))} />
             <h2 className="font-serif text-lg font-bold text-admin-ink">Gallery Media</h2>
             <p className="text-xs text-admin-muted">Upload project perspectives, render angles, and site photos.</p>
             <GalleryUpload
